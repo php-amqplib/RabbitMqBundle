@@ -71,7 +71,7 @@ Configure the `rabbitmq` service in your config:
 You have to configure at least one connection and one client. In the above
 example your service container will contain the service `rabbitmq.upload_picture_producer` and `rabbitmq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
 
-If you don't specify a connection for the client, the client will look for a connection with the same alias.
+If you don't specify a connection for the client, the client will look for a connection with the same alias. So for our `upload_picture` the service container will look for an `upload_picture` connection.
 
 ## Producers, Consumers, What? ##
 
