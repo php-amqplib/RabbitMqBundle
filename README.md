@@ -146,7 +146,7 @@ Keep in mind that because the callback class extends ContainerAware, it means it
 
 ### Recap ###
 
-This seems quite a lot, let's recap to have a better overview of how to produce/consume messages this is what we need:
+This seems quite a lot, let's recap to have a better overview. This is what we need to produce/consume messages.
 
 - Add an entry for the consumer/producer in the configuration.
 - Implement your callback.
