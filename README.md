@@ -167,10 +167,10 @@ Currently supported, not yet documented.
 
 Currently supported, not yet documented.
 
-### License ###
+## License ##
 
 See: resources/meta/LICENSE.md
 
-## Credits:
+## Credits: ##
 
 The bundle structure and the documentation is partially based on the (RedisBundle)[https://github.com/Seldaek/RedisBundle]
