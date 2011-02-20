@@ -2,15 +2,15 @@
 
 ## About ##
 
-The RabbitmqBundle incorporates messaging in your application via (Rabbitmq)[http://www.rabbitmq.com/] using the (php-amqplib)[http://github.com/tnc/php-amqplib] library.
+The RabbitmqBundle incorporates messaging in your application via [Rabbitmq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/tnc/php-amqplib) library.
 
-The bundle implements several messaging patterns as seen on the (Thumper)[https://github.com/videlalvaro/Thumper] library.
+The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library.
 
 All the examples expects a running RabbitMQ.
 
 ## Installation ##
 
-The following instructions expect a project created with the (Symfony2 sandbox PR6)[http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip]
+The following instructions expect a project created with the [Symfony2 sandbox PR6](http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip)
 
 Put the RabbitmqBundle into the src/ dir:
 
@@ -171,6 +171,6 @@ Currently supported, not yet documented.
 
 See: resources/meta/LICENSE.md
 
-## Credits: ##
+## Credits ##
 
-The bundle structure and the documentation is partially based on the (RedisBundle)[https://github.com/Seldaek/RedisBundle]
+The bundle structure and the documentation is partially based on the [RedisBundle](http://github.com/Seldaek/RedisBundle)
