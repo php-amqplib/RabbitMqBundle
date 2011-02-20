@@ -6,7 +6,7 @@ The RabbitMqBundle incorporates messaging in your application via [RabbitMq](htt
 
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library.
 
-All the examples expects a running RabbitMQ.
+All the examples expects a running RabbitMQ server.
 
 ## Installation ##
 
