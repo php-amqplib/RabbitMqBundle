@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Rabbitmq;
+namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 

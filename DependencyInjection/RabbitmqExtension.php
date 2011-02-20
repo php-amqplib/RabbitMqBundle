@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\DependencyInjection;
+namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class RabbitmqExtension extends Extension
+class RabbitMqExtension extends Extension
 {
     public function configLoad($configs, ContainerBuilder $container)
     {

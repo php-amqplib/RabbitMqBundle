@@ -1,10 +1,10 @@
 <?php
 
-namespace OldSound\RabbitmqBundle;
+namespace OldSound\RabbitMqBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class RabbitmqBundle extends Bundle
+class RabbitMqBundle extends Bundle
 {
     /**
      * {@inheritdoc}

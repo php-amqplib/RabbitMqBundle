@@ -1,8 +1,8 @@
-# RabbitmqBundle #
+# RabbitMqBundle #
 
 ## About ##
 
-The RabbitmqBundle incorporates messaging in your application via [Rabbitmq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/tnc/php-amqplib) library.
+The RabbitMqBundle incorporates messaging in your application via [RabbitMq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/tnc/php-amqplib) library.
 
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library.
 
@@ -12,10 +12,10 @@ All the examples expects a running RabbitMQ.
 
 The following instructions expect a project created with the [Symfony2 sandbox PR6](http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip)
 
-Put the RabbitmqBundle into the src/ dir:
+Put the RabbitMqBundle into the src/ dir:
 
     $ mkdir -p src/OldSound
-    $ git clone git://github.com/videlalvaro/RabbitmqBundle.git src/OldSound/RabbitmqBundle
+    $ git clone git://github.com/videlalvaro/RabbitMqBundle.git src/OldSound/RabbitMqBundle
 
 Put the [php-amqplib](http://github.com/tnc/php-amqplib) library into the vendor dir:
 
@@ -31,13 +31,13 @@ Add the [php-amqplib](http://github.com/tnc/php-amqplib) autoloading to your pro
         }
     });
 
-Add the RabbitmqBundle to your application's kernel:
+Add the RabbitMqBundle to your application's kernel:
 
     public function registerBundles()
     {
         $bundles = array(
             ...
-            new OldSound\RabbitmqBundle\RabbitmqBundle(),
+            new OldSound\RabbitMqBundle\RabbitMqBundle(),
             ...
         );
         ...
@@ -129,7 +129,7 @@ Here's an example callback:
     namespace Sensio\HelloBundle\Consumer;
 
     use Symfony\Component\DependencyInjection\ContainerAware;
-    use OldSound\RabbitmqBundle\Rabbitmq\ConsumerInterface;
+    use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
     class UploadPictureConsumer extends ContainerAware implements ConsumerInterface
     {

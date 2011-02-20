@@ -1,8 +1,8 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Rabbitmq;
+namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitmqBundle\Rabbitmq\Consumer;
+use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 
 class AnonConsumer extends Consumer
 {

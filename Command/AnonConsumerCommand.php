@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Command;
+namespace OldSound\RabbitMqBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use OldSound\RabbitmqBundle\Rabbitmq\ConsumerInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 class AnonConsumerCommand extends Command
 {

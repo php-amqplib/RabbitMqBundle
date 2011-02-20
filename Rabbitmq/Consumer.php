@@ -1,8 +1,8 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Rabbitmq;
+namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitmqBundle\Rabbitmq\BaseConsumer;
+use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
 
 class Consumer extends BaseConsumer
 {

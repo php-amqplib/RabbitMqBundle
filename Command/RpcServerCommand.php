@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Command;
+namespace OldSound\RabbitMqBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
-use OldSound\RabbitmqBundle\Rabbitmq\ConsumerInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 class RpcServerCommand extends Command
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace OldSound\RabbitmqBundle\Rabbitmq;
+namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitmqBundle\Rabbitmq\BaseAmqp;
+use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 
 class RpcServer extends BaseConsumer
 {
