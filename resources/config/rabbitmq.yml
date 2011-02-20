@@ -1,0 +1,7 @@
+parameters:
+    rabbitmq.connection.class:      AMQPConnection
+    rabbitmq.producer.class:        OldSound\RabbitmqBundle\Rabbitmq\Producer
+    rabbitmq.consumer.class:        OldSound\RabbitmqBundle\Rabbitmq\Consumer
+    rabbitmq.anon_consumer.class:   OldSound\RabbitmqBundle\Rabbitmq\AnonConsumer
+    rabbitmq.rpc_client.class:      OldSound\RabbitmqBundle\Rabbitmq\RpcClient
+    rabbitmq.rpc_server.class:      OldSound\RabbitmqBundle\Rabbitmq\RpcServer
