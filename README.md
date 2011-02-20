@@ -8,6 +8,8 @@ The bundle implements several messaging patterns as seen on the [Thumper](https:
 
 All the examples expects a running RabbitMQ server.
 
+This Bundle will be presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference.
+
 ## Installation ##
 
 The following instructions expect a project created with the [Symfony2 sandbox PR6](http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip)
