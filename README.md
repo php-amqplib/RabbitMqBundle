@@ -91,9 +91,9 @@ Now let's say that you want to process picture uploads in the background. After 
         $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
         ...
     }
-    
+
 As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __rabbitmq.upload\_picture\_producer__.
-    
+
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 
 ### Consumers ###
@@ -108,17 +108,17 @@ A consumer will connect to the server and start a __loop__  waiting for incoming
             queue_options:    {name: 'upload-picture'}
             callback:         @upload_picture_service
     ...
-    
+
 As we see there, the __callback__ option has a reference to an __upload\_picture\_service__. When the consumer gets a message from the server it will execute such callback. If for testing or debugging purposes you need to specify a different callback, then you can change it there. 
 
-Apart from the callback we also specify the connection to use, the same way as we do with a __producer__. The remaining options are the __exchange\_options__ and the __queue\_options__. The __exchange\_options__ should be the same ones as those used for the __producer__. In the __queue\_options__ we will provide a __queue name___. Why?
+Apart from the callback we also specify the connection to use, the same way as we do with a __producer__. The remaining options are the __exchange\_options__ and the __queue\_options__. The __exchange\_options__ should be the same ones as those used for the __producer__. In the __queue\_options__ we will provide a __queue name__. Why?
 
 As we said, messages in AMQP are published to an __exchange__. This doesn't mean the message has reached a __queue__. For this to happen, first we need to create such __queue__ and then bind it to the __exchange__. The cool thing about this is that you can bind several __queues__ to one __exchange__, in that way one message can arrive to several destinations. The advantage of this approach is the __decoupling__ from the producer and the consumer. The producer does not care about how many consumers will process his messages. All it needs is that his message arrives to the server. In this way we can expand the actions we perform every time a picture is uploaded without the need to change code in our controller.
 
 Now, how to run a consumer? There's a command for it that can be executed like this:
 
     $ ./app/console_dev rabbitmq:consumer -m 50 upload_picture
-    
+
 What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback. If you want to consumer messages __forever__, then pass the option __-1__ to the __m__ option.
 
 ### Callbacks ###
@@ -160,7 +160,7 @@ And that's it!
 
 ### RPC or Reply/Response ###
 
-So far we just have sent messages to the some consumers, but what if we want to get a reply from the consumer? To achieve this we have to implement RPC calls into our application. This bundle makes is pretty easy to achieve such things with Symfony2.
+So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes is pretty easy to achieve such things with Symfony2.
 
 Let's add a RPC client and server into the configuration:
 
