@@ -40,25 +40,8 @@ class RpcServerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         
-        $name = $input->getArgument('name');
-        
-        $callbackObj = $this->container->get(sprintf('%s_server', $name));
-        
-        if($callbackObj instanceof ConsumerInterface)
-        {
-            $server = $this->container->get(sprintf('rabbitmq.%s_server', $name));
-            
-            $callbackObj->setContainer($this->container);
-            
-            $server->setCallback(array($callbackObj, 'execute'));
-            $server->start();
-        }
-        else
-        {
-            throw new InvalidConfigurationException(sprintf('the callback %s must implement the ConsumerInterface', 
-                                                    sprintf('%s_service', $name)));
-        }
-
-
+        $this->container
+                ->get(sprintf('rabbitmq.%s_server', $input->getArgument('name')))
+                    ->start();
     }
 }

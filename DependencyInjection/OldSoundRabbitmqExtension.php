@@ -158,6 +158,7 @@ class OldSoundRabbitMqExtension extends Extension
         
         $consumerDef->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
         $consumerDef->addMethodCall('setQueueOptions', array($consumer['queue_options']));
+        $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
         
         $container->setDefinition(sprintf('rabbitmq.%s_consumer', $consumer['alias']), $consumerDef);
     }
@@ -171,8 +172,9 @@ class OldSoundRabbitMqExtension extends Extension
         $this->injectConnection($consumerDef, $consumer);
         
         $consumerDef->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
+        $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
         
-        $container->setDefinition(sprintf('rabbitmq.%s_anon_consumer', $consumer['alias']), $consumerDef);
+        $container->setDefinition(sprintf('rabbitmq.%s_anon', $consumer['alias']), $consumerDef);
     }
     
     protected function loadRpcClient(array $client, ContainerBuilder $container)
@@ -197,6 +199,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->injectConnection($serverDef, $server);
         
         $serverDef->addMethodCall('initServer', array($server['alias']));
+        $serverDef->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
         
         $container->setDefinition(sprintf('rabbitmq.%s_server', $server['alias']), $serverDef);
     }

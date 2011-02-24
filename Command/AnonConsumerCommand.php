@@ -41,24 +41,8 @@ class AnonConsumerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         
-        $name = $input->getArgument('name');
-        
-        $callbackObj = $this->container->get(sprintf('%s_service', $name));
-
-        if($callbackObj instanceof ConsumerInterface)
-        {
-            $consumer = $this->container->get(sprintf('rabbitmq.%s_anon_consumer', $name));
-            $consumer->setRoutingKey($input->getOption('r_key'));
-            
-            $callbackObj->setContainer($this->container);
-            
-            $consumer->setCallback(array($callbackObj, 'execute'));
-            $consumer->consume($input->getOption('messages'));
-        }
-        else
-        {
-            throw new InvalidConfigurationException(sprintf('the callback %s must implement the ConsumerInterface', 
-                                                    sprintf('%s_service', $name)));
-        }
+        $consumer = $this->container->get(sprintf('rabbitmq.%s_anon', $input->getArgument('name')));
+        $consumer->setRoutingKey($input->getOption('r_key'));
+        $consumer->consume($input->getOption('messages'));
     }
 }

@@ -40,24 +40,9 @@ class ConsumerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
-        
-        $name = $input->getArgument('name');
-        
-        $callbackObj = $this->container->get(sprintf('%s_service', $name));
-        
-        if($callbackObj instanceof ConsumerInterface)
-        {
-            $consumer = $this->container->get(sprintf('rabbitmq.%s_consumer', $name));
-            
-            $callbackObj->setContainer($this->container);
-            
-            $consumer->setCallback(array($callbackObj, 'execute'));
-            $consumer->consume($input->getOption('messages'));
-        }
-        else
-        {
-            throw new InvalidConfigurationException(sprintf('the callback %s must implement the ConsumerInterface', 
-                                                    sprintf('%s_service', $name)));
-        }
+
+        $this->container
+                ->get(sprintf('rabbitmq.%s_consumer', $input->getArgument('name')))
+                    ->consume($input->getOption('messages'));
     }
 }
