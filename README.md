@@ -67,7 +67,7 @@ Configure the `rabbitmq` service in your config:
                 connection: default
                 exchange_options: {name: 'upload-picture', type: direct}
                 queue_options:    {name: 'upload-picture'}
-                callback:         @upload_picture_service
+                callback:         upload_picture_service
         ...
 
 Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `rabbitmq.upload_picture_producer` and `rabbitmq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
@@ -106,7 +106,7 @@ A consumer will connect to the server and start a __loop__  waiting for incoming
             connection: default
             exchange_options: {name: 'upload-picture', type: direct}
             queue_options:    {name: 'upload-picture'}
-            callback:         @upload_picture_service
+            callback:         upload_picture_service
     ...
 
 As we see there, the __callback__ option has a reference to an __upload\_picture\_service__. When the consumer gets a message from the server it will execute such callback. If for testing or debugging purposes you need to specify a different callback, then you can change it there. 
@@ -170,7 +170,7 @@ Let's add a RPC client and server into the configuration:
     rpc_servers:
         random_int:
             connection: default
-            callback: @random_int_server
+            callback: random_int_server
             
 Here we have a very useful server: it returns random integers to its clients. The callback used to process the request will be the __random\_int\_server__ service. Now let's see how to invoke it from our controllers.
 
@@ -212,10 +212,10 @@ Let's say that for rendering some webpage, you need to perform two database quer
     rpc_servers:
         char_count:
             connection: default
-            callback: @char_count_server
+            callback: char_count_server
         random_int:
             connection: default
-            callback: @random_int_server
+            callback: random_int_server
     ...
     
 Then this code should go in our controller:
@@ -253,7 +253,7 @@ Now, how to configure and run such consumer?
             logs_watcher:
                 connection: default
                 exchange_options: {name: 'app-logs', type: topic}
-                callback:         @logs_watcher
+                callback:         logs_watcher
         ...
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
