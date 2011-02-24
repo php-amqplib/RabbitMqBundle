@@ -39,7 +39,7 @@ class Consumer extends BaseConsumer
         
         if($this->consumed == $this->target)
         {
-            $msg->delivery_info['channel']->basic_cancel($msg->delivery_info['consumer_tag']);
+            $this->stopConsuming();
         }
     }
 }
