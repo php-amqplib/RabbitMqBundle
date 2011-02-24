@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class RabbitMqExtension extends Extension
+class OldSoundRabbitMqExtension extends Extension
 {
     public function configLoad($configs, ContainerBuilder $container)
     {
