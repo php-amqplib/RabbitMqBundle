@@ -26,7 +26,7 @@ class RpcClient extends BaseAmqp
                                            'reply_to' => $this->queueName,
                                            'correlation_id' => $requestId));
     
-    $this->ch->basic_publish($msg, $server . '-exchange', $routingKey);
+    $this->ch->basic_publish($msg, $server, $routingKey);
     
     $this->requests++;
   }
