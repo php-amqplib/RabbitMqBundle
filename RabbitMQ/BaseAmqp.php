@@ -6,6 +6,7 @@ class BaseAmqp
 {
   protected $conn;
   protected $ch;
+  protected $consumerTag;
   
   protected $exchangeOptions = array(
       'passive' => false,
@@ -30,14 +31,18 @@ class BaseAmqp
     
   protected $routingKey = '';
   
-  public function __construct($conn)
+  public function __construct($conn, $ch = null, $consumerTag = null)
   {
     $this->conn = $conn;
-    $this->ch = $this->conn->channel();
+    
+    $this->ch = empty($ch) ? $this->conn->channel() : $ch;
+    
+    $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
   }
   
   public function __destruct()
   {
+    //TODO FIX!
     // if(!empty($this->ch) && !empty($this->conn))
     // {
     //     $this->ch->close();
@@ -91,9 +96,14 @@ class BaseAmqp
     $this->ch->basic_consume($queueName, $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
   }
   
-  protected function getConsumerTag()
+  public function setConsumerTag($tag)
   {
-    return sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid());
+      $this->consumerTag = $tag;
+  }
+  
+  public function getConsumerTag()
+  {
+      return $this->consumerTag;
   }
 }
 
