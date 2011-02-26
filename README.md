@@ -9,7 +9,7 @@ The bundle implements several messaging patterns as seen on the [Thumper](https:
     $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
     $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
     
-Later when you want to consume 50 messages out of the `upload\_pictures` queue, you just run on the CLI:
+Later when you want to consume 50 messages out of the `upload_pictures` queue, you just run on the CLI:
 
     $ ./app/console_dev rabbitmq:consumer -m 50 upload_picture
 
