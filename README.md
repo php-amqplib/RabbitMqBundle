@@ -4,7 +4,14 @@
 
 The RabbitMqBundle incorporates messaging in your application via [RabbitMq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/tnc/php-amqplib) library.
 
-The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library.
+The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
+
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
+    
+Later when you want to consume 50 messages out of the `upload\_pictures` queue, you just run on the CLI:
+
+    $ ./app/console_dev rabbitmq:consumer -m 50 upload_picture
 
 All the examples expect a running RabbitMQ server.
 
