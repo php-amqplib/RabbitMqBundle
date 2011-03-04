@@ -7,12 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 class OldSoundRabbitMqExtension extends Extension
-{
-    public function configLoad($configs, ContainerBuilder $container)
+{   
+    public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new YamlFileLoader($container, __DIR__.'/../Resources/config');
+        $locator = new FileLocator(array(__DIR__.'/../Resources/config'));
+        $loader = new YamlFileLoader($container, $locator);
         $loader->load('rabbitmq.yml');
         
         $config = $this->mergeConfig($configs);
@@ -127,17 +129,17 @@ class OldSoundRabbitMqExtension extends Extension
     
     protected function loadConnection(array $connection, ContainerBuilder $container)
     {
-        $connectionDef = new Definition($container->getParameter('rabbitmq.connection.class'), 
+        $connectionDef = new Definition($container->getParameter('old_sound_rabbit_mq.connection.class'), 
                                         array($connection['host'], $connection['port'],
                                               $connection['user'], $connection['password'],
                                               $connection['vhost']));
-        $container->setDefinition(sprintf('rabbitmq.connection.%s', $connection['alias']), $connectionDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $connection['alias']), $connectionDef);
         
     }
     
     protected function loadProducer(array $producer, ContainerBuilder $container)
     {
-        $producerDef = new Definition($container->getParameter('rabbitmq.producer.class'));
+        $producerDef = new Definition($container->getParameter('old_sound_rabbit_mq.producer.class'));
         
         $producer = $this->setDefaultItemConnection($producer);
         
@@ -145,12 +147,12 @@ class OldSoundRabbitMqExtension extends Extension
         
         $producerDef->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
         
-        $container->setDefinition(sprintf('rabbitmq.%s_producer', $producer['alias']), $producerDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $producer['alias']), $producerDef);
     }
     
     protected function loadConsumer(array $consumer, ContainerBuilder $container)
     {
-        $consumerDef = new Definition($container->getParameter('rabbitmq.consumer.class'));
+        $consumerDef = new Definition($container->getParameter('old_sound_rabbit_mq.consumer.class'));
         
         $consumer = $this->setDefaultItemConnection($consumer);
         
@@ -160,12 +162,12 @@ class OldSoundRabbitMqExtension extends Extension
         $consumerDef->addMethodCall('setQueueOptions', array($consumer['queue_options']));
         $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
         
-        $container->setDefinition(sprintf('rabbitmq.%s_consumer', $consumer['alias']), $consumerDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $consumer['alias']), $consumerDef);
     }
     
     protected function loadAnonConsumer(array $consumer, ContainerBuilder $container)
     {
-        $consumerDef = new Definition($container->getParameter('rabbitmq.anon_consumer.class'));
+        $consumerDef = new Definition($container->getParameter('old_sound_rabbit_mq.anon_consumer.class'));
         
         $consumer = $this->setDefaultItemConnection($consumer);
         
@@ -174,12 +176,12 @@ class OldSoundRabbitMqExtension extends Extension
         $consumerDef->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
         $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
         
-        $container->setDefinition(sprintf('rabbitmq.%s_anon', $consumer['alias']), $consumerDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_anon', $consumer['alias']), $consumerDef);
     }
     
     protected function loadRpcClient(array $client, ContainerBuilder $container)
     {
-        $clientDef = new Definition($container->getParameter('rabbitmq.rpc_client.class'));
+        $clientDef = new Definition($container->getParameter('old_sound_rabbit_mq.rpc_client.class'));
         
         $client = $this->setDefaultItemConnection($client);
         
@@ -187,12 +189,12 @@ class OldSoundRabbitMqExtension extends Extension
         
         $clientDef->addMethodCall('initClient');
         
-        $container->setDefinition(sprintf('rabbitmq.%s_rpc', $client['alias']), $clientDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $client['alias']), $clientDef);
     }
     
     protected function loadRpcServer(array $server, ContainerBuilder $container)
     {
-        $serverDef = new Definition($container->getParameter('rabbitmq.rpc_server.class'));
+        $serverDef = new Definition($container->getParameter('old_sound_rabbit_mq.rpc_server.class'));
         
         $server = $this->setDefaultItemConnection($server);
         
@@ -201,7 +203,7 @@ class OldSoundRabbitMqExtension extends Extension
         $serverDef->addMethodCall('initServer', array($server['alias']));
         $serverDef->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
         
-        $container->setDefinition(sprintf('rabbitmq.%s_server', $server['alias']), $serverDef);
+        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $server['alias']), $serverDef);
     }
     
     protected function setDefaultItemConnection($item)
@@ -216,7 +218,7 @@ class OldSoundRabbitMqExtension extends Extension
     
     protected function injectConnection(Definition $def, $item)
     {
-        $def->addArgument(new Reference(sprintf('rabbitmq.connection.%s', $item['connection'])));
+        $def->addArgument(new Reference(sprintf('old_sound_rabbit_mq.connection.%s', $item['connection'])));
     }
   
     public function getXsdValidationBasePath()
@@ -231,6 +233,6 @@ class OldSoundRabbitMqExtension extends Extension
 
     public function getAlias()
     {
-        return 'rabbitmq';
+        return 'old_sound_rabbit_mq';
     }
 }

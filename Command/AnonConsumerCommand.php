@@ -41,7 +41,7 @@ class AnonConsumerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         
-        $consumer = $this->container->get(sprintf('rabbitmq.%s_anon', $input->getArgument('name')));
+        $consumer = $this->container->get(sprintf('old_sound_rabbit_mq.%s_anon', $input->getArgument('name')));
         $consumer->setRoutingKey($input->getOption('r_key'));
         $consumer->consume($input->getOption('messages'));
     }

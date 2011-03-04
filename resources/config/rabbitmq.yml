@@ -1,7 +1,7 @@
 parameters:
-    rabbitmq.connection.class:      AMQPConnection
-    rabbitmq.producer.class:        OldSound\RabbitMqBundle\RabbitMq\Producer
-    rabbitmq.consumer.class:        OldSound\RabbitMqBundle\RabbitMq\Consumer
-    rabbitmq.anon_consumer.class:   OldSound\RabbitMqBundle\RabbitMq\AnonConsumer
-    rabbitmq.rpc_client.class:      OldSound\RabbitMqBundle\RabbitMq\RpcClient
-    rabbitmq.rpc_server.class:      OldSound\RabbitMqBundle\RabbitMq\RpcServer
+    old_sound_rabbit_mq.connection.class:      AMQPConnection
+    old_sound_rabbit_mq.producer.class:        OldSound\RabbitMqBundle\RabbitMq\Producer
+    old_sound_rabbit_mq.consumer.class:        OldSound\RabbitMqBundle\RabbitMq\Consumer
+    old_sound_rabbit_mq.anon_consumer.class:   OldSound\RabbitMqBundle\RabbitMq\AnonConsumer
+    old_sound_rabbit_mq.rpc_client.class:      OldSound\RabbitMqBundle\RabbitMq\RpcClient
+    old_sound_rabbit_mq.rpc_server.class:      OldSound\RabbitMqBundle\RabbitMq\RpcServer

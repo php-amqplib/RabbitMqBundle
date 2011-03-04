@@ -41,7 +41,7 @@ class RpcServerCommand extends Command
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         
         $this->container
-                ->get(sprintf('rabbitmq.%s_server', $input->getArgument('name')))
+                ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
                     ->start();
     }
 }
