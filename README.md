@@ -95,7 +95,7 @@ Now let's say that you want to process picture uploads in the background. After 
     {
         ...
         $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
-        $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
+        $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
         ...
     }
 
@@ -190,7 +190,7 @@ And then add the following code to our controller:
     public function indexAction($name)
     {
         ...
-        $client = $this->get('rabbitmq.integer_store_rpc');
+        $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
         $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
         $replies = $client->getReplies();
         ...
@@ -229,7 +229,7 @@ Then this code should go in our controller:
     
     public function indexAction($name)
     {
-        $client = $this->get('rabbitmq.parallel_rpc');
+        $client = $this->get('old_sound_rabbit_mq.parallel_rpc');
         $client->addRequest($name, 'char_count', 'char_count');
         $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'random_int');
         $replies = $client->getReplies();
