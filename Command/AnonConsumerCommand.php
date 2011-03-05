@@ -22,7 +22,6 @@ class AnonConsumerCommand extends Command
             ->setName('rabbitmq:anon-consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 1)
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
             ->addOption('r_key', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '#')
         ;
     }

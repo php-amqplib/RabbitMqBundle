@@ -22,7 +22,6 @@ class RpcServerCommand extends Command
         $this
             ->setName('rabbitmq:rpc-server')
             ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
         ;
     }
 
