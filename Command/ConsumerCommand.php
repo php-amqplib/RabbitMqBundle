@@ -23,7 +23,7 @@ class ConsumerCommand extends Command
             ->setName('rabbitmq:consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 1)
-            //->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
+            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
         ;
     }
 

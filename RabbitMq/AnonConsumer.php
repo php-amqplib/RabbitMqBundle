@@ -15,5 +15,3 @@ class AnonConsumer extends Consumer
                                      'arguments' => null, 'ticket' => null));
   }
 }
-
-?>

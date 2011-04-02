@@ -27,7 +27,7 @@ class Consumer extends BaseConsumer
             $this->consumed++;
             $this->maybeStopConsumer($msg);
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             throw $e;
         }

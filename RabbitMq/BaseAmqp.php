@@ -63,12 +63,12 @@ class BaseAmqp
   {
     if(empty($options['name']))
     {
-      throw new InvalidArgumentException('You must provide an exchange name');
+      throw new \InvalidArgumentException('You must provide an exchange name');
     }
     
     if(empty($options['type']))
     {
-      throw new InvalidArgumentException('You must provide an exchange type');
+      throw new \InvalidArgumentException('You must provide an exchange type');
     }
     
     $this->exchangeOptions = array_merge($this->exchangeOptions, $options);
@@ -84,5 +84,3 @@ class BaseAmqp
     $this->routingKey = $routingKey;
   }
 }
-
-?>

@@ -19,7 +19,7 @@ class RpcClient extends BaseAmqp
   {
     if(empty($requestId))
     {
-      throw new InvalidArgumentException('You must provide a $requestId');
+      throw new \InvalidArgumentException('You must provide a $requestId');
     }
     
     $msg = new \AMQPMessage($msgBody, array('content_type' => 'text/plain', 

@@ -30,9 +30,9 @@ class RpcServer extends BaseConsumer
       $result = call_user_func($this->callback, $msg->body);
       $this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
     }
-    catch (Exception $e)
+    catch (\Exception $e)
     {
-      $this->sendReply('error: ' .  $e->getMessage(), $msg->get('reply_to'));
+      $this->sendReply('error: ' .  $e->getMessage(), $msg->get('reply_to'),  $msg->get('correlation_id'));
     }
   }
   
