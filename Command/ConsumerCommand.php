@@ -42,7 +42,7 @@ class ConsumerCommand extends Command
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
         $this->container
-                ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
-                    ->consume($input->getOption('messages'));
+            ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
+            ->consume($input->getOption('messages'));
     }
 }

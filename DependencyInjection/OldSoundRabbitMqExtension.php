@@ -20,32 +20,32 @@ class OldSoundRabbitMqExtension extends Extension
         
         $config = $this->mergeConfig($configs);
 
-        foreach($config['connections'] as $name => $connection)
+        foreach ($config['connections'] as $name => $connection)
         {
             $this->loadConnection($connection, $container);
         }
 
-        foreach($config['producers'] as $name => $producer)
+        foreach ($config['producers'] as $name => $producer)
         {
             $this->loadProducer($producer, $container);
         }
 
-        foreach($config['consumers'] as $name => $consumer)
+        foreach ($config['consumers'] as $name => $consumer)
         {
             $this->loadConsumer($consumer, $container);
         }
 
-        foreach($config['anon_consumers'] as $name => $consumer)
+        foreach ($config['anon_consumers'] as $name => $consumer)
         {
             $this->loadAnonConsumer($consumer, $container);
         }
 
-        foreach($config['rpc_clients'] as $name => $rpc_client)
+        foreach ($config['rpc_clients'] as $name => $rpc_client)
         {
             $this->loadRpcClient($rpc_client, $container);
         }
 
-        foreach($config['rpc_servers'] as $name => $rpc_server)
+        foreach ($config['rpc_servers'] as $name => $rpc_server)
         {
             $this->loadRpcServer($rpc_server, $container);
         }
@@ -70,20 +70,20 @@ class OldSoundRabbitMqExtension extends Extension
             'vhost' => '/'
         );
 
-        foreach($configs as $config)
+        foreach ($configs as $config)
         {
-            if(isset($config['connections']))
+            if (isset($config['connections']))
             {
-                foreach($config['connections'] as $name => $connection)
+                foreach ($config['connections'] as $name => $connection)
                 {
-                    if(!isset($mergedConfig['connections'][$name]))
+                    if (!isset($mergedConfig['connections'][$name]))
                     {
                         $mergedConfig['connections'][$name] = $connectionDefaults;
                     }
                     $mergedConfig['connections'][$name]['alias'] = $name;
-                    foreach($connection as $k => $v)
+                    foreach ($connection as $k => $v)
                     {
-                        if(array_key_exists($k, $connectionDefaults))
+                        if (array_key_exists($k, $connectionDefaults))
                         {
                             $mergedConfig['connections'][$name][$k] = $v;
                         }
@@ -108,18 +108,18 @@ class OldSoundRabbitMqExtension extends Extension
             'connection' => null
         );
 
-        if(isset($config[$item . 's']))
+        if (isset($config[$item . 's']))
         {
-            foreach($config[$item . 's'] as $name => $$item)
+            foreach ($config[$item . 's'] as $name => $$item)
             {
-                if(!isset($mergedConfig[$item . 's'][$name]))
+                if (!isset($mergedConfig[$item . 's'][$name]))
                 {
                     $mergedConfig[$item . 's'][$name] = $clientDefaults;
                 }
                 $mergedConfig[$item . 's'][$name]['alias'] = $name;
-                if(!empty($$item))
+                if (!empty($$item))
                 {
-                    foreach($$item as $k => $v)
+                    foreach ($$item as $k => $v)
                     {
                         $mergedConfig[$item . 's'][$name][$k] = $v;
                     }
@@ -209,7 +209,7 @@ class OldSoundRabbitMqExtension extends Extension
 
     protected function setDefaultItemConnection($item)
     {
-        if(null === $item['connection'])
+        if (null === $item['connection'])
         {
             $item['connection'] = $item['alias'];
         }
