@@ -4,7 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 
-class BaseConsumer extends BaseAmqp
+abstract class BaseConsumer extends BaseAmqp
 {
     protected $callback;
 

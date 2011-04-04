@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-class BaseAmqp
+abstract class BaseAmqp
 {
     protected $conn;
     protected $ch;
