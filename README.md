@@ -26,6 +26,14 @@ Put the RabbitMqBundle into the src/ dir:
     $ mkdir -p src/OldSound
     $ git clone git://github.com/videlalvaro/RabbitMqBundle.git src/OldSound/RabbitMqBundle
 
+Register the bundle namespace in the `autoload.php` file:
+
+    $loader->registerNamespaces(array(
+        ...
+        'OldSound'         => __DIR__.'/../src',
+        ...
+    ));
+
 Put the [php-amqplib](http://github.com/tnc/php-amqplib) library into the vendor dir:
 
     $ git clone git://github.com/tnc/php-amqplib.git vendor/php-amqplib
