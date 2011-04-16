@@ -40,10 +40,10 @@ Put the [php-amqplib](http://github.com/tnc/php-amqplib) library into the vendor
 
 Add the [php-amqplib](http://github.com/tnc/php-amqplib) autoloading to your project's bootstrap script (app/autoload.php):
 
-    spl_autoload_register(function($class) use ($vendorDir)
+    spl_autoload_register(function($class)
     {
         if (strpos($class, 'AMQPConnection') === 0) {
-            require_once $vendorDir.'/php-amqplib/amqp.inc';
+            require_once __DIR__.'/../vendor/php-amqplib/amqp.inc';
             return true;
         }
     });
@@ -65,7 +65,7 @@ Add the RabbitMqBundle to your application's kernel:
 
 Configure the `rabbitmq` service in your config:
 
-    rabbitmq.config:
+    old_sound_rabbit_mq:
         connections:
             default:
                 host:      'localhost'
