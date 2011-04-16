@@ -262,7 +262,7 @@ When we start an Anonymous Consumer, it will take care of such details and we ju
 
 Now, how to configure and run such consumer?
 
-    rabbitmq.config:
+    old_sound_rabbit_mq:
         ...
         anon_consumers:
             logs_watcher:
