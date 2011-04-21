@@ -23,7 +23,7 @@ class ConsumerCommand extends Command
             ->setName('rabbitmq:consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 1)
-            //->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
+            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
         ;
     }
 
@@ -42,7 +42,7 @@ class ConsumerCommand extends Command
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
         $this->container
-                ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
-                    ->consume($input->getOption('messages'));
+            ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
+            ->consume($input->getOption('messages'));
     }
 }

@@ -6,19 +6,23 @@ use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
 
 class Consumer extends BaseConsumer
 {
+    protected $target;
+
+    protected $consumed = 0;
+    
     public function consume($msgAmount)
     {
         $this->target = $msgAmount;
 
         $this->setUpConsumer();
 
-        while(count($this->ch->callbacks))
+        while (count($this->ch->callbacks))
         {
             $this->ch->wait();
         }
     }
 
-    public function processMessage($msg)
+    public function processMessage(\AMQPMessage $msg)
     {
         try
         {
@@ -27,18 +31,19 @@ class Consumer extends BaseConsumer
             $this->consumed++;
             $this->maybeStopConsumer($msg);
         }
-        catch (Exception $e)
+        catch (\Exception $e)
         {
             throw $e;
         }
     }
 
-    protected function maybeStopConsumer($msg)
+    protected function maybeStopConsumer(\AMQPMessage $msg)
     {
-        if($this->target == -1) return;
-        
-        if($this->consumed == $this->target)
-        {
+        if ($this->target == -1) {
+            return;
+        }
+
+        if ($this->consumed == $this->target) {
             $this->stopConsuming();
         }
     }
