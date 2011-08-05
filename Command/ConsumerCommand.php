@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,7 +41,7 @@ class ConsumerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-        $this->container
+        $this->getContainer()
             ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
             ->consume($input->getOption('messages'));
     }
