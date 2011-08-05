@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\Command;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +22,7 @@ class RpcServerCommand extends Command
         $this
             ->setName('rabbitmq:rpc-server')
             ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
+            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)
         ;
     }
 
@@ -38,8 +39,8 @@ class RpcServerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
-        
-        $this->container
+
+        $this->getContainer()
             ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
             ->start();
     }
