@@ -65,7 +65,7 @@ Add the RabbitMqBundle to your application's kernel:
 
 Configure the `rabbitmq` service in your config:
 
-    rabbitmq.config:
+    old_sound_rabbit_mq:
         connections:
             default:
                 host:      'localhost'
