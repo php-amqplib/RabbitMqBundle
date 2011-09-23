@@ -11,7 +11,7 @@ The bundle implements several messaging patterns as seen on the [Thumper](https:
     
 Later when you want to consume 50 messages out of the `upload_pictures` queue, you just run on the CLI:
 
-    $ ./app/console_dev rabbitmq:consumer -m 50 upload_picture
+    $ ./app/console rabbitmq:consumer -m 50 upload_picture
 
 All the examples expect a running RabbitMQ server.
 
@@ -21,29 +21,31 @@ This Bundle will be presented at [Symfony Live Paris 2011](http://www.symfony-li
 
 The following instructions have been tested on a project created with the [Symfony2 sandbox PR6](http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip)
 
-Put the RabbitMqBundle into the src/ dir:
+Put the RabbitMqBundle and the [php-amqplib](http://github.com/tnc/php-amqplib) library into the deps file:
 
-    $ mkdir -p src/OldSound
-    $ git clone git://github.com/videlalvaro/RabbitMqBundle.git src/OldSound/RabbitMqBundle
+    ...
+    [RabbitMqBundle]
+    git=http://github.com/videlalvaro/RabbitMqBundle.git
+    target=/bundles/OldSound/RabbitMqBundle
+    
+    [php-amqplib]
+    git=http://github.com/tnc/php-amqplib.git
+    ...
 
 Register the bundle namespace in the `autoload.php` file:
 
     $loader->registerNamespaces(array(
         ...
-        'OldSound'         => __DIR__.'/../src',
+        'OldSound'         => __DIR__.'/../vendor/bundles',
         ...
     ));
 
-Put the [php-amqplib](http://github.com/tnc/php-amqplib) library into the vendor dir:
-
-    $ git clone git://github.com/tnc/php-amqplib.git vendor/php-amqplib
-
 Add the [php-amqplib](http://github.com/tnc/php-amqplib) autoloading to your project's bootstrap script (app/autoload.php):
 
-    spl_autoload_register(function($class) use ($vendorDir)
+    spl_autoload_register(function($class)
     {
         if (strpos($class, 'AMQPConnection') === 0) {
-            require_once $vendorDir.'/php-amqplib/amqp.inc';
+            require_once __DIR__.'/../vendor/php-amqplib/amqp.inc';
             return true;
         }
     });
@@ -132,7 +134,7 @@ As we said, messages in AMQP are published to an __exchange__. This doesn't mean
 
 Now, how to run a consumer? There's a command for it that can be executed like this:
 
-    $ ./app/console_dev rabbitmq:consumer -m 50 upload_picture
+    $ ./app/console rabbitmq:consumer -m 50 upload_picture
 
 What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback. If you want to consumer messages __forever__, then pass the option __-1__ to the __m__ option.
 
