@@ -2,34 +2,34 @@
 
 ## About ##
 
-The RabbitMqBundle incorporates messaging in your application via [RabbitMq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/tnc/php-amqplib) library.
+The RabbitMqBundle incorporates messaging in your application via [RabbitMq](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library.
 
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
 
     $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
     $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
-    
+
 Later when you want to consume 50 messages out of the `upload_pictures` queue, you just run on the CLI:
 
     $ ./app/console rabbitmq:consumer -m 50 upload_picture
 
 All the examples expect a running RabbitMQ server.
 
-This Bundle will be presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference.
+This Bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference. See the slides [here](http://www.slideshare.net/old_sound/theres-a-rabbit-on-my-symfony):
 
 ## Installation ##
 
-The following instructions have been tested on a project created with the [Symfony2 sandbox PR6](http://symfony-reloaded.org/downloads/sandbox_2_0_PR6.zip)
+The following instructions have been tested on a project created with the [Symfony2 Standard 2.0.6](http://symfony.com/download?v=Symfony_Standard_2.0.6.tgz)
 
-Put the RabbitMqBundle and the [php-amqplib](http://github.com/tnc/php-amqplib) library into the deps file:
+Put the RabbitMqBundle and the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library into the deps file:
 
     ...
     [RabbitMqBundle]
     git=http://github.com/videlalvaro/RabbitMqBundle.git
     target=/bundles/OldSound/RabbitMqBundle
-    
+
     [php-amqplib]
-    git=http://github.com/tnc/php-amqplib.git
+    git=http://github.com/videlalvaro/php-amqplib.git
     ...
 
 Register the bundle namespace in the `autoload.php` file:
@@ -40,7 +40,7 @@ Register the bundle namespace in the `autoload.php` file:
         ...
     ));
 
-Add the [php-amqplib](http://github.com/tnc/php-amqplib) autoloading to your project's bootstrap script (app/autoload.php):
+Add the [php-amqplib](http://github.com/videlalvaro/php-amqplib) autoloading to your project's bootstrap script (app/autoload.php):
 
     spl_autoload_register(function($class)
     {
@@ -99,7 +99,7 @@ In a messaging application, the process sending messages to the broker is called
 
 A producer will be used to send messages to the server. In the AMQP Model, messages are sent to an __exchange__, this means that in the configuration for a producer you will have to specify the connection options along with the exchange options, which usually will be the name of the exchange and the type of it.
 
-Now let's say that you want to process picture uploads in the background. After you move the picture to its final location, you will publish a message to server with the following information: 
+Now let's say that you want to process picture uploads in the background. After you move the picture to its final location, you will publish a message to server with the following information:
 
     public function indexAction($name)
     {
@@ -126,7 +126,7 @@ A consumer will connect to the server and start a __loop__  waiting for incoming
             callback:         upload_picture_service
     ...
 
-As we see there, the __callback__ option has a reference to an __upload\_picture\_service__. When the consumer gets a message from the server it will execute such callback. If for testing or debugging purposes you need to specify a different callback, then you can change it there. 
+As we see there, the __callback__ option has a reference to an __upload\_picture\_service__. When the consumer gets a message from the server it will execute such callback. If for testing or debugging purposes you need to specify a different callback, then you can change it there.
 
 Apart from the callback we also specify the connection to use, the same way as we do with a __producer__. The remaining options are the __exchange\_options__ and the __queue\_options__. The __exchange\_options__ should be the same ones as those used for the __producer__. In the __queue\_options__ we will provide a __queue name__. Why?
 
@@ -143,7 +143,7 @@ What does this mean? We are executing the __upload\_picture__ consumer telling i
 Here's an example callback:
 
     <?php
-    
+
     //src/Sensio/HelloBundle/Consumer/UploadPictureConsumer.php
 
     namespace Sensio\HelloBundle\Consumer;
@@ -155,11 +155,11 @@ Here's an example callback:
     {
         public function execute($msg)
         {
-            //Process picture upload. 
+            //Process picture upload.
             //$msg will be what was published from the Controller.
         }
     }
-    
+
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
 As an extra feature, because the callback class extends ContainerAware, it means it has access to the __Symfonny2__ service container that is specific to the current running application.
@@ -188,15 +188,15 @@ Let's add a RPC client and server into the configuration:
         random_int:
             connection: default
             callback: random_int_server
-            
+
 Here we have a very useful server: it returns random integers to its clients. The callback used to process the request will be the __random\_int\_server__ service. Now let's see how to invoke it from our controllers.
 
 First we have to start the server from the command line:
 
     ./app/console_dev rabbitmq:rpc-server random_int
-    
+
 And then add the following code to our controller:
-    
+
     public function indexAction($name)
     {
         ...
@@ -234,9 +234,9 @@ Let's say that for rendering some webpage, you need to perform two database quer
             connection: default
             callback: random_int_server
     ...
-    
+
 Then this code should go in our controller:
-    
+
     public function indexAction($name)
     {
         $client = $this->get('old_sound_rabbit_mq.parallel_rpc');
@@ -258,7 +258,7 @@ In AMQP there's a type of exchange called __topic__ where the messages are route
 - server1.warning
 - ...
 
-Since we don't want to be filling up queues with unlimited logs what we can do is that when we want to monitor the system, we can launch a consumer that creates a queue and attaches to the __logs__ exchange based on some topic, for example, we would like to see all the errors reported by our servers. The routing key will be something like: __\#.error__. In such case we have to come up with a queue name, bind it to the exchange, get the logs, unbind it and delete the queue. Happily AMPQ provides a way to do this automatically if you provide the right options when you declare and bind the queue. The problem is that you don't want to remember all those options. For such reason we implemented the __Anonymous Consumer__ pattern. 
+Since we don't want to be filling up queues with unlimited logs what we can do is that when we want to monitor the system, we can launch a consumer that creates a queue and attaches to the __logs__ exchange based on some topic, for example, we would like to see all the errors reported by our servers. The routing key will be something like: __\#.error__. In such case we have to come up with a queue name, bind it to the exchange, get the logs, unbind it and delete the queue. Happily AMPQ provides a way to do this automatically if you provide the right options when you declare and bind the queue. The problem is that you don't want to remember all those options. For such reason we implemented the __Anonymous Consumer__ pattern.
 
 When we start an Anonymous Consumer, it will take care of such details and we just have to think about implementing the callback for when the messages arrive. Is it called Anonymous because it won't specify a queue name, but it will wait for RabbitMQ to assign a random one to it.
 
@@ -278,7 +278,7 @@ There we specify the exchange name and it's type along with the callback that sh
 To start an Anonymous Consumer we use the following command:
 
     ./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
-    
+
 The only new option compared to the commands that we have seen before is the one that specifies the __routing key__: `-r '#.error'`.
 
 ## License ##
