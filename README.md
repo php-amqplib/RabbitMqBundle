@@ -7,7 +7,7 @@ The RabbitMqBundle incorporates messaging in your application via [RabbitMq](htt
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
 
     $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
-    $this->get('rabbitmq.upload_picture_producer')->publish(serialize($msg));
+    $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
 
 Later when you want to consume 50 messages out of the `upload_pictures` queue, you just run on the CLI:
 
@@ -154,7 +154,7 @@ Here's an example callback:
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
-As an extra feature, because the callback class extends ContainerAware, it means it has access to the __Symfonny2__ service container that is specific to the current running application.
+Keep in mind that your callbacks _need to be registered_ as normal `Symfony2` services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
 ### Recap ###
 
