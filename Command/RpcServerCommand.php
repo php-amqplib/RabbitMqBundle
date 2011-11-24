@@ -6,10 +6,8 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use Symfony\Component\Console\Output\OutputInterface;;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 class RpcServerCommand extends BaseRabbitMqCommand
 {
@@ -43,7 +41,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
                        ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')));
 
 
-        if(!($server instanceof 'ContainerAwareInterface')) {
+        if(!($server instanceof ContainerAwareInterface)) {
            throw new Exception("The consumer callback has to implement the ContainerAwareInterface");
         }
 

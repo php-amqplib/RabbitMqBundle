@@ -8,8 +8,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-
 class AnonConsumerCommand extends BaseRabbitMqCommand
 {
 
