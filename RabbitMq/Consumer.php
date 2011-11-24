@@ -27,6 +27,7 @@ class Consumer extends BaseConsumer
     {
         try
         {
+            //TODO pass the whole message and document the usage.
             call_user_func($this->callback, $msg->body);
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             $this->consumed++;
