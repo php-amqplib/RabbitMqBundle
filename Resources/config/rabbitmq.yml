@@ -1,5 +1,5 @@
 parameters:
-    old_sound_rabbit_mq.connection.class:      AMQPConnection
+    old_sound_rabbit_mq.connection.class:      PhpAmqpLib\Connection\AMQPConnection
     old_sound_rabbit_mq.producer.class:        OldSound\RabbitMqBundle\RabbitMq\Producer
     old_sound_rabbit_mq.consumer.class:        OldSound\RabbitMqBundle\RabbitMq\Consumer
     old_sound_rabbit_mq.anon_consumer.class:   OldSound\RabbitMqBundle\RabbitMq\AnonConsumer

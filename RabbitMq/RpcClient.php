@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClient extends BaseAmqp
 {
@@ -21,7 +22,7 @@ class RpcClient extends BaseAmqp
             throw new \InvalidArgumentException('You must provide a $requestId');
         }
 
-        $msg = new \AMQPMessage($msgBody, array('content_type' => 'text/plain',
+        $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain',
                                                'reply_to' => $this->queueName,
                                                'correlation_id' => $requestId));
 
@@ -32,7 +33,7 @@ class RpcClient extends BaseAmqp
 
     public function getReplies()
     {
-        $this->ch->basic_consume($this->queueName, $this->queueName, false, true, false, false, array($this, 'processMessage'));
+        $this->ch->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
 
         while (count($this->replies) < $this->requests)
         {
@@ -43,7 +44,7 @@ class RpcClient extends BaseAmqp
         return $this->replies;
     }
 
-    public function processMessage(\AMQPMessage $msg)
+    public function processMessage(AMQPMessage $msg)
     {
         $this->replies[$msg->get('correlation_id')] = unserialize($msg->body);
     }

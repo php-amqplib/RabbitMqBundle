@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcServer extends BaseConsumer
 {
@@ -22,7 +23,7 @@ class RpcServer extends BaseConsumer
         }
     }
 
-    public function processMessage(\AMQPMessage $msg)
+    public function processMessage(AMQPMessage $msg)
     {
         try
         {
@@ -38,7 +39,7 @@ class RpcServer extends BaseConsumer
 
     protected function sendReply($result, $client, $correlationId)
     {
-        $reply = new \AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
+        $reply = new AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
         $this->ch->basic_publish($reply, '', $client);
     }
 }

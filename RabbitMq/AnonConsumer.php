@@ -3,10 +3,11 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PhpAmqpLib\Connection\AMQPConnection;
 
 class AnonConsumer extends Consumer
 {
-    public function __construct(\AMQPConnection $conn)
+    public function __construct(AMQPConnection $conn)
     {
         parent::__construct($conn);
 

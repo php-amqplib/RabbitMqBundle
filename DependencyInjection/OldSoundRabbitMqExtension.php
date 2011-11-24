@@ -17,7 +17,7 @@ class OldSoundRabbitMqExtension extends Extension
         $locator = new FileLocator(array(__DIR__.'/../Resources/config'));
         $loader = new YamlFileLoader($container, $locator);
         $loader->load('rabbitmq.yml');
-        
+
         $config = $this->mergeConfig($configs);
 
         foreach ($config['connections'] as $name => $connection)
@@ -147,6 +147,8 @@ class OldSoundRabbitMqExtension extends Extension
         $this->injectConnection($producerDef, $producer);
 
         $producerDef->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+        //TODO add configuration option that allows to not do this all the time.
+        $producerDef->addMethodCall('exchangeDeclare');
 
         $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $producer['alias']), $producerDef);
     }

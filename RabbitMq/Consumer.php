@@ -3,13 +3,14 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
     protected $target;
 
     protected $consumed = 0;
-    
+
     public function consume($msgAmount)
     {
         $this->target = $msgAmount;
@@ -22,7 +23,7 @@ class Consumer extends BaseConsumer
         }
     }
 
-    public function processMessage(\AMQPMessage $msg)
+    public function processMessage(AMQPMessage $msg)
     {
         try
         {
@@ -37,7 +38,7 @@ class Consumer extends BaseConsumer
         }
     }
 
-    protected function maybeStopConsumer(\AMQPMessage $msg)
+    protected function maybeStopConsumer(AMQPMessage $msg)
     {
         if ($this->target == -1) {
             return;

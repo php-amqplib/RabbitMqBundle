@@ -1,6 +1,8 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPConnection;
 
 abstract class BaseAmqp
 {
@@ -32,11 +34,11 @@ abstract class BaseAmqp
     protected $routingKey = '';
 
     /**
-     * @param \AMQPConnection $conn
-     * @param \AMQPChannel|null $ch
+     * @param AMQPConnection $conn
+     * @param AMQPChannel|null $ch
      * @param null $consumerTag
      */
-    public function __construct(\AMQPConnection $conn, \AMQPChannel $ch = null, $consumerTag = null)
+    public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         $this->conn = $conn;
 
@@ -60,10 +62,10 @@ abstract class BaseAmqp
     }
 
     /**
-     * @param \AMQPChannel $ch
+     * @param AMQPChannel $ch
      * @return void
      */
-    public function setChannel(\AMQPChannel $ch)
+    public function setChannel(AMQPChannel $ch)
     {
         $this->ch = $ch;
     }
