@@ -30,25 +30,17 @@ Put the RabbitMqBundle and the [php-amqplib](http://github.com/videlalvaro/php-a
 
     [php-amqplib]
     git=http://github.com/videlalvaro/php-amqplib.git
+    target=videlalvaro/php-amqplib
     ...
 
-Register the bundle namespace in the `autoload.php` file:
+Register the bundle and library namespaces in the `app/autoload.php` file:
 
     $loader->registerNamespaces(array(
         ...
         'OldSound'         => __DIR__.'/../vendor/bundles',
+        'PhpAmqpLib'       => __DIR__ . '../vendor/videlalvaro/php-amqplib',
         ...
     ));
-
-Add the [php-amqplib](http://github.com/videlalvaro/php-amqplib) autoloading to your project's bootstrap script (app/autoload.php):
-
-    spl_autoload_register(function($class)
-    {
-        if (strpos($class, 'AMQPConnection') === 0) {
-            require_once __DIR__.'/../vendor/php-amqplib/amqp.inc';
-            return true;
-        }
-    });
 
 Add the RabbitMqBundle to your application's kernel:
 
