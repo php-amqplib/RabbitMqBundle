@@ -40,10 +40,6 @@ class AnonConsumerCommand extends BaseRabbitMqCommand
 
         $consumer = $this->getContainer()
                          ->get(sprintf('old_sound_rabbit_mq.%s_anon', $input->getArgument('name')));
-
-        $this->validateConsumer($consumer);
-
-        $consumer->setContainer($this->getContainer());
         $consumer->setRoutingKey($input->getOption('r_key'));
         $consumer->consume($input->getOption('messages'));
     }

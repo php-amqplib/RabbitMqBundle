@@ -6,8 +6,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class RpcServerCommand extends BaseRabbitMqCommand
 {
@@ -38,14 +37,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
         $server = $this->getContainer()
-                       ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')));
-
-
-        if(!($server instanceof ContainerAwareInterface)) {
-           throw new Exception("The consumer callback has to implement the ContainerAwareInterface");
-        }
-
-        $server->setContainer($this->getContainer());
-        $server->start();
+                       ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
+                       ->start();
     }
 }

@@ -38,11 +38,7 @@ class ConsumerCommand extends BaseRabbitMqCommand
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
         $consumer = $this->getContainer()
-                         ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')));
-
-        $this->validateConsumer($consumer);
-
-        $consumer->setContainer($this->getContainer());
-        $consumer->consume($input->getOption('messages'));
+                         ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
+                         ->consume($input->getOption('messages'));
     }
 }
