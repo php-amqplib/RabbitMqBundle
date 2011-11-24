@@ -41,7 +41,7 @@ class Consumer extends BaseConsumer
 
     protected function maybeStopConsumer(AMQPMessage $msg)
     {
-        if ($this->target == -1) {
+        if ($this->target == 0) {
             return;
         }
 
