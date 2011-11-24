@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,7 +11,7 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
-class RpcServerCommand extends Command
+class RpcServerCommand extends BaseRabbitMqCommand
 {
 
     protected function configure()
@@ -40,8 +39,15 @@ class RpcServerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-        $this->getContainer()
-            ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
-            ->start();
+        $server = $this->getContainer()
+                       ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')));
+
+
+        if(!($server instanceof 'ContainerAwareInterface')) {
+           throw new Exception("The consumer callback has to implement the ContainerAwareInterface");
+        }
+
+        $server->setContainer($this->getContainer());
+        $server->start();
     }
 }

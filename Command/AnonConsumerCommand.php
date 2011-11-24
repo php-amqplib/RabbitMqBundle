@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
-class AnonConsumerCommand extends Command
+class AnonConsumerCommand extends BaseRabbitMqCommand
 {
 
     protected function configure()
@@ -41,7 +40,12 @@ class AnonConsumerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-        $consumer = $this->getContainer()->get(sprintf('old_sound_rabbit_mq.%s_anon', $input->getArgument('name')));
+        $consumer = $this->getContainer()
+                         ->get(sprintf('old_sound_rabbit_mq.%s_anon', $input->getArgument('name')));
+
+        $this->validateConsumer($consumer);
+
+        $consumer->setContainer($this->getContainer());
         $consumer->setRoutingKey($input->getOption('r_key'));
         $consumer->consume($input->getOption('messages'));
     }

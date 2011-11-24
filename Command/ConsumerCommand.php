@@ -2,17 +2,16 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
-class ConsumerCommand extends Command
+class ConsumerCommand extends BaseRabbitMqCommand
 {
 
     protected function configure()
@@ -41,8 +40,12 @@ class ConsumerCommand extends Command
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-        $this->getContainer()
-            ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
-            ->consume($input->getOption('messages'));
+        $consumer = $this->getContainer()
+                         ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')));
+
+        $this->validateConsumer($consumer);
+
+        $consumer->setContainer($this->getContainer());
+        $consumer->consume($input->getOption('messages'));
     }
 }
