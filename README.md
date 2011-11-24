@@ -128,7 +128,7 @@ Now, how to run a consumer? There's a command for it that can be executed like t
 
     $ ./app/console rabbitmq:consumer -m 50 upload_picture
 
-What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback. If you want to consumer messages __forever__, then pass the option __-1__ to the __m__ option.
+What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
 
 ### Callbacks ###
 
