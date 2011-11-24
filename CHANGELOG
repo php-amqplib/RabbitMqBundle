@@ -1,0 +1,6 @@
+- 2011-11-24:
+    * The rabbitmq:consumer command consumes messages forever unless the -m option is provided.
+    * The -m option for the rabbitmq:consumer command must be greater null or greater than 0.
+    * Fixed issues #2 #7 #11 and #12.
+    * Updated the bundle to use the latest version from videlalvaro/php-amqplib.
+    * Updated installation/setup instructions.
