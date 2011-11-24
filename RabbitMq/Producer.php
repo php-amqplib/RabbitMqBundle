@@ -7,10 +7,9 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-
 class Producer extends BaseAmqp
 {
-    proteced $producerExchangeOptions = array(
+    protected $producerExchangeOptions = array(
         'durable' => false,
         'auto_delete' => true,
         'internal' => false
