@@ -38,7 +38,7 @@ Register the bundle and library namespaces in the `app/autoload.php` file:
     $loader->registerNamespaces(array(
         ...
         'OldSound'         => __DIR__.'/../vendor/bundles',
-        'PhpAmqpLib'       => __DIR__ . '../vendor/videlalvaro/php-amqplib',
+        'PhpAmqpLib'       => __DIR__.'/../vendor/videlalvaro/php-amqplib',
         ...
     ));
 
