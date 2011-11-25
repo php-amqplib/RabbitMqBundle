@@ -267,7 +267,7 @@ Now, how to configure and run such consumer?
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
 
-To start an Anonymous Consumer we use the following command:
+To start an _Anonymous Consumer_ we use the following command:
 
     ./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
 
