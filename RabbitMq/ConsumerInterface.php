@@ -2,9 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-interface ConsumerInterface extends ContainerAwareInterface
+interface ConsumerInterface
 {
     function execute($msg);
 }
