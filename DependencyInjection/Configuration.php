@@ -68,6 +68,7 @@ class Configuration implements ConfigurationInterface
         $node = $tb
             ->root('old_sound_rabbit_mq')
             ->children()
+                ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->arrayNode('connections')
                     ->useAttributeAsKey('key')
                     ->addDefaultsIfNotSet()
