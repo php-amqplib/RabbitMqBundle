@@ -1,0 +1,45 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img width="16" height="16" alt="RabbitMQ" style="border-width: 0; vertical-align: middle; margin-right: 5px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqlJREFUeNrsV01oE0EU/maz2U1tUFqtAY1QsaQVJKmHFjEF0R5E9CQIHhQF0UNBBL2IJ3tUevGiIOjFg0IpiErRXppD0VOpJCohQqWNYmzVtknaZtP9cWaTtKadDU3cmB76wUvCzJt5386+970JMQwDDMZQ3wmkf/bAIQKqAuz23yKHzkfAgRF/78Zo/9PlAZ3u4T95hbQEv6NMiOZnrL+bPO8dhKQBhACaDmzZ6kWL/xh2BGZWLyJDt+9g9M0pyEJuQKH+8bcDuBY6XC6B3A5fPnRiNg0sLALzC/Q7A/yYasfnsYPcVePhdtOH+Rb8J2IBVIDcCTicikmFFB4xT00QVe4qh5Q1ff72FyWlEgICaoxNApsENjgBqzIkgs4Z0+wjwOqahVica+DOZ1LuZQ0o+CvJxsqFiEeAUXt99ybi4QCVZx2GIdA+oSIRbcPvr3uKVrLf6V8C+o6OwBt4B21JtozI+oarPo0jl3ux06eIlo5OaonxLkzc7ypWQWp1HMJsPBIKYoxaKbDel6WmZWWcvXdDLOnozNt64VqnH20dmP3WXNsqEBxL1jnwLzA4r6fsJKwUyqraUvMRJA4x2wmwYL7OFwhefARRzpi6kEzswvCDq5ie7LDKJdG24PWNUVx6cgYeX7ZorsE7iYcXQtB1bsbZk4RMtOq2za0JzuBpjUKSLV+BfVVg6Py9dDZO/kMzYmrJLzc1d0TVJMBUMDXtQWTwwJq58MvTyGQsI4m2EVDmm/H43AD2H38FyUVzgXbM1FQTPtLru2itB/aVIdspNePDyLPrRSIklT5ne4WI16g27o3IcKycgEpbo4ZSyWovWCxNda4QaNr3CRLJXRZItR88f+57O4bNNCn8O0Ys1EavYNsLbbJ6BDQnZHcSrd2RYgI1wh8BBgAR2M5KdN1kRwAAAABJRU5ErkJggg==" />
+    {% endset %}
+    {% set text %}
+        <span>{{ collector.publishedMessagesCount }}</span>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><img alt="RabbitMQ" width="24" height="24" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAqlJREFUeNrsV01oE0EU/maz2U1tUFqtAY1QsaQVJKmHFjEF0R5E9CQIHhQF0UNBBL2IJ3tUevGiIOjFg0IpiErRXppD0VOpJCohQqWNYmzVtknaZtP9cWaTtKadDU3cmB76wUvCzJt5386+970JMQwDDMZQ3wmkf/bAIQKqAuz23yKHzkfAgRF/78Zo/9PlAZ3u4T95hbQEv6NMiOZnrL+bPO8dhKQBhACaDmzZ6kWL/xh2BGZWLyJDt+9g9M0pyEJuQKH+8bcDuBY6XC6B3A5fPnRiNg0sLALzC/Q7A/yYasfnsYPcVePhdtOH+Rb8J2IBVIDcCTicikmFFB4xT00QVe4qh5Q1ff72FyWlEgICaoxNApsENjgBqzIkgs4Z0+wjwOqahVica+DOZ1LuZQ0o+CvJxsqFiEeAUXt99ybi4QCVZx2GIdA+oSIRbcPvr3uKVrLf6V8C+o6OwBt4B21JtozI+oarPo0jl3ux06eIlo5OaonxLkzc7ypWQWp1HMJsPBIKYoxaKbDel6WmZWWcvXdDLOnozNt64VqnH20dmP3WXNsqEBxL1jnwLzA4r6fsJKwUyqraUvMRJA4x2wmwYL7OFwhefARRzpi6kEzswvCDq5ie7LDKJdG24PWNUVx6cgYeX7ZorsE7iYcXQtB1bsbZk4RMtOq2za0JzuBpjUKSLV+BfVVg6Py9dDZO/kMzYmrJLzc1d0TVJMBUMDXtQWTwwJq58MvTyGQsI4m2EVDmm/H43AD2H38FyUVzgXbM1FQTPtLru2itB/aVIdspNePDyLPrRSIklT5ne4WI16g27o3IcKycgEpbo4ZSyWovWCxNda4QaNr3CRLJXRZItR88f+57O4bNNCn8O0Ys1EavYNsLbbJ6BDQnZHcSrd2RYgI1wh8BBgAR2M5KdN1kRwAAAABJRU5ErkJggg==" /></span>
+    <strong>RabbitMQ</strong>
+    <span class="count">
+        <span>{{ collector.publishedMessagesCount }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Messages</h2>
+    {% if collector.publishedMessagesCount %}
+        <table>
+            <tbody>
+                <tr>
+                    <th>Exchange</th>
+                    <th>Message body</th>
+                </tr>
+                {% for log in collector.publishedMessagesLog %}
+                <tr>
+                    <td>{{ log.exchange }}</td>
+                    <td>{{ log.msg.body }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>
+            <em>No messages were sent.</em>
+        </p>
+    {% endif %}
+{% endblock %}

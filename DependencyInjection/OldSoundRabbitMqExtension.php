@@ -6,232 +6,169 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Variable;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
+/**
+ * OldSoundRabbitMqExtension.
+ *
+ * @author Alvaro Videla
+ * @author Marc Weistroff <marc.weistroff@sensio.com>
+ */
 class OldSoundRabbitMqExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
+        $this->container = $container;
 
-        $locator = new FileLocator(array(__DIR__.'/../Resources/config'));
-        $loader = new YamlFileLoader($container, $locator);
-        $loader->load('rabbitmq.yml');
+        $loader = new XmlFileLoader($this->container, new FileLocator(array(__DIR__.'/../Resources/config')));
+        $loader->load('rabbitmq.xml');
 
-        $config = $this->mergeConfig($configs);
+        $configuration = new Configuration();
+        $this->config = $this->processConfiguration($configuration, $configs);
 
-        foreach ($config['connections'] as $name => $connection)
-        {
-            $this->loadConnection($connection, $container);
-        }
+        $this->loadConnections();
+        $this->loadProducers();
+        $this->loadConsumers();
+        $this->loadAnonConsumers();
+        $this->loadRpcClients();
+        $this->loadRpcServers();
 
-        foreach ($config['producers'] as $name => $producer)
-        {
-            $this->loadProducer($producer, $container);
-        }
-
-        foreach ($config['consumers'] as $name => $consumer)
-        {
-            $this->loadConsumer($consumer, $container);
-        }
-
-        foreach ($config['anon_consumers'] as $name => $consumer)
-        {
-            $this->loadAnonConsumer($consumer, $container);
-        }
-
-        foreach ($config['rpc_clients'] as $name => $rpc_client)
-        {
-            $this->loadRpcClient($rpc_client, $container);
-        }
-
-        foreach ($config['rpc_servers'] as $name => $rpc_server)
-        {
-            $this->loadRpcServer($rpc_server, $container);
+        if ($this->config['debug']) {
+            $this->loadDataCollector();
         }
     }
 
-    protected function mergeConfig(array $configs)
+    protected function loadConnections()
     {
-        $mergedConfig = array(
-            'connections' => array(),
-            'producers' => array(),
-            'consumers' => array(),
-            'anon_consumers' => array(),
-            'rpc_clients' => array(),
-            'rpc_servers' => array()
-        );
+        foreach ($this->config['connections'] as $key => $connection) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.connection.class'),
+                                         array(
+                                            $connection['host'],
+                                            $connection['port'],
+                                            $connection['user'],
+                                            $connection['password'],
+                                            $connection['vhost'])
+                                        );
 
-        $connectionDefaults = array(
-            'host' => 'localhost',
-            'port' => 5672,
-            'user' => 'guest',
-            'password' => 'guest',
-            'vhost' => '/'
-        );
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
+        }
+    }
 
-        foreach ($configs as $config)
-        {
-            if (isset($config['connections']))
-            {
-                foreach ($config['connections'] as $name => $connection)
-                {
-                    if (!isset($mergedConfig['connections'][$name]))
-                    {
-                        $mergedConfig['connections'][$name] = $connectionDefaults;
-                    }
-                    $mergedConfig['connections'][$name]['alias'] = $name;
-                    foreach ($connection as $k => $v)
-                    {
-                        if (array_key_exists($k, $connectionDefaults))
-                        {
-                            $mergedConfig['connections'][$name][$k] = $v;
-                        }
-                    }
-                }
+    protected function loadProducers()
+    {
+        foreach ($this->config['producers'] as $key => $producer) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.producer.class'));
+
+            $this->injectConnection($definition, $producer['connection']);
+            if ($this->config['debug']) {
+                $this->injectLoggedChannel($definition, $key, $producer['connection']);
+            }
+            $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+            //TODO add configuration option that allows to not do this all the time.
+            $definition->addMethodCall('exchangeDeclare');
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+        }
+    }
+
+    protected function loadConsumers()
+    {
+        foreach ($this->config['consumers'] as $key => $consumer) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.consumer.class'));
+
+            $this->injectConnection($definition, $consumer['connection']);
+            if ($this->config['debug']) {
+                $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+            $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
+            $definition->addMethodCall('setQueueOptions', array($consumer['queue_options']));
+            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $key), $definition);
+        }
+    }
+
+    protected function loadAnonConsumers()
+    {
+        foreach ($this->config['anon_consumers'] as $key => $anon) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.anon_consumer.class'));
+
+            $this->injectConnection($definition, $anon['connection']);
+            if ($this->config['debug']) {
+                $this->injectLoggedChannel($definition, $key, $anon['connection']);
+            }
+            $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
+            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_anon', $key), $definition);
+        }
+    }
+
+    protected function loadRpcClients()
+    {
+        foreach ($this->config['rpc_clients'] as $key => $client) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.rpc_client.class'));
+
+            if ($this->config['debug']) {
+                $this->injectLoggedChannel($definition, $key, $client['connection']);
+            }
+            $this->injectConnection($definition, $client['connection']);
+            $definition->addMethodCall('initClient');
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
+        }
+    }
+
+    protected function loadRpcServers()
+    {
+        foreach ($this->config['rpc_servers'] as $key => $server) {
+            $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.rpc_server.class'));
+
+            $this->injectConnection($definition, $server['connection']);
+            if ($this->config['debug']) {
+                $this->injectLoggedChannel($definition, $key, $server['connection']);
             }
 
-            $this->mergeItem($mergedConfig, $config, 'producer');
-            $this->mergeItem($mergedConfig, $config, 'consumer');
-            $this->mergeItem($mergedConfig, $config, 'anon_consumer');
-            $this->mergeItem($mergedConfig, $config, 'rpc_client');
-            $this->mergeItem($mergedConfig, $config, 'rpc_server');
+            $definition->addMethodCall('initServer', array($server['alias']));
+            $definition->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
 
-        }
-
-        return $mergedConfig;
-    }
-
-    protected function mergeItem(&$mergedConfig, $config, $item)
-    {
-        $clientDefaults = array(
-            'connection' => null
-        );
-
-        if (isset($config[$item . 's']))
-        {
-            foreach ($config[$item . 's'] as $name => $$item)
-            {
-                if (!isset($mergedConfig[$item . 's'][$name]))
-                {
-                    $mergedConfig[$item . 's'][$name] = $clientDefaults;
-                }
-                $mergedConfig[$item . 's'][$name]['alias'] = $name;
-                if (!empty($$item))
-                {
-                    foreach ($$item as $k => $v)
-                    {
-                        $mergedConfig[$item . 's'][$name][$k] = $v;
-                    }
-                }
-            }
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
         }
     }
 
-    protected function loadConnection(array $connection, ContainerBuilder $container)
+    protected function loadDataCollector()
     {
-        $connectionDef = new Definition($container->getParameter('old_sound_rabbit_mq.connection.class'),
-                                        array($connection['host'], $connection['port'],
-                                              $connection['user'], $connection['password'],
-                                              $connection['vhost']));
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $connection['alias']), $connectionDef);
-
-    }
-
-    protected function loadProducer(array $producer, ContainerBuilder $container)
-    {
-        $producerDef = new Definition($container->getParameter('old_sound_rabbit_mq.producer.class'));
-
-        $producer = $this->setDefaultItemConnection($producer);
-
-        $this->injectConnection($producerDef, $producer);
-
-        $producerDef->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
-        //TODO add configuration option that allows to not do this all the time.
-        $producerDef->addMethodCall('exchangeDeclare');
-
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $producer['alias']), $producerDef);
-    }
-
-    protected function loadConsumer(array $consumer, ContainerBuilder $container)
-    {
-        $consumerDef = new Definition($container->getParameter('old_sound_rabbit_mq.consumer.class'));
-
-        $consumer = $this->setDefaultItemConnection($consumer);
-
-        $this->injectConnection($consumerDef, $consumer);
-
-        $consumerDef->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
-        $consumerDef->addMethodCall('setQueueOptions', array($consumer['queue_options']));
-        $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
-
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $consumer['alias']), $consumerDef);
-    }
-
-    protected function loadAnonConsumer(array $consumer, ContainerBuilder $container)
-    {
-        $consumerDef = new Definition($container->getParameter('old_sound_rabbit_mq.anon_consumer.class'));
-
-        $consumer = $this->setDefaultItemConnection($consumer);
-
-        $this->injectConnection($consumerDef, $consumer);
-
-        $consumerDef->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
-        $consumerDef->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
-
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_anon', $consumer['alias']), $consumerDef);
-    }
-
-    protected function loadRpcClient(array $client, ContainerBuilder $container)
-    {
-        $clientDef = new Definition($container->getParameter('old_sound_rabbit_mq.rpc_client.class'));
-
-        $client = $this->setDefaultItemConnection($client);
-
-        $this->injectConnection($clientDef, $client);
-
-        $clientDef->addMethodCall('initClient');
-
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $client['alias']), $clientDef);
-    }
-
-    protected function loadRpcServer(array $server, ContainerBuilder $container)
-    {
-        $serverDef = new Definition($container->getParameter('old_sound_rabbit_mq.rpc_server.class'));
-
-        $server = $this->setDefaultItemConnection($server);
-
-        $this->injectConnection($serverDef, $server);
-
-        $serverDef->addMethodCall('initServer', array($server['alias']));
-        $serverDef->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
-
-        $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $server['alias']), $serverDef);
-    }
-
-    protected function setDefaultItemConnection($item)
-    {
-        if (null === $item['connection'])
-        {
-            $item['connection'] = $item['alias'];
+        $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.data_collector.class'));
+        $channels = array();
+        foreach ($this->container->findTaggedServiceIds('old_sound_rabbit_mq.logged_channel') as $id => $params) {
+            $channels[] = new Reference($id);
         }
 
-        return $item;
+        $this->container->setDefinition('data_collector.rabbit_mq', $definition)
+                        ->addArgument($channels)
+                        ->addTag('data_collector', array(
+                            'template' => 'OldSoundRabbitMqBundle:Collector:collector.html.twig',
+                            'id'       => 'rabbit_mq',
+                        ));
     }
 
-    protected function injectConnection(Definition $def, $item)
+    protected function injectLoggedChannel(Definition $definition, $name, $connectionName)
     {
-        $def->addArgument(new Reference(sprintf('old_sound_rabbit_mq.connection.%s', $item['connection'])));
+        $channel = new Definition($this->container->getParameter('old_sound_rabbit_mq.logged.channel.class'));
+        $this->injectConnection($channel, $connectionName);
+        $channel->setPublic(false);
+        $channel->addTag('old_sound_rabbit_mq.logged_channel');
+
+        $id = sprintf('old_sound_rabbit_mq.channel.%s', $name);
+        $this->container->setDefinition($id, $channel);
+
+        $definition->addArgument(new Reference($id));
     }
 
-    public function getXsdValidationBasePath()
+    protected function injectConnection(Definition $def, $connectionName)
     {
-        return __DIR__.'/../Resources/config/';
-    }
-
-    public function getNamespace()
-    {
-        return 'http://www.example.com/symfony/schema/';
+        $def->addArgument(new Reference(sprintf('old_sound_rabbit_mq.connection.%s', $connectionName)));
     }
 
     public function getAlias()
@@ -239,3 +176,4 @@ class OldSoundRabbitMqExtension extends Extension
         return 'old_sound_rabbit_mq';
     }
 }
+
