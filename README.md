@@ -140,10 +140,9 @@ Here's an example callback:
 
     namespace Sensio\HelloBundle\Consumer;
 
-    use Symfony\Component\DependencyInjection\ContainerAware;
     use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
-    class UploadPictureConsumer extends ContainerAware implements ConsumerInterface
+    class UploadPictureConsumer implements ConsumerInterface
     {
         public function execute($msg)
         {
