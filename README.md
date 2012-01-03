@@ -128,7 +128,7 @@ Now, how to run a consumer? There's a command for it that can be executed like t
 
     $ ./app/console rabbitmq:consumer -m 50 upload_picture
 
-What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
+What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback passing the AMQP message as an instance of the `PhpAmqpLib\Message\AMQPMessage` class. The message body can be obtained by calling `$msg->body`. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
 
 ### Callbacks ###
 
@@ -147,13 +147,15 @@ Here's an example callback:
         public function execute($msg)
         {
             //Process picture upload.
-            //$msg will be what was published from the Controller.
+            //$msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
         }
     }
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
 Keep in mind that your callbacks _need to be registered_ as normal `Symfony2` services. There you can inject the service container, the database service, the Symfony logger, and so on.
+
+See [https://github.com/videlalvaro/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/videlalvaro/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
 ### Recap ###
 
