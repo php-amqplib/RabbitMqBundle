@@ -19,6 +19,7 @@ class ConsumerCommand extends BaseRabbitMqCommand
             ->setName('rabbitmq:consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
+            ->addOption('r_key', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '#')
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
         ;
     }
@@ -43,7 +44,8 @@ class ConsumerCommand extends BaseRabbitMqCommand
         }
 
         $consumer = $this->getContainer()
-                         ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')))
-                         ->consume($amount);
+                         ->get(sprintf('old_sound_rabbit_mq.%s_consumer', $input->getArgument('name')));
+        $consumer->setRoutingKey($input->getOption('r_key'));
+        $consumer->consume($amount);
     }
 }
