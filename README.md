@@ -139,7 +139,7 @@ Here's an example callback:
 
     <?php
 
-    //src/Sensio/HelloBundle/Consumer/UploadPictureConsumer.php
+    //src/Acme/DemoBundle/Consumer/UploadPictureConsumer.php
 
     namespace Sensio\HelloBundle\Consumer;
 
