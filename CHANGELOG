@@ -2,6 +2,8 @@
     * Merged PR #14 Now instances of `PhpAmqpLib\Message\AMQPMessage` are passed to consumers instead of just the message body.
         The message body can be obtained then by writing `$msg->body` inside the `execute` method.
     * Merged PR #13 removing the need for the ContainerAwareInterface on consumers.
+    * `rabbitmq:consumer` now takes a `--route` argument that can be used to specify the routing key.
+
 - 2011-11-25:
     * Fixed autoload configuration example
     * Adds a producer that can publish data coming from STDIN. The use case will be to use it in combination with unix pipes.
