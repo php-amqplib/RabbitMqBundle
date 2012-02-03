@@ -1,0 +1,21 @@
+{
+    "name": "oldsound/rabbitmq-bundle",
+    "description": "Integrates php-amqplib with Symfony2 and RabbitMq",
+    "keywords": ["symfony2", "rabbitmq", "message", "queue"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [{
+        "name" : "Alvaro Videla"
+    }],
+    "require": {
+        "php"                      : ">=5.3.0",
+        "symfony/framework-bundle" : ">=2.0",
+        "henrikbjorn/stampie"      : "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "OldSound\\RabbitMqBundle\\": ""
+        }
+    },
+    "target-dir" : "OldSound/RabbitMqBundle"
+}
