@@ -13,16 +13,6 @@ class RpcServer extends BaseConsumer
         $this->setQueueOptions(array('name' => $name . '-queue'));
     }
 
-    public function start()
-    {
-        $this->setUpConsumer();
-
-        while (count($this->ch->callbacks))
-        {
-            $this->ch->wait();
-        }
-    }
-
     public function processMessage(AMQPMessage $msg)
     {
         try
@@ -30,6 +20,8 @@ class RpcServer extends BaseConsumer
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             $result = call_user_func($this->callback, $msg);
             $this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
+            $this->consumed++;
+            $this->maybeStopConsumer();
         }
         catch (\Exception $e)
         {

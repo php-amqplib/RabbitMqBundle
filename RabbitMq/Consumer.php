@@ -7,10 +7,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
-    protected $target;
-
-    protected $consumed = 0;
-
     public function consume($msgAmount)
     {
         $this->target = $msgAmount;
@@ -30,7 +26,7 @@ class Consumer extends BaseConsumer
             call_user_func($this->callback, $msg);
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             $this->consumed++;
-            $this->maybeStopConsumer($msg);
+            $this->maybeStopConsumer();
         }
         catch (\Exception $e)
         {
@@ -38,14 +34,4 @@ class Consumer extends BaseConsumer
         }
     }
 
-    protected function maybeStopConsumer(AMQPMessage $msg)
-    {
-        if ($this->target == 0) {
-            return;
-        }
-
-        if ($this->consumed == $this->target) {
-            $this->stopConsuming();
-        }
-    }
 }
