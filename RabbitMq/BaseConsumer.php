@@ -6,11 +6,27 @@ use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 
 abstract class BaseConsumer extends BaseAmqp
 {
+    protected $target;
+
+    protected $consumed = 0;
+
     protected $callback;
 
     public function setCallback($callback)
     {
         $this->callback = $callback;
+    }
+
+    public function start($msgAmount = 0)
+    {
+        $this->target = $msgAmount;
+
+        $this->setUpConsumer();
+
+        while (count($this->ch->callbacks))
+        {
+            $this->ch->wait();
+        }
     }
 
     public function stopConsuming()
@@ -33,6 +49,17 @@ abstract class BaseConsumer extends BaseAmqp
 
         $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
         $this->ch->basic_consume($queueName, $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+    }
+
+    protected function maybeStopConsumer()
+    {
+        if ($this->target == 0) {
+            return;
+        }
+
+        if ($this->consumed == $this->target) {
+            $this->stopConsuming();
+        }
     }
 
     public function setConsumerTag($tag)

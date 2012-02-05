@@ -7,26 +7,10 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcServer extends BaseConsumer
 {
-    protected $target;
-
-    protected $consumed = 0;
-
     public function initServer($name)
     {
         $this->setExchangeOptions(array('name' => $name, 'type' => 'direct'));
         $this->setQueueOptions(array('name' => $name . '-queue'));
-    }
-
-    public function start($msgAmount = 0)
-    {
-        $this->target = $msgAmount;
-
-        $this->setUpConsumer();
-
-        while (count($this->ch->callbacks))
-        {
-            $this->ch->wait();
-        }
     }
 
     public function processMessage(AMQPMessage $msg)
@@ -49,16 +33,5 @@ class RpcServer extends BaseConsumer
     {
         $reply = new AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
         $this->ch->basic_publish($reply, '', $client);
-    }
-
-    protected function maybeStopConsumer()
-    {
-        if ($this->target == 0) {
-            return;
-        }
-
-        if ($this->consumed == $this->target) {
-            $this->stopConsuming();
-        }
     }
 }
