@@ -99,8 +99,8 @@ class OldSoundRabbitMqExtension extends Extension
             if ($this->config['debug']) {
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);
             }
-            $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
-            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+            $definition->addMethodCall('setExchangeOptions', array($anon['exchange_options']));
+            $definition->addMethodCall('setCallback', array(array(new Reference($anon['callback']), 'execute')));
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_anon', $key), $definition);
         }
@@ -111,10 +111,11 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['rpc_clients'] as $key => $client) {
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.rpc_client.class'));
 
+            $this->injectConnection($definition, $client['connection']);
             if ($this->config['debug']) {
                 $this->injectLoggedChannel($definition, $key, $client['connection']);
             }
-            $this->injectConnection($definition, $client['connection']);
+
             $definition->addMethodCall('initClient');
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
         }
@@ -130,7 +131,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $server['connection']);
             }
 
-            $definition->addMethodCall('initServer', array($server['alias']));
+            $definition->addMethodCall('initServer', array($key));
             $definition->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
