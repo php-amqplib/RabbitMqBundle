@@ -36,6 +36,7 @@ class Producer extends BaseAmqp
         $this->ch->exchange_declare(
             $this->exchangeOptions['name'],
             $this->exchangeOptions['type'],
+            $this->exchangeOptions['passive'],
             $this->exchangeOptions['durable'],
             $this->exchangeOptions['auto_delete'],
             $this->exchangeOptions['internal']);
