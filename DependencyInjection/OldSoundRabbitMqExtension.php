@@ -27,6 +27,7 @@ class OldSoundRabbitMqExtension extends Extension
 
         $configuration = new Configuration();
         $this->config = $this->processConfiguration($configuration, $configs);
+        $this->enable_collector = $this->config['enable_collector'];
 
         $this->loadConnections();
         $this->loadProducers();
@@ -35,7 +36,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadRpcClients();
         $this->loadRpcServers();
 
-        if ($this->config['debug']) {
+        if ($this->enable_collector) {
             $this->loadDataCollector();
         }
     }
@@ -62,7 +63,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.producer.class'));
 
             $this->injectConnection($definition, $producer['connection']);
-            if ($this->config['debug']) {
+            if ($this->enable_collector) {
                 $this->injectLoggedChannel($definition, $key, $producer['connection']);
             }
             $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
@@ -79,7 +80,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.consumer.class'));
 
             $this->injectConnection($definition, $consumer['connection']);
-            if ($this->config['debug']) {
+            if ($this->enable_collector) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
             $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
@@ -96,7 +97,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.anon_consumer.class'));
 
             $this->injectConnection($definition, $anon['connection']);
-            if ($this->config['debug']) {
+            if ($this->enable_collector) {
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);
             }
             $definition->addMethodCall('setExchangeOptions', array($anon['exchange_options']));
@@ -112,7 +113,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.rpc_client.class'));
 
             $this->injectConnection($definition, $client['connection']);
-            if ($this->config['debug']) {
+            if ($this->enable_collector) {
                 $this->injectLoggedChannel($definition, $key, $client['connection']);
             }
 
@@ -127,7 +128,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition($this->container->getParameter('old_sound_rabbit_mq.rpc_server.class'));
 
             $this->injectConnection($definition, $server['connection']);
-            if ($this->config['debug']) {
+            if ($this->enable_collector) {
                 $this->injectLoggedChannel($definition, $key, $server['connection']);
             }
 

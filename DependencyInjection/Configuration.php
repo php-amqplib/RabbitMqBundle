@@ -69,6 +69,7 @@ class Configuration implements ConfigurationInterface
             ->root('old_sound_rabbit_mq')
             ->children()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
+                ->booleanNode('enable_collector')->defaultValue(false)->end()
                 ->arrayNode('connections')
                     ->useAttributeAsKey('key')
                     ->canBeUnset()
