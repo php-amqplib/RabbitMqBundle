@@ -5,6 +5,7 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configuration
@@ -69,7 +70,6 @@ class Configuration implements ConfigurationInterface
             ->root('old_sound_rabbit_mq')
             ->children()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
-                ->booleanNode('enable_collector')->defaultValue(false)->end()
                 ->arrayNode('connections')
                     ->useAttributeAsKey('key')
                     ->canBeUnset()
@@ -113,6 +113,12 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('scope')->defaultValue('container')
+                                ->validate()
+                                    ->ifTrue(function($v){return !in_array($v, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE));})
+                                    ->thenInvalid("'Scope must be ". ContainerInterface::SCOPE_CONTAINER . " or " .ContainerInterface::SCOPE_PROTOTYPE . ".")
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
