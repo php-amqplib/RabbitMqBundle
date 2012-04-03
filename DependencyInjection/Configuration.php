@@ -114,7 +114,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
-                            ->scalarNode('scope')->defaultValue('container')
+                            ->scalarNode('scope')->defaultValue(ContainerInterface::SCOPE_CONTAINER)
                                 ->validate()
                                     ->ifTrue(function($v){return !in_array($v, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE));})
                                     ->thenInvalid("'Scope must be ". ContainerInterface::SCOPE_CONTAINER . " or " .ContainerInterface::SCOPE_PROTOTYPE . ".")
