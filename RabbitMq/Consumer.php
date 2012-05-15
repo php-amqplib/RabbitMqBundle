@@ -23,8 +23,12 @@ class Consumer extends BaseConsumer
     {
         try
         {
-            call_user_func($this->callback, $msg);
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            // Remove message from queue only if callback return not false
+            if (false !== call_user_func($this->callback, $msg))
+            {
+                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            }
+
             $this->consumed++;
             $this->maybeStopConsumer();
         }
