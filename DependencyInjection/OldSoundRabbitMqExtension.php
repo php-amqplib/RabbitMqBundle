@@ -67,8 +67,6 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $producer['connection']);
             }
             $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
-            //TODO add configuration option that allows to not do this all the time.
-            $definition->addMethodCall('exchangeDeclare');
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
         }
@@ -178,4 +176,3 @@ class OldSoundRabbitMqExtension extends Extension
         return 'old_sound_rabbit_mq';
     }
 }
-
