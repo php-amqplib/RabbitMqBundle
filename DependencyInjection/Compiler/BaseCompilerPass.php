@@ -6,18 +6,15 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @author Timothée Barray <tim@amicalement-web.net>
  */
-class BaseCompilerPass implements CompilerPassInterface
+abstract class BaseCompilerPass implements CompilerPassInterface
 {
     protected 
         $config = array(),
-        $enable_collector = false;
+        $enableCollector = false;
 
     public function process(ContainerBuilder $container)
     {
@@ -26,7 +23,7 @@ class BaseCompilerPass implements CompilerPassInterface
         $this->config = array_shift($config);
 
         if (isset($this->config['enable_collector']) && $this->config['enable_collector']) {
-            $this->enable_collector = true;
+            $this->enableCollector = true;
         }
 
         if (!isset($this->config['rpc_clients'])) {
@@ -39,6 +36,14 @@ class BaseCompilerPass implements CompilerPassInterface
 
         if (!isset($this->config['anon_consumers'])) {
             $this->config['anon_consumers'] = array();
+        }
+
+        if (!isset($this->config['consumers'])) {
+            $this->config['consumers'] = array();
+        }
+
+        if (!isset($this->config['producers'])) {
+            $this->config['producers'] = array();
         }
     }
 

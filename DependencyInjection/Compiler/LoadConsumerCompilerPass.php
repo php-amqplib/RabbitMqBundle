@@ -4,10 +4,7 @@ namespace OldSound\RabbitMqBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @author Timothée Barray <tim@amicalement-web.net>
@@ -25,7 +22,7 @@ class LoadConsumerCompilerPass extends BaseCompilerPass
             $definition = new Definition($container->getParameter('old_sound_rabbit_mq.consumer.class'));
 
             $this->injectConnection($definition, $consumer['connection']);
-            if ($this->enable_collector) {
+            if ($this->enableCollector) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection'], $container);
             }
             $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
