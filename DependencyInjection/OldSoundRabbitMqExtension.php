@@ -31,4 +31,3 @@ class OldSoundRabbitMqExtension extends Extension
         return 'old_sound_rabbit_mq';
     }
 }
-
