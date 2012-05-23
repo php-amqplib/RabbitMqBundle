@@ -15,6 +15,8 @@ class Producer extends BaseAmqp
         'internal' => false
     );
 
+    protected $declared = false;
+
     public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         parent::__construct($conn, $ch, $consumerTag);
@@ -40,10 +42,15 @@ class Producer extends BaseAmqp
             $this->exchangeOptions['durable'],
             $this->exchangeOptions['auto_delete'],
             $this->exchangeOptions['internal']);
+
+        $this->declared = true;
     }
 
     public function publish($msgBody, $routingKey = '')
     {
+        if (!$this->declared) {
+            $this->exchangeDeclare();
+        }
         $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain', 'delivery_mode' => 2));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
     }
