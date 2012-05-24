@@ -23,8 +23,6 @@ class LoadProducerCompilerPass extends BaseCompilerPass
                 $this->injectLoggedChannel($definition, $key, $producer['connection'], $container);
             }
             $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
-            //TODO add configuration option that allows to not do this all the time.
-            $definition->addMethodCall('exchangeDeclare');
 
             $container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
         }
