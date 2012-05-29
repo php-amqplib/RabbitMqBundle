@@ -1,3 +1,7 @@
+- 2012-05-29
+    * Merged PR #46 adding compiler passes for the configuration. Now the parameter classes can be overriden.
+    * Treats queue arguments as a variableNode in the configuration to allow declaring HA Queues.
+
 - 2012-01-03
     * Merged PR #14 Now instances of `PhpAmqpLib\Message\AMQPMessage` are passed to consumers instead of just the message body.
         The message body can be obtained then by writing `$msg->body` inside the `execute` method.
