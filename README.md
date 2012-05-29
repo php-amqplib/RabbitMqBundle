@@ -309,6 +309,15 @@ And finally the output of `cat` goes directly to our producer that is invoked li
 
 It takes only one argument which is the name of the producer as you configured it in your `config.yml` file.
 
+## How To Contribute ##
+
+To contribute just open a Pull Request with your new code taking into account that if you add new features or modify existing ones you have to document in this README what they do. If you break BC then you have to document it as well. Also you have to update the CHANGELOG. So:
+
+- Document New Features.
+- Update CHANGELOG.
+- Document BC breaking changes.
+
+
 ## License ##
 
 See: resources/meta/LICENSE.md
