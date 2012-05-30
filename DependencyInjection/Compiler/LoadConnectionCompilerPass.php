@@ -15,6 +15,10 @@ class LoadConnectionCompilerPass extends BaseCompilerPass
     {
         parent::process($container);
 
+        if (!isset($this->config['connections'])) {
+            return;
+        }
+
         foreach ($this->config['connections'] as $key => $connection) {
             $definition = new Definition($container->getParameter('old_sound_rabbit_mq.connection.class'),
                                          array(
