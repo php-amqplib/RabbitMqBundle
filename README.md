@@ -152,6 +152,16 @@ Here's an example callback:
         {
             //Process picture upload.
             //$msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
+
+			$isUploadSuccess = someUploadPictureMethod();
+			if (!$isUploadSuccess) {
+				
+				// If you upload an image failed due to a temporary error, from the callback can return `false`, 
+				// so RabbitMq did not remove the message from the queue, and moved it to the end of the queue 
+				// (reject & requeue). For any other result of the `execute` method will be removed from the message 
+				// queue as well handled.
+				return false;
+			}
         }
     }
 
