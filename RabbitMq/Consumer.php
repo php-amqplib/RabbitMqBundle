@@ -34,4 +34,5 @@ class Consumer extends BaseConsumer
         $this->consumed++;
         $this->maybeStopConsumer();
     }
+
 }
