@@ -13,41 +13,27 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
-    public function addExchangeConfiguration(NodeBuilder $nb, array $defaultValues = array())
+    public function getExchangeConfiguration()
     {
-        $defaults = array(
-            'passive'     => false,
-            'durable'     => true,
-            'auto_delete' => false,
-            'internal'    => false,
-            'nowait'      => false,
-            'arguments'   => null,
-            'tickets'     => null,
-        );
-
-        $defaults = array_merge($defaults, $defaultValues);
-
-        return $nb
-            ->arrayNode('exchange_options')
+        return arrayNode('exchange_options')
                 ->children()
                     ->scalarNode('name')->end()
                     ->scalarNode('type')->end()
-                    ->booleanNode('passive')->defaultValue($defaults['passive'])->end()
-                    ->booleanNode('durable')->defaultValue($defaults['durable'])->end()
-                    ->booleanNode('auto_delete')->defaultValue($defaults['auto_delete'])->end()
-                    ->booleanNode('internal')->defaultValue($defaults['internal'])->end()
-                    ->booleanNode('nowait')->defaultValue($defaults['nowait'])->end()
-                    ->scalarNode('arguments')->defaultValue($defaults['arguments'])->end()
-                    ->scalarNode('ticket')->defaultValue($defaults['tickets'])->end()
+                    ->booleanNode('passive')->defaultValue(false)->end()
+                    ->booleanNode('durable')->defaultValue(true)->end()
+                    ->booleanNode('auto_delete')->defaultValue(false)->end()
+                    ->booleanNode('internal')->defaultValue(false)->end()
+                    ->booleanNode('nowait')->defaultValue(false)->end()
+                    ->scalarNode('arguments')->defaultNull()->end()
+                    ->scalarNode('ticket')->defaultNull()->end()
                 ->end()
             ->end()
         ;
     }
 
-    public function addQueueConfiguration(NodeBuilder $nb)
+    public function getQueueConfiguration()
     {
-        return $nb
-            ->arrayNode('queue_options')
+        return arrayNode('queue_options')
                 ->children()
                     ->scalarNode('name')->end()
                     ->booleanNode('passive')->defaultFalse()->end()
@@ -89,8 +75,8 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $node = $this->addExchangeConfiguration($node, array('durable' => false, 'auto_delete' => true, 'internal' => false))
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
                         ->end()
                     ->end()
                 ->end()
@@ -100,9 +86,9 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $node = $this->addExchangeConfiguration($node);
-                            $node = $this->addQueueConfiguration($node)
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
+                            ->append($this->getQueueConfiguration())
                             ->scalarNode('callback')->end()
                         ->end()
                     ->end()
@@ -131,8 +117,8 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $this->addExchangeConfiguration($node)
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
                             ->scalarNode('callback')->end()
                         ->end()
                     ->end()
