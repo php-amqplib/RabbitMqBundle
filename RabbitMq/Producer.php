@@ -17,12 +17,6 @@ class Producer extends BaseAmqp
 
     protected $declared = false;
 
-    public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
-    {
-        parent::__construct($conn, $ch, $consumerTag);
-
-    }
-
     public function setExchangeOptions(array $options = array())
     {
         $this->exchangeOptions = array_merge(
