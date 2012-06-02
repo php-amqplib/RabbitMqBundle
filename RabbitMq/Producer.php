@@ -9,23 +9,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Producer extends BaseAmqp
 {
-    protected $producerExchangeOptions = array(
-        'durable' => false,
-        'auto_delete' => true,
-        'internal' => false
-    );
-
     protected $declared = false;
-
-    public function setExchangeOptions(array $options = array())
-    {
-        $this->exchangeOptions = array_merge(
-            $this->exchangeOptions,
-            $this->producerExchangeOptions
-        );
-
-        parent::setExchangeOptions($options);
-    }
 
     public function exchangeDeclare()
     {

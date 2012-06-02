@@ -5,6 +5,7 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * Configuration
@@ -13,60 +14,11 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
-    public function addExchangeConfiguration(NodeBuilder $nb, array $defaultValues = array())
-    {
-        $defaults = array(
-            'passive'     => false,
-            'durable'     => true,
-            'auto_delete' => false,
-            'internal'    => false,
-            'nowait'      => false,
-            'arguments'   => null,
-            'tickets'     => null,
-        );
-
-        $defaults = array_merge($defaults, $defaultValues);
-
-        return $nb
-            ->arrayNode('exchange_options')
-                ->children()
-                    ->scalarNode('name')->end()
-                    ->scalarNode('type')->end()
-                    ->booleanNode('passive')->defaultValue($defaults['passive'])->end()
-                    ->booleanNode('durable')->defaultValue($defaults['durable'])->end()
-                    ->booleanNode('auto_delete')->defaultValue($defaults['auto_delete'])->end()
-                    ->booleanNode('internal')->defaultValue($defaults['internal'])->end()
-                    ->booleanNode('nowait')->defaultValue($defaults['nowait'])->end()
-                    ->scalarNode('arguments')->defaultValue($defaults['arguments'])->end()
-                    ->scalarNode('ticket')->defaultValue($defaults['tickets'])->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    public function addQueueConfiguration(NodeBuilder $nb)
-    {
-        return $nb
-            ->arrayNode('queue_options')
-                ->children()
-                    ->scalarNode('name')->end()
-                    ->booleanNode('passive')->defaultFalse()->end()
-                    ->booleanNode('durable')->defaultTrue()->end()
-                    ->booleanNode('exclusive')->defaultFalse()->end()
-                    ->booleanNode('auto_delete')->defaultFalse()->end()
-                    ->booleanNode('nowait')->defaultFalse()->end()
-                    ->variableNode('arguments')->end()
-                    ->scalarNode('ticket')->defaultNull()->end()
-                ->end()
-            ->end()
-        ;
-    }
-
     public function getConfigTreeBuilder()
     {
-        $tb = new TreeBuilder();
-        $node = $tb
-            ->root('old_sound_rabbit_mq')
+        $tree = new TreeBuilder();
+
+        $tree->root('old_sound_rabbit_mq')
             ->children()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('enable_collector')->defaultValue(false)->end()
@@ -89,8 +41,8 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $node = $this->addExchangeConfiguration($node, array('durable' => false, 'auto_delete' => true, 'internal' => false))
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
                         ->end()
                     ->end()
                 ->end()
@@ -100,9 +52,9 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $node = $this->addExchangeConfiguration($node);
-                            $node = $this->addQueueConfiguration($node)
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
+                            ->append($this->getQueueConfiguration())
                             ->scalarNode('callback')->end()
                         ->end()
                     ->end()
@@ -131,15 +83,52 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end();
-                            $this->addExchangeConfiguration($node)
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->append($this->getExchangeConfiguration())
                             ->scalarNode('callback')->end()
                         ->end()
                     ->end()
             ->end()
         ;
 
-        return $tb;
+        return $tree;
+    }
+
+    protected function getExchangeConfiguration()
+    {
+        $node = new ArrayNodeDefinition('exchange_options');
+
+        return $node
+            ->children()
+            ->scalarNode('name')->end()
+            ->scalarNode('type')->end()
+            ->booleanNode('passive')->defaultValue(false)->end()
+            ->booleanNode('durable')->defaultValue(true)->end()
+            ->booleanNode('auto_delete')->defaultValue(false)->end()
+            ->booleanNode('internal')->defaultValue(false)->end()
+            ->booleanNode('nowait')->defaultValue(false)->end()
+            ->scalarNode('arguments')->defaultNull()->end()
+            ->scalarNode('ticket')->defaultNull()->end()
+            ->end()
+            ;
+    }
+
+    protected function getQueueConfiguration()
+    {
+        $node = new ArrayNodeDefinition('queue_options');
+
+        return $node
+            ->children()
+            ->scalarNode('name')->end()
+            ->booleanNode('passive')->defaultFalse()->end()
+            ->booleanNode('durable')->defaultTrue()->end()
+            ->booleanNode('exclusive')->defaultFalse()->end()
+            ->booleanNode('auto_delete')->defaultFalse()->end()
+            ->booleanNode('nowait')->defaultFalse()->end()
+            ->variableNode('arguments')->end()
+            ->scalarNode('ticket')->defaultNull()->end()
+            ->end()
+            ;
     }
 }
 
