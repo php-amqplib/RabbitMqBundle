@@ -56,6 +56,14 @@ Add the RabbitMqBundle to your application's kernel:
 
 ### Warning - BC Breaking Changes ###
 
+* Since 2012-06-02 Some default options for exchanges declared in the "producers" config section
+  have changed to match the defaults of exchanges declared under the "consumers" section.
+  The affected settings are:
+
+  * `durable` was changed from `false` to `true`,
+  * `auto_delete` was changed from `true` to `false`.
+
+  Your configuration must be updated if you were relying on the previous defalut values.
 * Since 2012-04-24 The ConsumerInterface::execute method signature has changed
 * Since 2012-01-03 the consumers execute method gets the whole AMQP message object and not just the body. See the CHANGELOG file for more details.
 
