@@ -55,7 +55,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->append($this->getExchangeConfiguration())
                             ->append($this->getQueueConfiguration())
-                            ->scalarNode('callback')->end()
+                            ->scalarNode('callback')->isRequired()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -74,7 +74,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
-                            ->scalarNode('callback')->end()
+                            ->scalarNode('callback')->isRequired()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -85,9 +85,10 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->append($this->getExchangeConfiguration())
-                            ->scalarNode('callback')->end()
+                            ->scalarNode('callback')->isRequired()->end()
                         ->end()
                     ->end()
+                ->end()
             ->end()
         ;
 
@@ -100,17 +101,17 @@ class Configuration implements ConfigurationInterface
 
         return $node
             ->children()
-            ->scalarNode('name')->end()
-            ->scalarNode('type')->end()
-            ->booleanNode('passive')->defaultValue(false)->end()
-            ->booleanNode('durable')->defaultValue(true)->end()
-            ->booleanNode('auto_delete')->defaultValue(false)->end()
-            ->booleanNode('internal')->defaultValue(false)->end()
-            ->booleanNode('nowait')->defaultValue(false)->end()
-            ->scalarNode('arguments')->defaultNull()->end()
-            ->scalarNode('ticket')->defaultNull()->end()
+                ->scalarNode('name')->end()
+                ->scalarNode('type')->end()
+                ->booleanNode('passive')->defaultValue(false)->end()
+                ->booleanNode('durable')->defaultValue(true)->end()
+                ->booleanNode('auto_delete')->defaultValue(false)->end()
+                ->booleanNode('internal')->defaultValue(false)->end()
+                ->booleanNode('nowait')->defaultValue(false)->end()
+                ->scalarNode('arguments')->defaultNull()->end()
+                ->scalarNode('ticket')->defaultNull()->end()
             ->end()
-            ;
+        ;
     }
 
     protected function getQueueConfiguration()
@@ -119,16 +120,16 @@ class Configuration implements ConfigurationInterface
 
         return $node
             ->children()
-            ->scalarNode('name')->end()
-            ->booleanNode('passive')->defaultFalse()->end()
-            ->booleanNode('durable')->defaultTrue()->end()
-            ->booleanNode('exclusive')->defaultFalse()->end()
-            ->booleanNode('auto_delete')->defaultFalse()->end()
-            ->booleanNode('nowait')->defaultFalse()->end()
-            ->variableNode('arguments')->end()
-            ->scalarNode('ticket')->defaultNull()->end()
+                ->scalarNode('name')->end()
+                ->booleanNode('passive')->defaultFalse()->end()
+                ->booleanNode('durable')->defaultTrue()->end()
+                ->booleanNode('exclusive')->defaultFalse()->end()
+                ->booleanNode('auto_delete')->defaultFalse()->end()
+                ->booleanNode('nowait')->defaultFalse()->end()
+                ->variableNode('arguments')->end()
+                ->scalarNode('ticket')->defaultNull()->end()
             ->end()
-            ;
+        ;
     }
 }
 
