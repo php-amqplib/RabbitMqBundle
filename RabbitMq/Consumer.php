@@ -24,8 +24,6 @@ class Consumer extends BaseConsumer
         try
         {
             if (false === call_user_func($this->callback, $msg)) {
-                // Pause 1 second. No need load CPU for requeue
-                sleep(1);
                 // Reject and requeue message to RabbitMQ
                 $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
             }
