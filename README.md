@@ -56,8 +56,8 @@ Add the RabbitMqBundle to your application's kernel:
 
 ### Warning - BC Breaking Changes ###
 
-* Since 2012-06-02 Some default options for exchanges declared in the "producers" config section
-  have changed to match the defaults of exchanges declared under the "consumers" section.
+* Since 2012-06-04 Some default options for exchanges declared in the "producers" config section
+  have changed to match the defaults of exchanges declared in the "consumers" section.
   The affected settings are:
 
   * `durable` was changed from `false` to `true`,

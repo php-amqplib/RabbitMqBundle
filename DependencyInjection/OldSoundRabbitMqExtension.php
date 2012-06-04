@@ -29,7 +29,6 @@ class OldSoundRabbitMqExtension extends Extension
 
     private $channelIds = array();
 
-
     public function load(array $configs, ContainerBuilder $container)
     {
         $this->container = $container;

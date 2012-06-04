@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\Reference;
 
-
 class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testFooConnectionDefinition()
