@@ -5,6 +5,7 @@
         The affected settings are:
             * `durable` was changed from `false` to `true`,
             * `auto_delete` was changed from `true` to `false`.
+    * Adds basic_reject functionality to consumers. A message can be rejected by returning `false` from a callback.
 
 - 2012-05-29
     * Merged PR #46 adding compiler passes for the configuration. Now the parameter classes can be overriden.
