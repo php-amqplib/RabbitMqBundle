@@ -108,7 +108,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('auto_delete')->defaultValue(false)->end()
                 ->booleanNode('internal')->defaultValue(false)->end()
                 ->booleanNode('nowait')->defaultValue(false)->end()
-                ->scalarNode('arguments')->defaultNull()->end()
+                ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
             ->end()
         ;
@@ -126,7 +126,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('exclusive')->defaultFalse()->end()
                 ->booleanNode('auto_delete')->defaultFalse()->end()
                 ->booleanNode('nowait')->defaultFalse()->end()
-                ->variableNode('arguments')->end()
+                ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
             ->end()
         ;

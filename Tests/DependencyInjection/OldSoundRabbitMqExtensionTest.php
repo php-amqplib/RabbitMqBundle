@@ -187,6 +187,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'exclusive'   => false,
                             'auto_delete' => false,
                             'nowait'      => false,
+                            'arguments'   => null,
                             'ticket'      => null,
                         )
                     )
@@ -362,7 +363,22 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->has('old_sound_rabbit_mq.data_collector'));
     }
 
+    public function testExchangeArgumentsAreArray()
+    {
+        $container = $this->getContainer('exchange_arguments.yml');
 
+        $definition = $container->getDefinition('old_sound_rabbit_mq.producer_producer');
+        $calls = $definition->getMethodCalls();
+        $this->assertEquals('setExchangeOptions', $calls[0][0]);
+        $options = $calls[0][1];
+        $this->assertEquals(array('name' => 'bar'), $options[0]['arguments']);
+
+        $definition = $container->getDefinition('old_sound_rabbit_mq.consumer_consumer');
+        $calls = $definition->getMethodCalls();
+        $this->assertEquals('setExchangeOptions', $calls[0][0]);
+        $options = $calls[0][1];
+        $this->assertEquals(array('name' => 'bar'), $options[0]['arguments']);
+    }
 
     private function getContainer($file, $debug = false)
     {
