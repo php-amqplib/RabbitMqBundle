@@ -32,7 +32,7 @@ class ConsumerCommand extends BaseRabbitMqCommand
      *
      * @return integer 0 if everything went fine, or an error code
      *
-     * @throws \LogicException When this abstract class is not implemented
+     * @throws \InvalidArgumentException When the number of messages to consume is less than 0
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -40,7 +40,7 @@ class ConsumerCommand extends BaseRabbitMqCommand
         $amount = $input->getOption('messages');
 
         if (0 > $amount) {
-            throw new InvalidArgumentException("The -m option should be null or greater than 0");
+            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
 
         $consumer = $this
