@@ -17,6 +17,8 @@ All the examples expect a running RabbitMQ server.
 
 This Bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference. See the slides [here](http://www.slideshare.net/old_sound/theres-a-rabbit-on-my-symfony):
 
+[![Build Status](https://secure.travis-ci.org/videlalvaro/RabbitMqBundle.png?branch=master)](http://travis-ci.org/videlalvaro/RabbitMqBundle)
+
 ## Installation ##
 
 The following instructions have been tested on a project created with the [Symfony2 Standard 2.0.6](http://symfony.com/download?v=Symfony_Standard_2.0.6.tgz)
