@@ -21,7 +21,7 @@ class Consumer extends BaseConsumer
 
     public function processMessage(AMQPMessage $msg)
     {
-		if (false === call_user_func($this->callback, $msg)) {
+        if (false === call_user_func($this->callback, $msg)) {
             // Reject and requeue message to RabbitMQ
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
         }
