@@ -1,0 +1,21 @@
+old_sound_rabbit_mq:
+
+    enable_collector: true
+
+    connections:
+        default:
+
+    producers:
+        default_producer:
+            exchange_options:
+                name:       default_exchange
+                type:       direct
+
+    consumers:
+        default_consumer:
+            exchange_options:
+                name:       default_exchange
+                type:       direct
+            queue_options:
+                name:       default_queue
+            callback:       default.callback

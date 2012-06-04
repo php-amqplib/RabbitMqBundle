@@ -9,27 +9,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Producer extends BaseAmqp
 {
-    protected $producerExchangeOptions = array(
-        'durable' => false,
-        'auto_delete' => true,
-        'internal' => false
-    );
-
-    public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
-    {
-        parent::__construct($conn, $ch, $consumerTag);
-
-    }
-
-    public function setExchangeOptions(array $options = array())
-    {
-        $this->exchangeOptions = array_merge(
-            $this->exchangeOptions,
-            $this->producerExchangeOptions
-        );
-
-        parent::setExchangeOptions($options);
-    }
+    protected $declared = false;
 
     public function exchangeDeclare()
     {
@@ -40,10 +20,15 @@ class Producer extends BaseAmqp
             $this->exchangeOptions['durable'],
             $this->exchangeOptions['auto_delete'],
             $this->exchangeOptions['internal']);
+
+        $this->declared = true;
     }
 
     public function publish($msgBody, $routingKey = '')
     {
+        if (!$this->declared) {
+            $this->exchangeDeclare();
+        }
         $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain', 'delivery_mode' => 2));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
     }

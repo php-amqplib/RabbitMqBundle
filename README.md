@@ -56,6 +56,14 @@ Add the RabbitMqBundle to your application's kernel:
 
 ### Warning - BC Breaking Changes ###
 
+* Since 2012-06-04 Some default options for exchanges declared in the "producers" config section
+  have changed to match the defaults of exchanges declared in the "consumers" section.
+  The affected settings are:
+
+  * `durable` was changed from `false` to `true`,
+  * `auto_delete` was changed from `true` to `false`.
+
+  Your configuration must be updated if you were relying on the previous default values.
 * Since 2012-04-24 The ConsumerInterface::execute method signature has changed
 * Since 2012-01-03 the consumers execute method gets the whole AMQP message object and not just the body. See the CHANGELOG file for more details.
 
@@ -86,6 +94,12 @@ Configure the `rabbitmq` service in your config:
 Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `rabbitmq.upload_picture_producer` and `rabbitmq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
 
 If you don't specify a connection for the client, the client will look for a connection with the same alias. So for our `upload_picture` the service container will look for an `upload_picture` connection.
+
+If you need to use HA Queues then your queue options can be something like this:
+
+    queue_options:    {name: 'upload-picture', arguments: {'x-ha-policy': ['S', 'all']}}
+
+Adapt the `arguments` according to your needs.
 
 ## Producers, Consumers, What? ##
 
@@ -145,10 +159,11 @@ Here's an example callback:
     namespace Sensio\HelloBundle\Consumer;
 
     use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+    use PhpAmqpLib\Message\AMQPMessage;
 
     class UploadPictureConsumer implements ConsumerInterface
     {
-        public function execute($msg)
+        public function execute(AMQPMessage $msg)
         {
             //Process picture upload.
             //$msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
@@ -318,6 +333,15 @@ And finally the output of `cat` goes directly to our producer that is invoked li
     ./app/console rabbitmq:stdin-producer words
 
 It takes only one argument which is the name of the producer as you configured it in your `config.yml` file.
+
+## How To Contribute ##
+
+To contribute just open a Pull Request with your new code taking into account that if you add new features or modify existing ones you have to document in this README what they do. If you break BC then you have to document it as well. Also you have to update the CHANGELOG. So:
+
+- Document New Features.
+- Update CHANGELOG.
+- Document BC breaking changes.
+
 
 ## License ##
 
