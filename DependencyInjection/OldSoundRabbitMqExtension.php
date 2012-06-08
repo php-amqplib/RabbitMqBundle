@@ -111,7 +111,7 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadAnonConsumers()
     {
         foreach ($this->config['anon_consumers'] as $key => $anon) {
-            $definition = new Definition('%old_sound_rabbit_mq.anon_consumer%');
+            $definition = new Definition('%old_sound_rabbit_mq.anon_consumer.class%');
             $definition
                 ->addMethodCall('setExchangeOptions', array($anon['exchange_options']))
                 ->addMethodCall('setCallback', array(array(new Reference($anon['callback']), 'execute')))
@@ -128,7 +128,7 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadRpcClients()
     {
         foreach ($this->config['rpc_clients'] as $key => $client) {
-            $definition = new Definition('%old_sound_rabbit_mq.rpc_client%');
+            $definition = new Definition('%old_sound_rabbit_mq.rpc_client.class%');
             $definition->addMethodCall('initClient');
             $this->injectConnection($definition, $client['connection']);
             if ($this->collectorEnabled) {
@@ -142,7 +142,7 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadRpcServers()
     {
         foreach ($this->config['rpc_servers'] as $key => $server) {
-            $definition = new Definition('%old_sound_rabbit_mq.rpc_server%');
+            $definition = new Definition('%old_sound_rabbit_mq.rpc_server.class%');
             $definition
                 ->addMethodCall('initServer', array($key))
                 ->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')))
