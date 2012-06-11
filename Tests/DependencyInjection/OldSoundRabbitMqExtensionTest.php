@@ -233,7 +233,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.anon_consumer%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.anon_consumer.class%', $definition->getClass());
     }
 
     public function testDefaultAnonConsumerDefinition()
@@ -268,7 +268,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.anon_consumer%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.anon_consumer.class%', $definition->getClass());
     }
 
     public function testFooRpcClientDefinition()
@@ -283,7 +283,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             array(array('initClient', array())),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.rpc_client%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
     }
 
     public function testDefaultRpcClientDefinition()
@@ -298,7 +298,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             array(array('initClient', array())),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.rpc_client%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
     }
 
     public function testFooRpcServerDefinition()
@@ -315,7 +315,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.rpc_server%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
     }
 
     public function testDefaultRpcServerDefinition()
@@ -332,7 +332,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.rpc_server%', $definition->getClass());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
     }
 
     public function testHasCollectorWhenChannelsExist()
