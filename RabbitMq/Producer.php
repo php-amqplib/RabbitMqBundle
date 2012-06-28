@@ -22,6 +22,15 @@ class Producer extends BaseAmqp
             $this->exchangeOptions['internal']);
 
         $this->declared = true;
+
+        if (('' != $this->queueOptions['name']) && (null !== $this->queueOptions['name'])) {
+            list($queueName, ,) = $this->ch->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
+                                                                   $this->queueOptions['durable'], $this->queueOptions['exclusive'],
+                                                                   $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
+                                                                   $this->queueOptions['arguments'], $this->queueOptions['ticket']);
+
+            $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+        }
     }
 
     public function publish($msgBody, $routingKey = '')
