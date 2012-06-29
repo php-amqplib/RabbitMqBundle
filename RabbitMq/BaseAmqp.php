@@ -31,6 +31,8 @@ abstract class BaseAmqp
         'ticket' => null
     );
 
+    protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+
     protected $routingKey = '';
 
     /**
