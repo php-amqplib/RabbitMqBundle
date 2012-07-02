@@ -29,7 +29,7 @@ class Producer extends BaseAmqp
 
         $this->declared = true;
     }
-
+    
     /**
      * Publishes the message and merges additional properties with basic properties
      *
@@ -42,7 +42,7 @@ class Producer extends BaseAmqp
         if (!$this->declared) {
             $this->exchangeDeclare();
         }
-        $msg = new AMQPMessage((string) $msgBody, array_merge($additionalProperties, $this->basicProperties));
+        $msg = new AMQPMessage((string) $msgBody, array_merge($this->basicProperties, $additionalProperties));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
     }
 }
