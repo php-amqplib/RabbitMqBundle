@@ -39,6 +39,10 @@ class OldSoundRabbitMqExtension extends Extension
         $configuration = new Configuration();
         $this->config = $this->processConfiguration($configuration, $configs);
 
+        if (isset($this->config['consumers'])) {
+            $this->config['consumers']= $this->addAMQPArgumentKeysForConsumers($this->config['consumers']);
+        }
+
         $this->collectorEnabled = $this->config['enable_collector'];
 
         $this->loadConnections();
@@ -59,6 +63,30 @@ class OldSoundRabbitMqExtension extends Extension
         } else {
             $this->container->removeDefinition('old_sound_rabbit_mq.data_collector');
         }
+    }
+
+    /**
+     * Handle the arguments for the queue options correctly.
+     */
+    protected function addAMQPArgumentKeysForConsumers($consumerConfig)
+    {
+        foreach ($consumerConfig as $consumers => $arguments) {
+            if (isset($arguments['queue_options']['arguments'])) {
+                $argumentPairs = explode(',', $arguments['queue_options']['arguments']);
+                $flattenedArguments = array();
+                foreach ($argumentPairs as $argument) {
+                    $argumentPair = explode(':', $argument);
+                    $type = 'S';
+                    if (isset($argumentPair[2])) {
+                        $type = $argumentPair[2];
+                    }
+                    $flattenedArguments[$argumentPair[0]] = array($type, $argumentPair[1]);
+                }
+                $consumerConfig[$consumers]['queue_options']['arguments'] = $flattenedArguments;
+            }
+        }
+
+        return $consumerConfig;
     }
 
     protected function loadConnections()

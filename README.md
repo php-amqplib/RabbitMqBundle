@@ -99,9 +99,9 @@ If you don't specify a connection for the client, the client will look for a con
 
 If you need to use HA Queues then your queue options can be something like this:
 
-    queue_options:    {name: 'upload-picture', arguments: {'x-ha-policy': ['S', 'all']}}
+    queue_options:    {name: 'upload-picture', arguments: 'x-ha-policy:all:S'}
 
-Adapt the `arguments` according to your needs.
+You add different arguments by comma separating them. You first define the argument and then you define its value. The ':S' is an optional parameter (default is S). Adapt the `arguments` according to your needs.
 
 ## Producers, Consumers, What? ##
 
