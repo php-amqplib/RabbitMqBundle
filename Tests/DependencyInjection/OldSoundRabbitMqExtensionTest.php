@@ -63,6 +63,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'ticket'      => null,
                         )
                     )
+                ),
+                array(
+                    'setQueueOptions',
+                    array(
+                        array(
+                            'name'        => null,
+                        )
+                    )
                 )
             ),
             $definition->getMethodCalls()
@@ -92,6 +100,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                        )
+                    )
+                ),
+                array(
+                    'setQueueOptions',
+                    array(
+                        array(
+                            'name'        => null,
                         )
                     )
                 )
