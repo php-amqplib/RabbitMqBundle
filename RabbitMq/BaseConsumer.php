@@ -12,6 +12,8 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected $callback;
 
+    protected $forceStop = false;
+
     public function setCallback($callback)
     {
         $this->callback = $callback;
@@ -53,12 +55,14 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected function maybeStopConsumer()
     {
-        if ($this->target == 0) {
-            return;
+        if(extension_loaded('pcntl')) {
+            pcntl_signal_dispatch();
         }
-
-        if ($this->consumed == $this->target) {
+        
+        if($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
+        } else {
+            return;
         }
     }
 
@@ -70,5 +74,10 @@ abstract class BaseConsumer extends BaseAmqp
     public function getConsumerTag()
     {
         return $this->consumerTag;
+    }
+
+    public function forceStopConsumer()
+    {
+        $this->forceStop = true;
     }
 }
