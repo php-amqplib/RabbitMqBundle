@@ -58,7 +58,7 @@ abstract class BaseConsumer extends BaseAmqp
         if(extension_loaded('pcntl')) {
             pcntl_signal_dispatch();
         }
-        
+
         if($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
         } else {
