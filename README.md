@@ -93,7 +93,7 @@ Configure the `rabbitmq` service in your config:
                 callback:         upload_picture_service
         ...
 
-Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `rabbitmq.upload_picture_producer` and `rabbitmq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
+Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `old_sound_rabbit_mq.upload_picture_producer` and `old_sound_rabbit_mq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
 
 If you don't specify a connection for the client, the client will look for a connection with the same alias. So for our `upload_picture` the service container will look for an `upload_picture` connection.
 
