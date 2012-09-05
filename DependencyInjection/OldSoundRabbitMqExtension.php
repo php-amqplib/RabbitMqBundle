@@ -146,6 +146,11 @@ class OldSoundRabbitMqExtension extends Extension
     {
         if (isset($config['arguments'])) {
             $arguments = $config['arguments'];
+            // support for old configuration
+            if (is_string($arguments)) {
+                $arguments = $this->argumentsStringAsArray($arguments);
+            }
+
             $newArguments = array();
             foreach ($arguments as $key => $value) {
                 if (strstr($key, '_')) {
@@ -156,6 +161,30 @@ class OldSoundRabbitMqExtension extends Extension
             $config['arguments'] = $newArguments;
         }
         return $config;
+    }
+
+    /**
+     * Support for arguments provided as string. Support for old configuration files.
+     *
+     * @deprecated
+     * @param string $arguments
+     * @return array
+     */
+    private function argumentsStringAsArray($arguments)
+    {
+        $argumentsArray = array();
+
+        $argumentPairs = explode(',', $arguments);
+        foreach ($argumentPairs as $argument) {
+            $argumentPair = explode(':', $argument);
+            $type = 'S';
+            if (isset($argumentPair[2])) {
+                $type = $argumentPair[2];
+            }
+            $argumentsArray[$argumentPair[0]] = array($type, $argumentPair[1]);
+        }
+
+        return $argumentsArray;
     }
 
     protected function loadRpcClients()
