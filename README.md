@@ -309,8 +309,8 @@ The only new option compared to the commands that we have seen before is the one
 
 There's a Command that reads data from STDIN and publishes it to a RabbitMQ queue. To use it first you have to configure a `producer` service in your configuration file like this:
 
-  producers:
-      words:
+    producers:
+        words:
           connection: default
           exchange_options: {name: 'words', type: direct}
 
