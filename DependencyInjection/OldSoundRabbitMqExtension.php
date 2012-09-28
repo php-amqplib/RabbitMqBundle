@@ -106,9 +106,18 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
             $definition
                 ->addMethodCall('setExchangeOptions',
-                array($this->normalizeArgumentKeys($consumer['exchange_options'])))
+                    array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
                 ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+
+            if (array_key_exists('qos_options', $consumer)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $consumer['qos_options']['prefetch_size'],
+                    $consumer['qos_options']['prefetch_count'],
+                    $consumer['qos_options']['global']
+                ));
+            }
+
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
