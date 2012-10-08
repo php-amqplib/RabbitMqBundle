@@ -27,7 +27,25 @@ class OldSoundRabbitMqExtension extends Extension
      */
     private $collectorEnabled;
 
+    /**
+     * @var array
+     */
     private $channelIds = array();
+
+    /**
+     * @var array
+     */
+    private $config;
+
+    /**
+     * @var string
+     */
+    private $defaultConnection;
+
+    /**
+     * @var Definition
+     */
+    private $poolDefinition;
 
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -41,12 +59,17 @@ class OldSoundRabbitMqExtension extends Extension
 
         $this->collectorEnabled = $this->config['enable_collector'];
 
+        if ($this->container->hasDefinition('old_sound_rabbit_mq.config_pool')) {
+            $this->poolDefinition = $this->container->getDefinition('old_sound_rabbit_mq.config_pool');
+        }
+
         $this->loadConnections();
         $this->loadProducers();
-        $this->loadConsumers();
-        $this->loadAnonConsumers();
-        $this->loadRpcClients();
-        $this->loadRpcServers();
+        $this->loadExchanges();
+        $this->loadQueues();
+//        $this->loadAnonConsumers();
+//        $this->loadRpcClients();
+//        $this->loadRpcServers();
 
         if ($this->collectorEnabled && $this->channelIds) {
             $channels = array();
@@ -72,7 +95,41 @@ class OldSoundRabbitMqExtension extends Extension
                 $connection['vhost']
             ));
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
+            $id = sprintf('old_sound_rabbit_mq.connection.%s', $key);
+            $this->container->setDefinition($id, $definition);
+            $this->poolDefinition->addMethodCall('addConnection', array($key, new Reference($id)));
+            if ($connection['is_default']) {
+                $this->defaultConnection = $connection;
+                $this->poolDefinition->addMethodCall('setDefaultConnection', array(new Reference($id)));
+            }
+        }
+    }
+
+    protected function loadExchanges()
+    {
+        foreach ($this->config['exchanges'] as $name => $options) {
+            $definition = new Definition('%old_sound_rabbit_mq.exchange.class%');
+            $definition->addArgument($name);
+            $definition->addArgument($options);
+
+            $id = sprintf('old_sound_rabbit_mq.%s_exchange', $name);
+            $this->container->setDefinition($id, $definition);
+
+            $this->poolDefinition->addMethodCall('addExchange', array($name, new Reference($id)));
+        }
+    }
+
+    protected function loadQueues()
+    {
+        foreach ($this->config['queues'] as $name => $options) {
+            $definition = new Definition('%old_sound_rabbit_mq.queue.class%');
+            $definition->addArgument($name);
+            $definition->addArgument($options);
+
+            $id = sprintf('old_sound_rabbit_mq.%s_queue', $name);
+            $this->container->setDefinition($id, $definition);
+
+            $this->poolDefinition->addMethodCall('addQueue', array($name, new Reference($id)));
         }
     }
 
@@ -80,31 +137,27 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['producers'] as $key => $producer) {
             $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
-            $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
-            $this->injectConnection($definition, $producer['connection']);
+
+            // exchange
+            $exchangeId = sprintf('old_sound_rabbit_mq.%s_exchange', $producer['exchange']);
+            $definition->addMethodCall('setExchange', array(new Reference($exchangeId)));
+
+            if (isset($producer['connection'])) {
+                $this->injectConnection($definition, $producer['connection']);
+            } elseif (isset($this->defaultConnection)) {
+                $this->injectConnection($definition, $this->defaultConnection);
+            } else {
+                // TODO: throw exception
+            }
+
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $producer['connection']);
             }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
-        }
-    }
+            $id = sprintf('old_sound_rabbit_mq.%s_producer', $key);
+            $this->container->setDefinition($id, $definition);
 
-    protected function loadConsumers()
-    {
-        foreach ($this->config['consumers'] as $key => $consumer) {
-            $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
-            $definition
-                ->addMethodCall('setExchangeOptions', array($consumer['exchange_options']))
-                ->addMethodCall('setQueueOptions', array($consumer['queue_options']))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')))
-            ;
-            $this->injectConnection($definition, $consumer['connection']);
-            if ($this->collectorEnabled) {
-                $this->injectLoggedChannel($definition, $key, $consumer['connection']);
-            }
-
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $key), $definition);
+            $this->poolDefinition->addMethodCall('addProducer', array($key, new Reference($id)));
         }
     }
 
