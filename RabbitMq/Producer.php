@@ -11,15 +11,21 @@ class Producer extends BaseAmqp
 {
     protected $declared = false;
 
+    /**
+     * @var Exchange
+     */
+    protected $exchange;
+
     public function exchangeDeclare()
     {
         $this->ch->exchange_declare(
-            $this->exchangeOptions['name'],
-            $this->exchangeOptions['type'],
-            $this->exchangeOptions['passive'],
-            $this->exchangeOptions['durable'],
-            $this->exchangeOptions['auto_delete'],
-            $this->exchangeOptions['internal']);
+            $this->exchange->getName(),
+            $this->exchange->getOptions()->get('type'),
+            $this->exchange->getOptions()->get('passive'),
+            $this->exchange->getOptions()->get('durable'),
+            $this->exchange->getOptions()->get('auto_delete'),
+            $this->exchange->getOptions()->get('internal')
+        );
 
         $this->declared = true;
     }
@@ -30,6 +36,22 @@ class Producer extends BaseAmqp
             $this->exchangeDeclare();
         }
         $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain', 'delivery_mode' => 2));
-        $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
+        $this->ch->basic_publish($msg, $this->exchange->getName(), $routingKey);
+    }
+
+    /**
+     * @param Exchange $exchange
+     */
+    public function setExchange(Exchange $exchange)
+    {
+        $this->exchange = $exchange;
+    }
+
+    /**
+     * @return Exchange
+     */
+    public function getExchange()
+    {
+        return $this->exchange;
     }
 }

@@ -5,6 +5,10 @@
 
     <parameters>
         <parameter key="old_sound_rabbit_mq.connection.class">PhpAmqpLib\Connection\AMQPConnection</parameter>
+        <parameter key="old_sound_rabbit_mq.config_pool.class">OldSound\RabbitMqBundle\RabbitMq\ConfigPool</parameter>
+        <parameter key="old_sound_rabbit_mq.manager.class">OldSound\RabbitMqBundle\RabbitMq\Manager</parameter>
+        <parameter key="old_sound_rabbit_mq.exchange.class">OldSound\RabbitMqBundle\RabbitMq\Exchange</parameter>
+        <parameter key="old_sound_rabbit_mq.queue.class">OldSound\RabbitMqBundle\RabbitMq\Queue</parameter>
         <parameter key="old_sound_rabbit_mq.producer.class">OldSound\RabbitMqBundle\RabbitMq\Producer</parameter>
         <parameter key="old_sound_rabbit_mq.consumer.class">OldSound\RabbitMqBundle\RabbitMq\Consumer</parameter>
         <parameter key="old_sound_rabbit_mq.anon_consumer.class">OldSound\RabbitMqBundle\RabbitMq\AnonConsumer</parameter>
@@ -18,6 +22,12 @@
         <service id="old_sound_rabbit_mq.data_collector" class="%old_sound_rabbit_mq.data_collector.class%">
             <argument type="collection" />
             <tag name="data_collector" template="OldSoundRabbitMqBundle:Collector:collector.html.twig" id="rabbit_mq" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.config_pool" class="%old_sound_rabbit_mq.config_pool.class%" />
+
+        <service id="old_sound_rabbit_mq.manager" class="%old_sound_rabbit_mq.manager.class%">
+            <argument type="service" id="old_sound_rabbit_mq.config_pool" />
         </service>
     </services>
 

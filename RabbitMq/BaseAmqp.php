@@ -9,28 +9,6 @@ abstract class BaseAmqp
     protected $conn;
     protected $ch;
     protected $consumerTag;
-
-    protected $exchangeOptions = array(
-        'passive' => false,
-        'durable' => true,
-        'auto_delete' => false,
-        'internal' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null
-    );
-
-    protected $queueOptions = array(
-        'name' => '',
-        'passive' => false,
-        'durable' => true,
-        'exclusive' => false,
-        'auto_delete' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null
-    );
-
     protected $routingKey = '';
 
     /**
@@ -68,33 +46,6 @@ abstract class BaseAmqp
     public function setChannel(AMQPChannel $ch)
     {
         $this->ch = $ch;
-    }
-
-    /**
-     * @throws \InvalidArgumentException
-     * @param array $options
-     * @return void
-     */
-    public function setExchangeOptions(array $options = array())
-    {
-        if (empty($options['name'])) {
-            throw new \InvalidArgumentException('You must provide an exchange name');
-        }
-
-        if (empty($options['type'])) {
-            throw new \InvalidArgumentException('You must provide an exchange type');
-        }
-
-        $this->exchangeOptions = array_merge($this->exchangeOptions, $options);
-    }
-
-    /**
-     * @param array $options
-     * @return void
-     */
-    public function setQueueOptions(array $options = array())
-    {
-        $this->queueOptions = array_merge($this->queueOptions, $options);
     }
 
     /**
