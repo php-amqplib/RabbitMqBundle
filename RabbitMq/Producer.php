@@ -9,7 +9,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Producer extends BaseAmqp
 {
-    protected $declared = false;
+    protected $exchangeDeclared = false;
+    protected $queueDeclared = false;
 
     public function exchangeDeclare()
     {
@@ -21,14 +22,38 @@ class Producer extends BaseAmqp
             $this->exchangeOptions['auto_delete'],
             $this->exchangeOptions['internal']);
 
-        $this->declared = true;
+        $this->exchangeDeclared = true;
+    }
+
+    public function queueDeclare()
+    {
+        if (null !== $this->queueOptions['name']) {
+            list($queueName, ,) = $this->ch->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
+                                                                   $this->queueOptions['durable'], $this->queueOptions['exclusive'],
+                                                                   $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
+                                                                   $this->queueOptions['arguments'], $this->queueOptions['ticket']);
+
+            $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+
+            $this->queueDeclared = true;
+        }
+    }
+
+    public function setupProducer()
+    {
+        if (!$this->exchangeDeclared) {
+            $this->exchangeDeclare();
+        }
+
+        if (!$this->queueDeclared) {
+            $this->queueDeclare();
+        }
     }
 
     public function publish($msgBody, $routingKey = '')
     {
-        if (!$this->declared) {
-            $this->exchangeDeclare();
-        }
+        $this->setupProducer();
+
         $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain', 'delivery_mode' => 2));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
     }
