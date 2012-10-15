@@ -64,7 +64,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
                 pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
                 pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
             }else{
-                throw new \InvalidArgumentException("The -s option can be used, if pcntl extension installed");
+                throw new \InvalidArgumentException("The -w option can be used, if pcntl extension installed");
             }
         }
 
