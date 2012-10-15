@@ -217,6 +217,32 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.consumer.class%', $definition->getClass());
     }
 
+    public function testConsumerWithQosOptions()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.qos_test_consumer_consumer'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.qos_test_consumer_consumer');
+        $methodCalls = $definition->getMethodCalls();
+
+        $setQosParameters = null;
+        foreach ($methodCalls as $methodCall) {
+            if ($methodCall[0] === 'setQosOptions') {
+                $setQosParameters = $methodCall[1];
+            }
+        }
+
+        $this->assertInternalType('array', $setQosParameters);
+        $this->assertEquals(
+            array(
+                1024,
+                1,
+                true
+            ),
+            $setQosParameters
+        );
+    }
+
     public function testFooAnonConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');
