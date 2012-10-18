@@ -10,13 +10,15 @@ class Consumer extends BaseConsumer
     public function consume($msgAmount)
     {
         $this->target = $msgAmount;
-
         $this->setUpConsumer();
 
         while (count($this->ch->callbacks))
         {
             $this->ch->wait();
         }
+
+        $this->ch->close();
+        $this->conn->close();
     }
 
     public function processMessage(AMQPMessage $msg)
