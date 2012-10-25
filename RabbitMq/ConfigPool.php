@@ -71,6 +71,30 @@ class ConfigPool
     }
 
     /**
+     * @param  string $name
+     *
+     * @return Consumer
+     * @throws \InvalidArgumentException
+     */
+    public function getConsumer($name)
+    {
+        if (!$this->hasConsumer($name)) {
+            throw new \InvalidArgumentException(sprintf('Consumer with name "%s" doesn\'t exist', $name));
+        }
+
+        return $this->consumers[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasConsumer($name)
+    {
+        return isset($this->consumers[$name]);
+    }
+
+    /**
      * @return Producer[]
      */
     public function getProducers()
