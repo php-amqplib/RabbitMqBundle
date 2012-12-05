@@ -6,12 +6,16 @@ The RabbitMqBundle incorporates messaging in your application via [RabbitMq](htt
 
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
 
-    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
-    $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
+```php
+$msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+$this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
+```
 
 Later when you want to consume 50 messages out of the `upload_pictures` queue, you just run on the CLI:
 
-    $ ./app/console rabbitmq:consumer -m 50 upload_picture
+```bash
+$ ./app/console rabbitmq:consumer -m 50 upload_picture
+```
 
 All the examples expect a running RabbitMQ server.
 
@@ -25,36 +29,42 @@ The following instructions have been tested on a project created with the [Symfo
 
 Put the RabbitMqBundle and the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library into the deps file:
 
-    ...
-    [RabbitMqBundle]
-    git=http://github.com/videlalvaro/RabbitMqBundle.git
-    target=/bundles/OldSound/RabbitMqBundle
+```ini
+...
+[RabbitMqBundle]
+git=http://github.com/videlalvaro/RabbitMqBundle.git
+target=/bundles/OldSound/RabbitMqBundle
 
-    [php-amqplib]
-    git=http://github.com/videlalvaro/php-amqplib.git
-    target=videlalvaro/php-amqplib
-    ...
+[php-amqplib]
+git=http://github.com/videlalvaro/php-amqplib.git
+target=videlalvaro/php-amqplib
+...
+```
 
 Register the bundle and library namespaces in the `app/autoload.php` file:
 
-    $loader->registerNamespaces(array(
-        ...
-        'OldSound'         => __DIR__.'/../vendor/bundles',
-        'PhpAmqpLib'       => __DIR__.'/../vendor/videlalvaro/php-amqplib',
-        ...
-    ));
+```php
+$loader->registerNamespaces(array(
+    ...
+    'OldSound'         => __DIR__.'/../vendor/bundles',
+    'PhpAmqpLib'       => __DIR__.'/../vendor/videlalvaro/php-amqplib',
+    ...
+));
+```
 
 Add the RabbitMqBundle to your application's kernel:
 
-    public function registerBundles()
-    {
-        $bundles = array(
-            ...
-            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-            ...
-        );
+```php
+public function registerBundles()
+{
+    $bundles = array(
         ...
-    }
+        new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+        ...
+    );
+    ...
+}
+```
 
 ### Warning - BC Breaking Changes ###
 
@@ -73,25 +83,27 @@ Add the RabbitMqBundle to your application's kernel:
 
 Configure the `rabbitmq` service in your config:
 
-    old_sound_rabbit_mq:
-        connections:
-            default:
-                host:      'localhost'
-                port:      5672
-                user:      'guest'
-                password:  'guest'
-                vhost:     '/'
-        producers:
-            upload_picture:
-                connection: default
-                exchange_options: {name: 'upload-picture', type: direct}
-        consumers:
-            upload_picture:
-                connection: default
-                exchange_options: {name: 'upload-picture', type: direct}
-                queue_options:    {name: 'upload-picture'}
-                callback:         upload_picture_service
-        ...
+```yaml
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:      'localhost'
+            port:      5672
+            user:      'guest'
+            password:  'guest'
+            vhost:     '/'
+    producers:
+        upload_picture:
+            connection: default
+            exchange_options: {name: 'upload-picture', type: direct}
+    consumers:
+        upload_picture:
+            connection: default
+            exchange_options: {name: 'upload-picture', type: direct}
+            queue_options:    {name: 'upload-picture'}
+            callback:         upload_picture_service
+    ...
+```
 
 Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `old_sound_rabbit_mq.upload_picture_producer` and `old_sound_rabbit_mq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
 
@@ -99,7 +111,9 @@ If you don't specify a connection for the client, the client will look for a con
 
 If you need to use HA Queues then your queue options can be something like this:
 
+```yaml
     queue_options:    {name: 'upload-picture', arguments: {'x-ha-policy': ['S', 'all']}}
+```
 
 Adapt the `arguments` according to your needs.
 
@@ -113,13 +127,15 @@ A producer will be used to send messages to the server. In the AMQP Model, messa
 
 Now let's say that you want to process picture uploads in the background. After you move the picture to its final location, you will publish a message to server with the following information:
 
-    public function indexAction($name)
-    {
-        ...
-        $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
-        $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
-        ...
-    }
+```php
+public function indexAction($name)
+{
+    ...
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
+    ...
+}
+```
 
 As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __old_sound_rabbit_mq.upload\_picture\_producer__.
 
@@ -129,7 +145,8 @@ The next piece of the puzzle is to have a consumer that will take the message ou
 
 A consumer will connect to the server and start a __loop__  waiting for incoming messages to process. Depending on the specified __callback__ for such consumer will be the behavior it will have. Let's review the consumer configuration from above:
 
-    ...
+```yaml
+...
     consumers:
         upload_picture:
             connection: default
@@ -137,6 +154,7 @@ A consumer will connect to the server and start a __loop__  waiting for incoming
             queue_options:    {name: 'upload-picture'}
             callback:         upload_picture_service
     ...
+```
 
 As we see there, the __callback__ option has a reference to an __upload\_picture\_service__. When the consumer gets a message from the server it will execute such callback. If for testing or debugging purposes you need to specify a different callback, then you can change it there.
 
@@ -146,7 +164,9 @@ As we said, messages in AMQP are published to an __exchange__. This doesn't mean
 
 Now, how to run a consumer? There's a command for it that can be executed like this:
 
-    $ ./app/console rabbitmq:consumer -m 50 upload_picture
+```bash
+$ ./app/console rabbitmq:consumer -m 50 upload_picture
+```
 
 What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback passing the AMQP message as an instance of the `PhpAmqpLib\Message\AMQPMessage` class. The message body can be obtained by calling `$msg->body`. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
 
@@ -154,33 +174,35 @@ What does this mean? We are executing the __upload\_picture__ consumer telling i
 
 Here's an example callback:
 
-    <?php
+```php
+<?php
 
-    //src/Acme/DemoBundle/Consumer/UploadPictureConsumer.php
+//src/Acme/DemoBundle/Consumer/UploadPictureConsumer.php
 
-    namespace Sensio\HelloBundle\Consumer;
+namespace Sensio\HelloBundle\Consumer;
 
-    use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-    use PhpAmqpLib\Message\AMQPMessage;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
 
-    class UploadPictureConsumer implements ConsumerInterface
+class UploadPictureConsumer implements ConsumerInterface
+{
+    public function execute(AMQPMessage $msg)
     {
-        public function execute(AMQPMessage $msg)
-        {
-            //Process picture upload.
-            //$msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
+        //Process picture upload.
+        //$msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
 
-            $isUploadSuccess = someUploadPictureMethod();
-            if (!$isUploadSuccess) {
-                // If your image upload failed due to a temporary error you can return false
-                // from your callback so the message will be rejected by the consumer and
-                // requeued by RabbitMQ.
-                // Any other value not equal to false will acknowledge the message and remove it
-                // from the queue
-                return false;
-            }
+        $isUploadSuccess = someUploadPictureMethod();
+        if (!$isUploadSuccess) {
+            // If your image upload failed due to a temporary error you can return false
+            // from your callback so the message will be rejected by the consumer and
+            // requeued by RabbitMQ.
+            // Any other value not equal to false will acknowledge the message and remove it
+            // from the queue
+            return false;
         }
     }
+}
+```
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
@@ -205,30 +227,36 @@ So far we just have sent messages to consumers, but what if we want to get a rep
 
 Let's add a RPC client and server into the configuration:
 
-    rpc_clients:
-        integer_store:
-            connection: default
-    rpc_servers:
-        random_int:
-            connection: default
-            callback: random_int_server
+```yaml
+rpc_clients:
+    integer_store:
+        connection: default
+rpc_servers:
+    random_int:
+        connection: default
+        callback: random_int_server
+```
 
 Here we have a very useful server: it returns random integers to its clients. The callback used to process the request will be the __random\_int\_server__ service. Now let's see how to invoke it from our controllers.
 
 First we have to start the server from the command line:
 
-    ./app/console_dev rabbitmq:rpc-server random_int
+```bash
+./app/console_dev rabbitmq:rpc-server random_int
+```
 
 And then add the following code to our controller:
 
-    public function indexAction($name)
-    {
-        ...
-        $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
-        $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
-        $replies = $client->getReplies();
-        ...
-    }
+```php
+public function indexAction($name)
+{
+    ...
+    $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
+    $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
+    $replies = $client->getReplies();
+    ...
+}
+```
 
 As you can see there, if our client id is __integer\_store__, then the service name will be __old_sound_rabbit_mq.integer\_store_rpc__. Once we get that object we place a request on the server by calling `addRequest` that expects three parameters:
 
@@ -246,6 +274,7 @@ As you can guess, we can also make __parallel RPC calls__.
 
 Let's say that for rendering some webpage, you need to perform two database queries, one taking 5 seconds to complete and the other one taking 2 seconds –very expensive queries–. If you execute them sequentially, then your page will be ready to deliver in about 7 seconds. If you run them in parallel then you will have your page served in about 5 seconds. With RabbitMqBundle we can do such parallel calls with ease. Let's define a parallel client in the config and another RPC server:
 
+```yaml
     ...
     rpc_clients:
         parallel:
@@ -258,16 +287,19 @@ Let's say that for rendering some webpage, you need to perform two database quer
             connection: default
             callback: random_int_server
     ...
+```
 
 Then this code should go in our controller:
 
-    public function indexAction($name)
-    {
-        $client = $this->get('old_sound_rabbit_mq.parallel_rpc');
-        $client->addRequest($name, 'char_count', 'char_count');
-        $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'random_int');
-        $replies = $client->getReplies();
-    }
+```php
+public function indexAction($name)
+{
+    $client = $this->get('old_sound_rabbit_mq.parallel_rpc');
+    $client->addRequest($name, 'char_count', 'char_count');
+    $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'random_int');
+    $replies = $client->getReplies();
+}
+```
 
 Is very similar to the previous example, we just have an extra `addRequest` call. Also we provide meaningful request identifiers so later will be easier for us to find the reply we want in the __$replies__ array.
 
@@ -288,20 +320,24 @@ When we start an Anonymous Consumer, it will take care of such details and we ju
 
 Now, how to configure and run such consumer?
 
-    old_sound_rabbit_mq.config:
-        ...
-        anon_consumers:
-            logs_watcher:
-                connection: default
-                exchange_options: {name: 'app-logs', type: topic}
-                callback:         logs_watcher
-        ...
+```yaml
+old_sound_rabbit_mq.config:
+    ...
+    anon_consumers:
+        logs_watcher:
+            connection: default
+            exchange_options: {name: 'app-logs', type: topic}
+            callback:         logs_watcher
+    ...
+```
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
 
 To start an _Anonymous Consumer_ we use the following command:
 
-    ./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
+```bash
+./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
+```
 
 The only new option compared to the commands that we have seen before is the one that specifies the __routing key__: `-r '#.error'`.
 
@@ -309,22 +345,28 @@ The only new option compared to the commands that we have seen before is the one
 
 There's a Command that reads data from STDIN and publishes it to a RabbitMQ queue. To use it first you have to configure a `producer` service in your configuration file like this:
 
-    producers:
-        words:
-          connection: default
-          exchange_options: {name: 'words', type: direct}
+```yaml
+producers:
+    words:
+      connection: default
+      exchange_options: {name: 'words', type: direct}
+```
 
 That producer will publish messages to the `words` direct exchange. Of course you can adapt the configuration to whatever you like.
 
 Then let's say you want to publish the contents of some XML files so they are processed by a farm of consumers. You could publish them by just using a command like this:
 
-    $ find vendor/symfony/ -name "*.xml" -print0 | xargs -0 cat | ./app/console rabbitmq:stdin-producer words
+```bash
+$ find vendor/symfony/ -name "*.xml" -print0 | xargs -0 cat | ./app/console rabbitmq:stdin-producer words
+```
 
 This means you can compose producers with plain Unix commands.
 
 Let's decompose that one liner:
 
-    find vendor/symfony/ -name "*.xml" -print0
+```bash
+find vendor/symfony/ -name "*.xml" -print0
+```
 
 That command will find all the `.xml` files inside the symfony folder and will print the file name. Each of those file names is then _piped_ to `cat` via `xargs`:
 
@@ -332,7 +374,9 @@ That command will find all the `.xml` files inside the symfony folder and will p
 
 And finally the output of `cat` goes directly to our producer that is invoked like this:
 
-    ./app/console rabbitmq:stdin-producer words
+```bash
+./app/console rabbitmq:stdin-producer words
+```
 
 It takes only one argument which is the name of the producer as you configured it in your `config.yml` file.
 
