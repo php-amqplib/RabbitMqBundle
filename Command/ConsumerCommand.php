@@ -36,7 +36,9 @@ class ConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        define('AMQP_DEBUG', (Boolean) $input->getOption('debug'));
+        if(defined('AMQP_DEBUG') === false) {
+            define('AMQP_DEBUG', (Boolean) $input->getOption('debug'));
+        }
         $amount = $input->getOption('messages');
 
         if (0 > $amount) {
