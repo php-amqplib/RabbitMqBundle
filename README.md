@@ -93,7 +93,7 @@ Configure the `rabbitmq` service in your config:
                 callback:         upload_picture_service
         ...
 
-Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `rabbitmq.upload_picture_producer` and `rabbitmq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
+Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `old_sound_rabbit_mq.upload_picture_producer` and `old_sound_rabbit_mq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
 
 If you don't specify a connection for the client, the client will look for a connection with the same alias. So for our `upload_picture` the service container will look for an `upload_picture` connection.
 
@@ -121,7 +121,7 @@ Now let's say that you want to process picture uploads in the background. After 
         ...
     }
 
-As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __rabbitmq.upload\_picture\_producer__.
+As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __old_sound_rabbit_mq.upload\_picture\_producer__.
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 
@@ -238,7 +238,7 @@ And then add the following code to our controller:
         ...
     }
 
-As you can see there, if our client id is __integer\_store__, then the service name will be __rabbitmq.integer\_store_rpc__. Once we get that object we place a request on the server by calling `addRequest` that expects three parameters:
+As you can see there, if our client id is __integer\_store__, then the service name will be __old_sound_rabbit_mq.integer\_store_rpc__. Once we get that object we place a request on the server by calling `addRequest` that expects three parameters:
 
 - The arguments to be sent to the remote procedure call.
 - The name of the RPC server, in our case __random\_int__.
@@ -296,7 +296,7 @@ When we start an Anonymous Consumer, it will take care of such details and we ju
 
 Now, how to configure and run such consumer?
 
-    rabbitmq.config:
+    old_sound_rabbit_mq.config:
         ...
         anon_consumers:
             logs_watcher:
@@ -317,8 +317,8 @@ The only new option compared to the commands that we have seen before is the one
 
 There's a Command that reads data from STDIN and publishes it to a RabbitMQ queue. To use it first you have to configure a `producer` service in your configuration file like this:
 
-  producers:
-      words:
+    producers:
+        words:
           connection: default
           exchange_options: {name: 'words', type: direct}
 

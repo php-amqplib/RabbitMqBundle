@@ -29,6 +29,8 @@ class OldSoundRabbitMqExtension extends Extension
 
     private $channelIds = array();
 
+    private $config = array();
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $this->container = $container;
@@ -81,6 +83,11 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['producers'] as $key => $producer) {
             $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
             $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+            //this producer doesn't define a queue
+            if (!isset($producer['queue_options'])) {
+                $producer['queue_options']['name'] = null;
+            }
+            $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
             $this->injectConnection($definition, $producer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $producer['connection']);
@@ -97,8 +104,16 @@ class OldSoundRabbitMqExtension extends Extension
             $definition
                 ->addMethodCall('setExchangeOptions', array($consumer['exchange_options']))
                 ->addMethodCall('setQueueOptions', array($consumer['queue_options']))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')))
-            ;
+                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+
+            if (array_key_exists('qos_options', $consumer)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $consumer['qos_options']['prefetch_size'],
+                    $consumer['qos_options']['prefetch_count'],
+                    $consumer['qos_options']['global']
+                ));
+            }
+
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
