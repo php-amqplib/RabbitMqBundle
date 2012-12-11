@@ -150,11 +150,11 @@ Now, how to run a consumer? There's a command for it that can be executed like t
 
 What does this mean? We are executing the __upload\_picture__ consumer telling it to consume only 50 messages. Every time the consumer receives a message from the server, it will execute the configured callback passing the AMQP message as an instance of the `PhpAmqpLib\Message\AMQPMessage` class. The message body can be obtained by calling `$msg->body`. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
 
-If you want to be sure that consumer will finish executing even if command's proccess will be stopped or restarted by unix signal (TERM, INT, HUP), you can run command with flag `-w`.
+If you want to be sure that consumer will finish executing instantly on Unix signal, you can run command with flag `-w`.
 
     $ ./app/console rabbitmq:consumer -w upload_picture
 
-Then consumer will finish executing of task before it will be stopped or restarted.
+Then consumer will finish executing instantly.
 
 For using command with this flag you need to install PHP with [PCNTL extension](http://www.php.net/manual/en/book.pcntl.php).
 

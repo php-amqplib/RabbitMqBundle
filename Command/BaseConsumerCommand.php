@@ -28,7 +28,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
     public function restartConsumer()
     {
-
+        // TODO: Implement restarting of consumer
     }
 
     protected function configure()
@@ -40,7 +40,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
-            ->addOption('with-signals', 'w', InputOption::VALUE_OPTIONAL, 'Enable catching of system signals', false)
+            ->addOption('without-signals', 'w', InputOption::VALUE_OPTIONAL, 'Disable catching of system signals', false)
         ;
     }
 
@@ -57,15 +57,11 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $signals = $input->getOption('with-signals');
-        if($signals){
-            if(extension_loaded('pcntl')){
-                pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
-                pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
-                pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
-            }else{
-                throw new \InvalidArgumentException("The -w option can be used, if pcntl extension installed");
-            }
+        $signals = $input->getOption('without-signals');
+        if(!$signals && extension_loaded('pcntl')){
+            pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
+            pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
+            pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
         }
 
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
