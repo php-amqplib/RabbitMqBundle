@@ -15,6 +15,7 @@ class Consumer extends BaseConsumer
 
         while (count($this->ch->callbacks))
         {
+            $this->maybeStopConsumer();
             $this->ch->wait();
         }
     }
