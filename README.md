@@ -187,7 +187,7 @@ Here's an example callback:
 
 //src/Acme/DemoBundle/Consumer/UploadPictureConsumer.php
 
-namespace Sensio\HelloBundle\Consumer;
+namespace Acme\DemoBundle\Consumer;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
