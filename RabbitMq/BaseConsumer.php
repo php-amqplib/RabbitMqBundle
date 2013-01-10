@@ -25,8 +25,7 @@ abstract class BaseConsumer extends BaseAmqp
 
         $this->setupConsumer();
 
-        while (count($this->ch->callbacks))
-        {
+        while (count($this->ch->callbacks)) {
             $this->ch->wait();
         }
     }
@@ -69,7 +68,6 @@ abstract class BaseConsumer extends BaseAmqp
         return $this->consumerTag;
     }
 
-
     public function forceStopConsumer()
     {
         $this->forceStop = true;
@@ -79,8 +77,8 @@ abstract class BaseConsumer extends BaseAmqp
      * Sets the qos settings for the current channel
      * Consider that prefetchSize and global do not work with rabbitMQ version <= 8.0
      *
-     * @param int $prefetchSize
-     * @param int $prefetchCount
+     * @param int  $prefetchSize
+     * @param int  $prefetchCount
      * @param bool $global
      */
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
