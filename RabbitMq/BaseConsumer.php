@@ -23,7 +23,8 @@ abstract class BaseConsumer extends BaseAmqp
     {
         $this->target = $msgAmount;
 
-        $this->setUpConsumer();
+        $this->setupQueue();
+        $this->ch->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
 
         while (count($this->ch->callbacks))
         {
@@ -34,23 +35,6 @@ abstract class BaseConsumer extends BaseAmqp
     public function stopConsuming()
     {
         $this->ch->basic_cancel($this->getConsumerTag());
-    }
-
-    protected function setUpConsumer()
-    {
-        $this->ch->exchange_declare($this->exchangeOptions['name'], $this->exchangeOptions['type'],
-                                    $this->exchangeOptions['passive'], $this->exchangeOptions['durable'],
-                                    $this->exchangeOptions['auto_delete'], $this->exchangeOptions['internal'],
-                                    $this->exchangeOptions['nowait'], $this->exchangeOptions['arguments'],
-                                    $this->exchangeOptions['ticket']);
-
-        list($queueName, ,) = $this->ch->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
-                                                       $this->queueOptions['durable'], $this->queueOptions['exclusive'],
-                                                       $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-                                                       $this->queueOptions['arguments'], $this->queueOptions['ticket']);
-
-        $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
-        $this->ch->basic_consume($queueName, $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
     protected function maybeStopConsumer()
