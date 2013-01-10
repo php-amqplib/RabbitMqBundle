@@ -138,9 +138,9 @@ class Configuration implements ConfigurationInterface
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
                 ->arrayNode('routing_keys')
-                    ->addDefaultsIfNotSet()
                     ->prototype('scalar')->end()
                     ->defaultValue(array())
+                ->end()
             ->end()
         ;
     }

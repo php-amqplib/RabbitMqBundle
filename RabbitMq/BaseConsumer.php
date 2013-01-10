@@ -23,8 +23,7 @@ abstract class BaseConsumer extends BaseAmqp
     {
         $this->target = $msgAmount;
 
-        $this->setupQueue();
-        $this->ch->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->setupConsumer();
 
         while (count($this->ch->callbacks))
         {
@@ -35,6 +34,12 @@ abstract class BaseConsumer extends BaseAmqp
     public function stopConsuming()
     {
         $this->ch->basic_cancel($this->getConsumerTag());
+    }
+
+    protected function setupConsumer()
+    {
+        $this->setupQueue();
+        $this->ch->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
     protected function maybeStopConsumer()
