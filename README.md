@@ -117,6 +117,14 @@ If you need to use HA Queues then your queue options can be something like this:
 
 Adapt the `arguments` according to your needs.
 
+If you want to bind queue with specific routingKeys you can declare it in producer or consumer config:
+
+    queue_options:
+        name: "upload-picture"
+        routing_keys:
+          - 'android.#.upload'
+          - 'iphone.upload'
+
 ## Producers, Consumers, What? ##
 
 In a messaging application, the process sending messages to the broker is called __producer__ while the process receiving those messages is called __consumer__. In your application you will have several of them that you can list under their respective entries in the configuration.
