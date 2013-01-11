@@ -64,7 +64,9 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
         }
 
-        define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+        if(defined('AMQP_DEBUG') === false) {
+            define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+        }
 
         $this->amount = $input->getOption('messages');
 
