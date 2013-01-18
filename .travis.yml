@@ -8,4 +8,6 @@ env:
   - SYMFONY_VERSION=v2.0.7
   - SYMFONY_VERSION=origin/2.0
 
-before_script: ./vendor/vendors.sh
+before_script:
+    - curl -s http://getcomposer.org/installer | php
+    - php composer.phar install --dev --prefer-source

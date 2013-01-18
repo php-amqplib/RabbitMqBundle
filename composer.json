@@ -13,6 +13,9 @@
         "symfony/yaml": ">=2.0",
         "videlalvaro/php-amqplib"  : "dev-master"
     },
+    "require-dev": {
+        "symfony/console": ">=2.1.0,<2.3-dev"
+    },
     "autoload": {
         "psr-0": {
             "OldSound\\RabbitMqBundle\\": ""
