@@ -55,11 +55,11 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected function maybeStopConsumer()
     {
-        if(extension_loaded('pcntl')) {
+        if (extension_loaded('pcntl') && (defined('AMQP_WITHOUT_SIGNALS') ? !AMQP_WITHOUT_SIGNALS : true)) {
             pcntl_signal_dispatch();
         }
 
-        if($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
         } else {
             return;
