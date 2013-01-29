@@ -80,20 +80,27 @@ class OldSoundRabbitMqExtension extends Extension
 
     protected function loadProducers()
     {
-        foreach ($this->config['producers'] as $key => $producer) {
-            $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
-            $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
-            //this producer doesn't define a queue
-            if (!isset($producer['queue_options'])) {
-                $producer['queue_options']['name'] = null;
-            }
-            $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
-            $this->injectConnection($definition, $producer['connection']);
-            if ($this->collectorEnabled) {
-                $this->injectLoggedChannel($definition, $key, $producer['connection']);
-            }
+        if($this->config['disable'] == false) {
+            foreach ($this->config['producers'] as $key => $producer) {
+                $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
+                $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+                //this producer doesn't define a queue
+                if (!isset($producer['queue_options'])) {
+                    $producer['queue_options']['name'] = null;
+                }
+                $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
+                $this->injectConnection($definition, $producer['connection']);
+                if ($this->collectorEnabled) {
+                    $this->injectLoggedChannel($definition, $key, $producer['connection']);
+                }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+                $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+            }
+        else {
+            foreach ($this->config['producers'] as $key => $producer) {
+                $definition = new Definition('%old_sound_rabbit_mq.fallback.class%');
+                $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+            }
         }
     }
 
