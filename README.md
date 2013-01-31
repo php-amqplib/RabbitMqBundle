@@ -341,6 +341,18 @@ old_sound_rabbit_mq.config:
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
 
+This Anonymous Consumer is now able to listen to Producers, which are linked to the same exchange and of type _topic_:
+
+```yaml
+old_sound_rabbit_mq.config:
+    ...
+    producers:
+        app_logs:
+            connection: default
+            exchange_options: {name: 'app-logs', type: topic}
+    ...
+```
+
 To start an _Anonymous Consumer_ we use the following command:
 
 ```bash
