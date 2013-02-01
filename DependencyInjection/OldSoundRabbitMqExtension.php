@@ -96,6 +96,7 @@ class OldSoundRabbitMqExtension extends Extension
 
                 $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
             }
+        }
         else {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition('%old_sound_rabbit_mq.fallback.class%');
