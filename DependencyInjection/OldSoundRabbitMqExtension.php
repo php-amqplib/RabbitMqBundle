@@ -80,7 +80,7 @@ class OldSoundRabbitMqExtension extends Extension
 
     protected function loadProducers()
     {
-        if($this->config['disable'] == false) {
+        if ($this->config['sandbox'] == false) {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
                 $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
@@ -96,8 +96,7 @@ class OldSoundRabbitMqExtension extends Extension
 
                 $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
             }
-        }
-        else {
+        } else {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition('%old_sound_rabbit_mq.fallback.class%');
                 $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);

@@ -4,7 +4,8 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 class Fallback
 {
-    public function publish() {
+    public function publish() 
+    {
         return false;
     }
 }
