@@ -11,7 +11,7 @@ class Consumer extends BaseConsumer
     {
         $this->target = $msgAmount;
 
-        $this->setUpConsumer();
+        $this->setupConsumer();
 
         while (count($this->ch->callbacks))
         {
