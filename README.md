@@ -183,13 +183,14 @@ If you want to be sure that consumer will finish executing instantly on Unix sig
 
 Then consumer will finish executing instantly.
 
+For using command with this flag you need to install PHP with [PCNTL extension](http://www.php.net/manual/en/book.pcntl.php).
+
 If you want to establish a consumer memory limit, you can do it by using flag `-a`. In the following example, this flag 
 adds 256 MB memory limit. Consumer will be stopped five MB before reaching 256MB in order to avoid a PHP Allowed 
 memory size error.
   
     $ ./app/console rabbitmq:consumer -a 256
 
-For using command with this flag you need to install PHP with [PCNTL extension](http://www.php.net/manual/en/book.pcntl.php).
 
 ### Callbacks ###
 
