@@ -41,7 +41,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
-            ->addOption('memory-limit', 'a', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', 100)
+            ->addOption('memory-limit', 'a', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', 128)
         ;
     }
 
