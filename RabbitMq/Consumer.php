@@ -38,6 +38,11 @@ class Consumer extends BaseConsumer
 
         $this->consumed++;
         $this->maybeStopConsumer();
+        
+        if($this->isRamAlmostOverloaded()){
+            
+            $this->stopConsuming();
+        }
     }
     
     /**
@@ -47,9 +52,10 @@ class Consumer extends BaseConsumer
         
         if (memory_get_usage(true) >= $this->memoryToBytes($this->memoryLimit)) {
 
-            //exit;
-            pcntl_signal_dispatch();
+            return true;
         }
+        
+        return false;
     }
     
     private function memoryToBytes($memory){
