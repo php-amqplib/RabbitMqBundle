@@ -7,9 +7,14 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
-    public function consume($msgAmount)
+    
+    protected $memoryLimit;
+    
+    public function consume($msgAmount, $memoryLimit = 128)
     {
         $this->target = $msgAmount;
+        
+        $this->memoryLimit = $memoryLimit;
 
         $this->setUpConsumer();
 
@@ -33,5 +38,22 @@ class Consumer extends BaseConsumer
 
         $this->consumed++;
         $this->maybeStopConsumer();
+    }
+    
+    /**
+     * Checks if memory in use is greater or equal than memory allowed for this process
+     */
+    protected function isRamAlmostOverloaded(){
+        
+        if (memory_get_usage(true) >= $this->memoryToBytes($this->memoryLimit)) {
+
+            //exit;
+            pcntl_signal_dispatch();
+        }
+    }
+    
+    private function memoryToBytes($memory){
+        
+        return ($memory * 1024 * 1024);
     }
 }
