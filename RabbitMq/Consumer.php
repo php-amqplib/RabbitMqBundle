@@ -50,12 +50,14 @@ class Consumer extends BaseConsumer
      */
     protected function isRamAlmostOverloaded(){
         
-        if (memory_get_usage(true) >= $this->memoryToBytes($this->memoryLimit)) {
+        $memoryLimit = $this->memoryToBytes($this->memoryLimit - 5);
+        if (memory_get_usage(true) >= $memoryLimit) {
 
             return true;
         }
         
         return false;
+        
     }
     
     private function memoryToBytes($memory){
