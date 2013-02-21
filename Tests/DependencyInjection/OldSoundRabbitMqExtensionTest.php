@@ -146,14 +146,15 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'setQueueOptions',
                     array(
                         array(
-                            'name'        => 'foo_queue',
-                            'passive'     => true,
-                            'durable'     => false,
-                            'exclusive'   => true,
-                            'auto_delete' => true,
-                            'nowait'      => true,
-                            'arguments'   => null,
-                            'ticket'      => null,
+                            'name'         => 'foo_queue',
+                            'passive'      => true,
+                            'durable'      => false,
+                            'exclusive'    => true,
+                            'auto_delete'  => true,
+                            'nowait'       => true,
+                            'arguments'    => null,
+                            'ticket'       => null,
+                            'routing_keys' => array('android.#.upload', 'iphone.upload'),
                         )
                     )
                 ),
@@ -204,6 +205,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'routing_keys' => array(),
                         )
                     )
                 ),

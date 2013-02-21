@@ -54,6 +54,9 @@ old_sound_rabbit_mq:
                 nowait:      true
                 arguments:   null
                 ticket:      null
+                routing_keys:
+                  - 'android.#.upload'
+                  - 'iphone.upload'
             callback:        foo.callback
 
         default_consumer:
