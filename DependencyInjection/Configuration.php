@@ -4,7 +4,6 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
@@ -147,4 +146,3 @@ class Configuration implements ConfigurationInterface
         ;
     }
 }
-
