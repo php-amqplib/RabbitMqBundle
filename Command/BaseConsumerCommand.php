@@ -19,9 +19,9 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
     public function stopConsumer()
     {
-        if($this->consumer instanceof Consumer) {
+        if ($this->consumer instanceof Consumer) {
             $this->consumer->forceStopConsumer();
-        }else{
+        } else {
             exit();
         }
     }
@@ -39,8 +39,8 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
-            ->addOption('without-signals', 'w', InputOption::VALUE_OPTIONAL, 'Disable catching of system signals', false)
+            ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
+            ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
         ;
     }
 
@@ -57,14 +57,24 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $signals = $input->getOption('without-signals');
-        if(!$signals && extension_loaded('pcntl')){
+
+        if (defined('AMQP_WITHOUT_SIGNALS') === false) {
+            define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
+        }
+
+        if (!AMQP_WITHOUT_SIGNALS && extension_loaded('pcntl')) {
+            if (!function_exists('pcntl_signal')) {
+                throw new \BadFunctionCallException("This function is referenced in the php.ini 'disable_functions' and can't be called.");
+            }
+
             pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
             pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
             pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
         }
 
-        define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+        if (defined('AMQP_DEBUG') === false) {
+            define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+        }
 
         $this->amount = $input->getOption('messages');
 
