@@ -4,7 +4,6 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
@@ -60,10 +59,11 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('callback')->isRequired()->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
+                                ->useAttributeAsKey('key')
                                 ->children()
                                     ->scalarNode('prefetch_size')->defaultValue(0)->end()
                                     ->scalarNode('prefetch_count')->defaultValue(0)->end()
-                                    ->booleanNode('global')->defaultFalse()->end()
+                                    ->booleanNode('global')->defaultValue(false)->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -138,8 +138,11 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('nowait')->defaultFalse()->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
+                ->arrayNode('routing_keys')
+                    ->prototype('scalar')->end()
+                    ->defaultValue(array())
+                ->end()
             ->end()
         ;
     }
 }
-

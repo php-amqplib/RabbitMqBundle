@@ -54,6 +54,9 @@ old_sound_rabbit_mq:
                 nowait:      true
                 arguments:   null
                 ticket:      null
+                routing_keys:
+                  - 'android.#.upload'
+                  - 'iphone.upload'
             callback:        foo.callback
 
         default_consumer:
@@ -97,6 +100,19 @@ old_sound_rabbit_mq:
                 name:        default_anon_exchange
                 type:        direct
             callback:        default_anon.callback
+
+        qos_test_consumer:
+            connection:         foo_connection
+            exchange_options:
+                name:           foo_exchange
+                type:           direct
+            queue_options:
+                name:           foo_queue
+            qos_options:
+                prefetch_size:  1024
+                prefetch_count: 1
+                global:         true
+            callback:           foo.callback
 
     rpc_clients:
         foo_client:

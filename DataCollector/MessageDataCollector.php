@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\DataCollector;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +21,7 @@ class MessageDataCollector extends DataCollector
         $this->data = array();
     }
 
-    function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         foreach ($this->channels as $channel) {
             foreach ($channel->getBasicPublishLog() as $log) {
