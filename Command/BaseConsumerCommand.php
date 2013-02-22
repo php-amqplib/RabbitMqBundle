@@ -41,7 +41,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
-            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', NULL)
         ;
     }
 
@@ -58,10 +57,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!is_null($input->getOption('memory-limit'))) {
-            ini_set('memory_limit', $input->getOption('memory-limit').'M');
-        }
-
         if (defined('AMQP_WITHOUT_SIGNALS') === false) {
             define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
         }
@@ -90,6 +85,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
         $this->consumer->setRoutingKey($input->getOption('route'));
-        $this->consumer->consume($this->amount, $input->getOption('memory-limit'));
+        $this->consumer->consume($this->amount);
     }
 }
