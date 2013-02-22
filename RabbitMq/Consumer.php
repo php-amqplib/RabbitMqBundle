@@ -10,7 +10,7 @@ class Consumer extends BaseConsumer
     
     protected $memoryLimit;
     
-    public function consume($msgAmount, $memoryLimit = 128)
+    public function consume($msgAmount, $memoryLimit = null)
     {
         $this->target = $msgAmount;
         
@@ -39,8 +39,7 @@ class Consumer extends BaseConsumer
         $this->consumed++;
         $this->maybeStopConsumer();
         
-        if($this->isRamAlmostOverloaded()){
-            
+        if (!is_null($this->memoryLimit) && $this->isRamAlmostOverloaded()) {     
             $this->stopConsuming();
         }
     }
