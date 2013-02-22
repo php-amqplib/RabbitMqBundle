@@ -11,16 +11,6 @@ class Producer extends BaseAmqp
 {
     protected $exchangeDeclared = false;
     protected $queueDeclared = false;
-    protected $contentType = 'text/plain';
-    protected $deliveryMode = 2;
-    
-    public function setContentType($contentType) {
-        $this->contentType = $contentType;
-    }
-    
-    public function setDeliveryMode($deliveryMode) {
-        $this->deliveryMode = $deliveryMode;
-    }
 
     public function exchangeDeclare()
     {
@@ -64,7 +54,7 @@ class Producer extends BaseAmqp
     {
         $this->setupProducer();
 
-        $msg = new AMQPMessage($msgBody, array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode));
+        $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain', 'delivery_mode' => 2));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
     }
 }
