@@ -41,7 +41,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
-            ->addOption('memory-limit', 'a', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', 128)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', NULL)
         ;
     }
 
@@ -58,7 +58,9 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        ini_set('memory_limit', $input->getOption('memory-limit').'M');
+        if (!is_null($input->getOption('memory-limit'))) {
+            ini_set('memory_limit', $input->getOption('memory-limit').'M');
+        }
 
         if (defined('AMQP_WITHOUT_SIGNALS') === false) {
             define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
