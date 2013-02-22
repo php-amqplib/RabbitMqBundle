@@ -139,6 +139,13 @@ public function indexAction($name)
 
 As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __old_sound_rabbit_mq.upload\_picture\_producer__.
 
+You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message 
+delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode. 
+
+```php
+    $this->get('old_sound_rabbit_mq.upload_picture_producer')->setContentType('application/json');
+```
+
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 
 ### Consumers ###
@@ -177,6 +184,13 @@ If you want to be sure that consumer will finish executing instantly on Unix sig
 Then consumer will finish executing instantly.
 
 For using command with this flag you need to install PHP with [PCNTL extension](http://www.php.net/manual/en/book.pcntl.php).
+
+If you want to establish a consumer memory limit, you can do it by using flag `-a`. In the following example, this flag 
+adds 256 MB memory limit. Consumer will be stopped five MB before reaching 256MB in order to avoid a PHP Allowed 
+memory size error.
+  
+    $ ./app/console rabbitmq:consumer -a 256
+
 
 ### Callbacks ###
 
