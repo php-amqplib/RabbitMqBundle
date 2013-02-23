@@ -14,11 +14,13 @@ class Producer extends BaseAmqp
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     
-    public function setContentType($contentType) {
+    public function setContentType($contentType) 
+    {
         $this->contentType = $contentType;
     }
     
-    public function setDeliveryMode($deliveryMode) {
+    public function setDeliveryMode($deliveryMode) 
+    {
         $this->deliveryMode = $deliveryMode;
     }
 
