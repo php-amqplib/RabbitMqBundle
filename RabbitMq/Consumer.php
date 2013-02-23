@@ -47,20 +47,19 @@ class Consumer extends BaseConsumer
     /**
      * Checks if memory in use is greater or equal than memory allowed for this process
      */
-    protected function isRamAlmostOverloaded(){
-        
+    protected function isRamAlmostOverloaded()
+    {      
         $memoryLimit = $this->memoryToBytes($this->memoryLimit - 5);
         if (memory_get_usage(true) >= $memoryLimit) {
 
             return true;
         }
         
-        return false;
-        
+        return false;    
     }
     
-    private function memoryToBytes($memory){
-        
+    private function memoryToBytes($memory)
+    {    
         return ($memory * 1024 * 1024);
     }
 }
