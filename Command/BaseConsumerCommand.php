@@ -57,7 +57,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         if (defined('AMQP_WITHOUT_SIGNALS') === false) {
             define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
         }

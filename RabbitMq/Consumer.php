@@ -7,6 +7,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
+    
     public function consume($msgAmount)
     {
         $this->target = $msgAmount;
@@ -33,5 +34,7 @@ class Consumer extends BaseConsumer
 
         $this->consumed++;
         $this->maybeStopConsumer();
+        
     }
+    
 }
