@@ -4,9 +4,7 @@ namespace OldSound\RabbitMqBundle\Tests\Command;
 
 use OldSound\RabbitMqBundle\Command\ConsumerCommand;
 
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\NullOutput;
 
 class ConsumerCommandTest extends \PHPUnit_Framework_TestCase
 {

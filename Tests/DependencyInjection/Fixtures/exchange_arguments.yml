@@ -20,4 +20,3 @@ old_sound_rabbit_mq:
                 arguments:  {name: bar}
             queue_options:
             callback:       consumer.callback
-
