@@ -38,7 +38,7 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected function setupConsumer()
     {
-        $this->setupQueue();
+        $this->setupFabric();
         $this->ch->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
