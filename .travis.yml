@@ -9,5 +9,4 @@ env:
   - SYMFONY_VERSION=v2.1.*
 
 before_script:
-    - curl -s http://getcomposer.org/installer | php
-    - php composer.phar install --dev --prefer-source
+    - composer install --dev --prefer-source
