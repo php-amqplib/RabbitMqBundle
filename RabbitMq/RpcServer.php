@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcServer extends BaseConsumer
@@ -15,16 +14,13 @@ class RpcServer extends BaseConsumer
 
     public function processMessage(AMQPMessage $msg)
     {
-        try
-        {
+        try {
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
             $result = call_user_func($this->callback, $msg);
             $this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
             $this->consumed++;
             $this->maybeStopConsumer();
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->sendReply('error: ' . $e->getMessage(), $msg->get('reply_to'), $msg->get('correlation_id'));
         }
     }

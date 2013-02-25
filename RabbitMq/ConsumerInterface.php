@@ -6,6 +6,5 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 interface ConsumerInterface
 {
-    function execute(AMQPMessage $msg);
+    public function execute(AMQPMessage $msg);
 }
-
