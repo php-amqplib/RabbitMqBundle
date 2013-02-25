@@ -13,11 +13,15 @@ class Producer extends BaseAmqp
     public function setContentType($contentType)
     {
         $this->contentType = $contentType;
+
+        return $this;
     }
 
     public function setDeliveryMode($deliveryMode)
     {
         $this->deliveryMode = $deliveryMode;
+
+        return $this;
     }
 
     public function publish($msgBody, $routingKey = '')
