@@ -35,12 +35,12 @@ class RpcClient extends BaseAmqp
     {
         $this->ch->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
 
-        while (count($this->replies) < $this->requests)
-        {
+        while (count($this->replies) < $this->requests) {
             $this->ch->wait();
         }
 
         $this->ch->basic_cancel($this->queueName);
+
         return $this->replies;
     }
 
