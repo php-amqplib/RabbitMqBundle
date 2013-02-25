@@ -61,6 +61,9 @@ class ConsumerCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->command->getDefinition()->hasOption('route'));
         $this->assertTrue($this->command->getDefinition()->getOption('route')->isValueOptional()); // It should accept value
+        
+        $this->assertTrue($this->command->getDefinition()->hasOption('memory-limit'));
+        $this->assertTrue($this->command->getDefinition()->getOption('memory-limit')->isValueOptional());
 
         $this->assertTrue($this->command->getDefinition()->hasOption('without-signals'));
         $this->assertFalse($this->command->getDefinition()->getOption('without-signals')->acceptValue()); // It shouldn't accept value because it is a true/false input
