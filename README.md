@@ -240,7 +240,7 @@ This seems to be quite a lot of work for just sending messages, let's recap to h
 
 - Add an entry for the consumer/producer in the configuration.
 - Implement your callback.
-- Start the consumer form the CLI.
+- Start the consumer from the CLI.
 - Add the code to publish messages inside the controller.
 
 And that's it!
