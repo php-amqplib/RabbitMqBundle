@@ -4,9 +4,5 @@ php:
   - 5.3
   - 5.4
 
-env:
-  - SYMFONY_VERSION=v2.0.*
-  - SYMFONY_VERSION=v2.1.*
-
 before_script:
     - composer install --dev --prefer-source
