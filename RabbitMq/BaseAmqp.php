@@ -131,7 +131,7 @@ abstract class BaseAmqp
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
                 $this->queueOptions['arguments'], $this->queueOptions['ticket']);
 
-            if (count($this->queueOptions['routing_keys']) > 0) {
+            if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
                     $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
