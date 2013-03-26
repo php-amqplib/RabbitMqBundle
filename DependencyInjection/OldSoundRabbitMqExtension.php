@@ -41,6 +41,10 @@ class OldSoundRabbitMqExtension extends Extension
         $configuration = new Configuration();
         $this->config = $this->processConfiguration($configuration, $configs);
 
+        if (!$this->config['enable_amqp']) {
+            return;
+        }
+
         $this->collectorEnabled = $this->config['enable_collector'];
 
         $this->loadConnections();

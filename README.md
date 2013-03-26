@@ -85,6 +85,7 @@ Configure the `rabbitmq` service in your config:
 
 ```yaml
 old_sound_rabbit_mq:
+    enable_amqp:       true
     connections:
         default:
             host:      'localhost'

@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
 
         $tree->root('old_sound_rabbit_mq')
             ->children()
+                ->booleanNode('enable_amqp')->defaultValue(false)->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('enable_collector')->defaultValue(false)->end()
                 ->booleanNode('sandbox')->defaultValue(false)->end()
