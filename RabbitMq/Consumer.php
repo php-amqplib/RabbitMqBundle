@@ -54,10 +54,10 @@ class Consumer extends BaseConsumer
 
         $processFlag = call_user_func($this->callback, $msg);
 
-        if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE) {
+        if ($processFlag == ConsumerInterface::MSG_REJECT_REQUEUE) {
             // Reject and requeue message to RabbitMQ
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+        } else if ($processFlag == ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
         } else {
