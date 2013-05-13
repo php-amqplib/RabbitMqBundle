@@ -36,14 +36,14 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $amqpChannel->expects($this->any())
             ->method('basic_reject')
             ->will($this->returnCallback(function($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
-                $this->assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
-                $this->assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
+                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
+                \PHPUnit_Framework_Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
             }));
 
         $amqpChannel->expects($this->any())
             ->method('basic_ack')
             ->will($this->returnCallback(function($delivery_tag) use ($expectedMethod) {
-                $this->assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
+                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
             }));
 
         $consumer->processMessage($amqpMessage);
