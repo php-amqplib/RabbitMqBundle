@@ -14,7 +14,7 @@ class Consumer extends BaseConsumer
 
     /**
      * Set the memory limit
-     * 
+     *
      * @param int $memoryLimit
      */
     public function setMemoryLimit($memoryLimit)
@@ -24,17 +24,17 @@ class Consumer extends BaseConsumer
 
     /**
      * Get the memory limit
-     * 
+     *
      * @return int
      */
     public function getMemoryLimit()
     {
-        return $this->memoryLimit;   
+        return $this->memoryLimit;
     }
 
     /**
      * Consume the message
-     * 
+     *
      * @param int $msgAmount
      */
     public function consume($msgAmount)
@@ -54,10 +54,10 @@ class Consumer extends BaseConsumer
 
         $processFlag = call_user_func($this->callback, $msg);
 
-        if ($processFlag == ConsumerInterface::MSG_REJECT_REQUEUE) {
+        if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
-        } else if ($processFlag == ConsumerInterface::MSG_REJECT) {
+        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
         } else {
@@ -68,7 +68,7 @@ class Consumer extends BaseConsumer
         $this->consumed++;
         $this->maybeStopConsumer();
 
-        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {     
+        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
             $this->stopConsuming();
         }
     }
