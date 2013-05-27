@@ -49,6 +49,14 @@ class Consumer extends BaseConsumer
         }
     }
 
+    /**
+     * Purge the queue
+     */
+    public function purge()
+    {
+        $this->ch->queue_purge($this->queueOptions['name'], true);
+    }
+
     public function processMessage(AMQPMessage $msg)
     {
 
