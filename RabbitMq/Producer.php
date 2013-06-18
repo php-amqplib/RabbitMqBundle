@@ -29,6 +29,6 @@ class Producer extends BaseAmqp
         $this->setupFabric();
 
         $msg = new AMQPMessage($msgBody, array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode));
-        $this->ch->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
     }
 }

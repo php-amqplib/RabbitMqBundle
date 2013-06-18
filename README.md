@@ -92,6 +92,7 @@ old_sound_rabbit_mq:
             user:      'guest'
             password:  'guest'
             vhost:     '/'
+            lazy:      false
     producers:
         upload_picture:
             connection: default
@@ -139,6 +140,8 @@ If you want to bind queue with specific routingKeys you can declare it in produc
         routing_keys:
           - 'android.#.upload'
           - 'iphone.upload'
+
+By default, connections to the queue are instantiated at bootstrap time, i.e. at every web request. Depending on your application business logic, this could be unnecessary and too much expensive in production environments. Use `lazy: true` in such cases.
 
 ## Producers, Consumers, What? ##
 

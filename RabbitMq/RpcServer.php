@@ -28,6 +28,6 @@ class RpcServer extends BaseConsumer
     protected function sendReply($result, $client, $correlationId)
     {
         $reply = new AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
-        $this->ch->basic_publish($reply, '', $client);
+        $this->getChannel()->basic_publish($reply, '', $client);
     }
 }
