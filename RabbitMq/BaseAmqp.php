@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 
 abstract class BaseAmqp
 {
@@ -43,7 +44,7 @@ abstract class BaseAmqp
     {
         $this->conn = $conn;
 
-        if (get_class($conn) === 'PhpAmqpLib\Connection\AMQPLazyConnection') {
+        if ($conn instanceof AMQPLazyConnection) {
             $this->ch = $ch;
         } else {
             $this->ch = empty($ch) ? $this->conn->channel() : $ch;
@@ -71,7 +72,7 @@ abstract class BaseAmqp
      */
     public function getChannel()
     {
-        if (empty($ch)) {
+        if (empty($this->ch)) {
             $this->ch = $this->conn->channel();
         }
 
