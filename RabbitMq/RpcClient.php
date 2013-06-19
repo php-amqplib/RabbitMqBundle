@@ -13,7 +13,7 @@ class RpcClient extends BaseAmqp
 
     public function initClient()
     {
-        list($this->queueName, ,) = $this->ch->queue_declare("", false, false, true, true);
+        list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, true);
     }
 
     public function addRequest($msgBody, $server, $requestId = null, $routingKey = '')
@@ -26,20 +26,20 @@ class RpcClient extends BaseAmqp
                                                'reply_to' => $this->queueName,
                                                'correlation_id' => $requestId));
 
-        $this->ch->basic_publish($msg, $server, $routingKey);
+        $this->getChannel()->basic_publish($msg, $server, $routingKey);
 
         $this->requests++;
     }
 
     public function getReplies()
     {
-        $this->ch->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
 
         while (count($this->replies) < $this->requests) {
-            $this->ch->wait();
+            $this->getChannel()->wait();
         }
 
-        $this->ch->basic_cancel($this->queueName);
+        $this->getChannel()->basic_cancel($this->queueName);
 
         return $this->replies;
     }

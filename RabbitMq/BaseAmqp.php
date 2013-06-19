@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPLazyConnection;
 
 abstract class BaseAmqp
 {
@@ -42,8 +43,11 @@ abstract class BaseAmqp
     public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         $this->conn = $conn;
+        $this->ch = $ch;
 
-        $this->ch = empty($ch) ? $this->conn->channel() : $ch;
+        if (!($conn instanceof AMQPLazyConnection)) {
+            $this->getChannel();
+        }
 
         $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
     }
@@ -51,15 +55,27 @@ abstract class BaseAmqp
     public function __destruct()
     {
         //TODO FIX!
-        // if (!empty($this->ch) && !empty($this->conn))
+        // if (!empty($this->getChannel()) && !empty($this->conn))
         // {
-        //     $this->ch->close();
+        //     $this->getChannel()->close();
         // }
         //
         // if (!empty($this->conn))
         // {
         //     $this->conn->close();
         // }
+    }
+
+    /**
+     * @return AMQPChannel
+     */
+    public function getChannel()
+    {
+        if (empty($this->ch)) {
+            $this->ch = $this->conn->channel();
+        }
+
+        return $this->ch;
     }
 
     /**
@@ -109,7 +125,7 @@ abstract class BaseAmqp
 
     protected function exchangeDeclare()
     {
-        $this->ch->exchange_declare(
+        $this->getChannel()->exchange_declare(
             $this->exchangeOptions['name'],
             $this->exchangeOptions['type'],
             $this->exchangeOptions['passive'],
@@ -126,17 +142,17 @@ abstract class BaseAmqp
     protected function queueDeclare()
     {
         if (null !== $this->queueOptions['name']) {
-            list($queueName, ,) = $this->ch->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
+            list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
                 $this->queueOptions['durable'], $this->queueOptions['exclusive'],
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
                 $this->queueOptions['arguments'], $this->queueOptions['ticket']);
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-                    $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->ch->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
 
             $this->queueDeclared = true;

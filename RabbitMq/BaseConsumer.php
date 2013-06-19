@@ -25,20 +25,20 @@ abstract class BaseConsumer extends BaseAmqp
 
         $this->setupConsumer();
 
-        while (count($this->ch->callbacks)) {
-            $this->ch->wait();
+        while (count($this->getChannel()->callbacks)) {
+            $this->getChannel()->wait();
         }
     }
 
     public function stopConsuming()
     {
-        $this->ch->basic_cancel($this->getConsumerTag());
+        $this->getChannel()->basic_cancel($this->getConsumerTag());
     }
 
     protected function setupConsumer()
     {
         $this->setupFabric();
-        $this->ch->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
     protected function maybeStopConsumer()
@@ -83,6 +83,6 @@ abstract class BaseConsumer extends BaseAmqp
      */
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
     {
-        $this->ch->basic_qos($prefetchSize, $prefetchCount, $global);
+        $this->getChannel()->basic_qos($prefetchSize, $prefetchCount, $global);
     }
 }
