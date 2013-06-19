@@ -16,7 +16,6 @@ class BaseAmqpTest extends \PHPUnit_Framework_TestCase
         $amqpLazyConnection = new AMQPLazyConnection('localhost', 123, 'lazy_user', 'lazy_password');
 
         $consumer = new Consumer($amqpLazyConnection, null);
-
-        \PHPUnit_Framework_Assert::assertNull($consumer->getChannel());
+        $consumer->getChannel();
     }
 }

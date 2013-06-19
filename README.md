@@ -141,7 +141,14 @@ If you want to bind queue with specific routingKeys you can declare it in produc
           - 'android.#.upload'
           - 'iphone.upload'
 
-By default, connections to the queue are instantiated at bootstrap time, i.e. at every web request. Depending on your application business logic, this could be unnecessary and too much expensive in production environments. Use `lazy: true` in such cases.
+### Important notice ###
+
+In current Symfony release (v2.3) all services are fully bootstrapped for each request, a lazy loading support
+will be added in the future to save resources. Services in this bundle, by default, will open connections
+to the brokers at loading time, i.e. during every web request, unless you set `lazy: true` in your connection configuration.
+It's extremely recommended to use lazy connections because performance reasons, nevertheless lazy option is disabled
+by default to avoid possible breaks in applications already using this bundle.
+
 
 ## Producers, Consumers, What? ##
 

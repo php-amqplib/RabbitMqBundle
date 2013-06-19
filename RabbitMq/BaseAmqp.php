@@ -43,11 +43,10 @@ abstract class BaseAmqp
     public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         $this->conn = $conn;
+        $this->ch = $ch;
 
-        if ($conn instanceof AMQPLazyConnection) {
-            $this->ch = $ch;
-        } else {
-            $this->ch = empty($ch) ? $this->conn->channel() : $ch;
+        if (!($conn instanceof AMQPLazyConnection)) {
+            $this->getChannel();
         }
 
         $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
