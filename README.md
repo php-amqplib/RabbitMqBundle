@@ -92,6 +92,7 @@ old_sound_rabbit_mq:
             user:      'guest'
             password:  'guest'
             vhost:     '/'
+            lazy:      false
     producers:
         upload_picture:
             connection: default
@@ -139,6 +140,15 @@ If you want to bind queue with specific routingKeys you can declare it in produc
         routing_keys:
           - 'android.#.upload'
           - 'iphone.upload'
+
+### Important notice ###
+
+In current Symfony release (v2.3) all services are fully bootstrapped for each request, a lazy loading support
+will be added in the future to save resources. Services in this bundle, by default, will open connections
+to the brokers at loading time, i.e. during every web request, unless you set `lazy: true` in your connection configuration.
+It's extremely recommended to use lazy connections because performance reasons, nevertheless lazy option is disabled
+by default to avoid possible breaks in applications already using this bundle.
+
 
 ## Producers, Consumers, What? ##
 

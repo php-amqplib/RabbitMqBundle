@@ -25,6 +25,20 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
+    public function testLazyConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.lazy_connection'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_connection');
+        $this->assertEquals('lazy_host', $definition->getArgument(0));
+        $this->assertEquals(456, $definition->getArgument(1));
+        $this->assertEquals('lazy_user', $definition->getArgument(2));
+        $this->assertEquals('lazy_password', $definition->getArgument(3));
+        $this->assertEquals('/lazy', $definition->getArgument(4));
+        $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
+    }
+
     public function testDefaultConnectionDefinition()
     {
         $container = $this->getContainer('test.yml');
