@@ -19,6 +19,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)
+            ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
         ;
     }
 
@@ -41,8 +42,12 @@ class RpcServerCommand extends BaseRabbitMqCommand
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
 
-        $this->getContainer()
-               ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
-               ->start($amount);
+        $rpcServer = $this
+            ->getContainer()
+            ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
+        ;
+
+        $rpcServer->setRoutingKey($input->getOption('route'));
+        $rpcServer->start($amount);
     }
 }
