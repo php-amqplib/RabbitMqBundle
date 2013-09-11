@@ -46,6 +46,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                            ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.producer.class%')->end()
                         ->end()
                     ->end()
                 ->end()
