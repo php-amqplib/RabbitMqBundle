@@ -95,11 +95,11 @@ old_sound_rabbit_mq:
             lazy:      false
     producers:
         upload_picture:
-            connection: default
+            connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
     consumers:
         upload_picture:
-            connection: default
+            connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
             queue_options:    {name: 'upload-picture'}
             callback:         upload_picture_service
@@ -189,7 +189,7 @@ A consumer will connect to the server and start a __loop__  waiting for incoming
 ...
     consumers:
         upload_picture:
-            connection: default
+            connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
             queue_options:    {name: 'upload-picture'}
             callback:         upload_picture_service
@@ -221,6 +221,23 @@ For using command with this flag you need to install PHP with [PCNTL extension](
 If you want to establish a consumer memory limit, you can do it by using flag -l. In the following example, this flag adds 256 MB memory limit. Consumer will be stopped five MB before reaching 256MB in order to avoid a PHP Allowed memory size error.
 
 $ ./app/console rabbitmq:consumer -l 256
+
+#### Idle timeout ####
+
+If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
+
+```yaml
+...
+    consumers:
+        upload_picture:
+            connection:       default
+            exchange_options: {name: 'upload-picture', type: direct}
+            queue_options:    {name: 'upload-picture'}
+            callback:         upload_picture_service
+            idle_timeout:     60
+    ...
+```
+ 
 
 ### Callbacks ###
 
