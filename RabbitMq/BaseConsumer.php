@@ -14,6 +14,8 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected $forceStop = false;
 
+    protected $idleTimeout = 0;
+
     public function setCallback($callback)
     {
         $this->callback = $callback;
@@ -84,5 +86,15 @@ abstract class BaseConsumer extends BaseAmqp
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
     {
         $this->getChannel()->basic_qos($prefetchSize, $prefetchCount, $global);
+    }
+
+    public function setIdleTimeout($idleTimeout)
+    {
+        $this->idleTimeout = $idleTimeout;
+    }
+
+    public function getIdleTimeout()
+    {
+        return $this->idleTimeout;
     }
 }
