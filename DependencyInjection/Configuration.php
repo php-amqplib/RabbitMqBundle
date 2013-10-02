@@ -58,6 +58,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('callback')->isRequired()->end()
+                            ->scalarNode('idle_timeout')->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
                                 ->children()
