@@ -461,6 +461,20 @@ And finally the output of `cat` goes directly to our producer that is invoked li
 
 It takes only one argument which is the name of the producer as you configured it in your `config.yml` file.
 
+### Setting up the Rabbit MQ fabric ###
+
+The purpose of this bundle is to let your application produce messages and publish them to some exchanges you configured.
+
+In some cases and even if your configuration is right, the messages you are producing will not be routed to any queue because none exist. The consumer responsible for the queue consomption has to be run for the queue to be created.
+
+Launching a command for each consumer can be a nightmare when the number of consumers is high.
+
+In order to create exchanges, queues and bindings at once and be sure you will not lose any message, you can run the following command:
+
+```bash
+./app/console rabbitmq:setup-fabric
+```
+
 ## How To Contribute ##
 
 To contribute just open a Pull Request with your new code taking into account that if you add new features or modify existing ones you have to document in this README what they do. If you break BC then you have to document it as well. Also you have to update the CHANGELOG. So:
