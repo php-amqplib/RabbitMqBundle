@@ -159,7 +159,7 @@ abstract class BaseAmqp
         }
     }
 
-    protected function setupFabric()
+    public function setupFabric()
     {
         if (!$this->exchangeDeclared) {
             $this->exchangeDeclare();
