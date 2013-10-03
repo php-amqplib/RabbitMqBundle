@@ -88,6 +88,8 @@ class OldSoundRabbitMqExtension extends Extension
         if ($this->config['sandbox'] == false) {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
+                $definition->addTag('old_sound_rabbit_mq.base_amqp');
+                $definition->addTag('old_sound_rabbit_mq.producer');
                 $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
                 //this producer doesn't define a queue
                 if (!isset($producer['queue_options'])) {
@@ -114,6 +116,8 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
             $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.consumer')
                 ->addMethodCall('setExchangeOptions', array($consumer['exchange_options']))
                 ->addMethodCall('setQueueOptions', array($consumer['queue_options']))
                 ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
@@ -144,6 +148,8 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['anon_consumers'] as $key => $anon) {
             $definition = new Definition('%old_sound_rabbit_mq.anon_consumer.class%');
             $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.anon_consumer')
                 ->addMethodCall('setExchangeOptions', array($anon['exchange_options']))
                 ->addMethodCall('setCallback', array(array(new Reference($anon['callback']), 'execute')))
             ;
@@ -160,7 +166,10 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['rpc_clients'] as $key => $client) {
             $definition = new Definition('%old_sound_rabbit_mq.rpc_client.class%');
-            $definition->addMethodCall('initClient');
+            $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.rpc_client')
+                ->addMethodCall('initClient');
             $this->injectConnection($definition, $client['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $client['connection']);
@@ -175,6 +184,8 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['rpc_servers'] as $key => $server) {
             $definition = new Definition('%old_sound_rabbit_mq.rpc_server.class%');
             $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.rpc_server')
                 ->addMethodCall('initServer', array($key))
                 ->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')))
             ;
