@@ -461,6 +461,8 @@ And finally the output of `cat` goes directly to our producer that is invoked li
 
 It takes only one argument which is the name of the producer as you configured it in your `config.yml` file.
 
+## Other Commands ##
+
 ### Setting up the Rabbit MQ fabric ###
 
 The purpose of this bundle is to let your application produce messages and publish them to some exchanges you configured.
