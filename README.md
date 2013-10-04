@@ -141,7 +141,7 @@ If you want to bind queue with specific routingKeys you can declare it in produc
           - 'android.#.upload'
           - 'iphone.upload'
 
-### Important notice ###
+### Important notice - Lazy Connections ###
 
 In current Symfony release (v2.3) all services are fully bootstrapped for each request, a lazy loading support
 will be added in the future to save resources. Services in this bundle, by default, will open connections
@@ -463,7 +463,7 @@ It takes only one argument which is the name of the producer as you configured i
 
 ## Other Commands ##
 
-### Setting up the Rabbit MQ fabric ###
+### Setting up the RabbitMQ fabric ###
 
 The purpose of this bundle is to let your application produce messages and publish them to some exchanges you configured.
 
