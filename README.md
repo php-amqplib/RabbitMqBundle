@@ -25,6 +25,41 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 ## Installation ##
 
+### For Symfony >= 2.1.* ###
+
+Require the bundle in your composer.json file:
+
+````
+{
+    "require": {
+        "oldsound/rabbitmq-bundle": "1.2.*",
+    }
+}
+```
+
+Register the bundle:
+
+```php
+// app/AppKernel.php
+
+public function registerBundles()
+{
+    $bundles = array(
+        new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+    );
+}
+```
+
+Install the bundle:
+
+```
+$ composer update oldsound/rabbitmq-bundle
+```
+
+Enjoy !
+
+### For Symfony 2.0.* ###
+
 The following instructions have been tested on a project created with the [Symfony2 Standard 2.0.6](http://symfony.com/download?v=Symfony_Standard_2.0.6.tgz)
 
 Put the RabbitMqBundle and the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library into the deps file:
@@ -163,8 +198,8 @@ public function indexAction($name)
 
 As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __old_sound_rabbit_mq.upload\_picture\_producer__.
 
-You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message 
-delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode. 
+You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message
+delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode.
 
 ```php
 $this->get('old_sound_rabbit_mq.upload_picture_producer')->setContentType('application/json');
