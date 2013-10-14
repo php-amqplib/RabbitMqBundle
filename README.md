@@ -494,6 +494,21 @@ In order to create exchanges, queues and bindings at once and be sure you will n
 $ ./app/console rabbitmq:setup-fabric
 ```
 
+When desired, you can configure your consumers and producers to asume the RabbitMQ fabric is already defined. To do this, add the following to your configuration:
+
+```yaml
+producers:
+    upload_picture:
+      auto_setup_fabric: false
+consumers:
+    upload_picture:
+      auto_setup_fabric: false
+```
+
+By default a consumer or producer will declare everything it needs with RabbitMQ when it starts.
+Be careful using this, when exchanges or queues are not defined, there will be errors. When you've changed any configuration you need to run the above setup-fabric command to declare your configuration.
+
+
 ## How To Contribute ##
 
 To contribute just open a Pull Request with your new code taking into account that if you add new features or modify existing ones you have to document in this README what they do. If you break BC then you have to document it as well. Also you have to update the CHANGELOG. So:

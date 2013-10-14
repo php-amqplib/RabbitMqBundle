@@ -100,6 +100,9 @@ class OldSoundRabbitMqExtension extends Extension
                 if ($this->collectorEnabled) {
                     $this->injectLoggedChannel($definition, $key, $producer['connection']);
                 }
+                if (!$producer['auto_setup_fabric']) {
+                    $definition->addMethodCall('disableAutoSetupFabric');
+                }
 
                 $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
             }
@@ -132,6 +135,9 @@ class OldSoundRabbitMqExtension extends Extension
 
             if(isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+            if (!$consumer['auto_setup_fabric']) {
+                $definition->addMethodCall('disableAutoSetupFabric');
             }
 
             $this->injectConnection($definition, $consumer['connection']);
