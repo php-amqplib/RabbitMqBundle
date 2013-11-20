@@ -31,12 +31,12 @@ class RpcClient extends BaseAmqp
         $this->requests++;
     }
 
-    public function getReplies()
+    public function getReplies($timeout = 0)
     {
         $this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
 
         while (count($this->replies) < $this->requests) {
-            $this->getChannel()->wait();
+            $this->getChannel()->wait(null, false, $timeout);
         }
 
         $this->getChannel()->basic_cancel($this->queueName);
