@@ -87,7 +87,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         if ($this->config['sandbox'] == false) {
             foreach ($this->config['producers'] as $key => $producer) {
-                $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
+                $definition = new Definition($producer['class']);
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));

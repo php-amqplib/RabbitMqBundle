@@ -22,6 +22,7 @@ old_sound_rabbit_mq:
 
     producers:
         foo_producer:
+            class:           My\Foo\Producer
             connection:      foo_connection
             exchange_options:
                 name:        foo_exchange

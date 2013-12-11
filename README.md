@@ -205,6 +205,19 @@ delivery mode respectively. Default values are __text/plain__ for content type a
 $this->get('old_sound_rabbit_mq.upload_picture_producer')->setContentType('application/json');
 ```
 
+If you need to use a custom class for a producer (which should inherit from `OldSound\RabbitMqBundle\RabbitMq\Producer`), you can use the `class` option:
+
+```yaml
+    ...
+    producers:
+        upload_picture:
+            class: My\Custom\Producer
+            connection: default
+            exchange_options: {name: 'upload-picture', type: direct}
+    ...
+```
+
+
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 
 ### Consumers ###

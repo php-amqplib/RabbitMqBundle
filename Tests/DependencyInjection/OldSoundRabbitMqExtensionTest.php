@@ -89,7 +89,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
-        $this->assertEquals('%old_sound_rabbit_mq.producer.class%', $definition->getClass());
+        $this->assertEquals('My\Foo\Producer', $definition->getClass());
     }
 
     public function testDefaultProducerDefinition()
