@@ -497,7 +497,7 @@ It takes only one argument which is the name of the producer as you configured i
 
 The purpose of this bundle is to let your application produce messages and publish them to some exchanges you configured.
 
-In some cases and even if your configuration is right, the messages you are producing will not be routed to any queue because none exist. The consumer responsible for the queue consomption has to be run for the queue to be created.
+In some cases and even if your configuration is right, the messages you are producing will not be routed to any queue because none exist. The consumer responsible for the queue consumption has to be run for the queue to be created.
 
 Launching a command for each consumer can be a nightmare when the number of consumers is high.
 
@@ -507,7 +507,7 @@ In order to create exchanges, queues and bindings at once and be sure you will n
 $ ./app/console rabbitmq:setup-fabric
 ```
 
-When desired, you can configure your consumers and producers to asume the RabbitMQ fabric is already defined. To do this, add the following to your configuration:
+When desired, you can configure your consumers and producers to assume the RabbitMQ fabric is already defined. To do this, add the following to your configuration:
 
 ```yaml
 producers:
