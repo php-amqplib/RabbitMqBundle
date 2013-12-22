@@ -2,12 +2,11 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand as Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 {
