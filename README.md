@@ -140,13 +140,13 @@ If you don't specify a connection for the client, the client will look for a con
 If you need to add optional queue arguments, then your queue options can be something like this:
 
 ```yaml
-queue_options: {name: 'upload-picture', arguments: {'x-ha-policy': ['S', 'all']}}
+queue_options: {name: 'upload-picture', arguments: 'x-ha-policy:all:S'}
 ```
 
 another example with message TTL of 20 seconds:
 
 ```yaml
-queue_options: {name: 'upload-picture', arguments: {'x-message-ttl': ['I', 20000]}}
+queue_options: {name: 'upload-picture', arguments: 'x-message-ttl:20000:I'}
 ```
 
 The argument value must be a list of datatype and value. Valid datatypes are:
