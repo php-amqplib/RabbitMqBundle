@@ -39,7 +39,7 @@ class OldSoundRabbitMqExtension extends Extension
         $loader->load('rabbitmq.xml');
 
         $configuration = new Configuration();
-        $this->config  = $this->processConfiguration($configuration, $configs);
+        $this->config = $this->processConfiguration($configuration, $configs);
 
         $this->collectorEnabled = $this->config['enable_collector'];
 
