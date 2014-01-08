@@ -158,7 +158,7 @@ The argument value must be a list of datatype and value. Valid datatypes are:
 * `F` - Table
 * `A` - Array
 
-Adapt the `arguments` according to your needs.
+You add different arguments by comma separating them. You first define the argument and then you define its value. The ':S' is an optional parameter (default is S). Adapt the `arguments` according to your needs.
 
 If you want to bind queue with specific routing keys you can declare it in producer or consumer config:
 
