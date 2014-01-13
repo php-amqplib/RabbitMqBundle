@@ -140,13 +140,13 @@ If you don't specify a connection for the client, the client will look for a con
 If you need to add optional queue arguments, then your queue options can be something like this:
 
 ```yaml
-queue_options: {name: 'upload-picture', arguments: 'x-ha-policy:all:S'}
+queue_options: {name: 'upload-picture', arguments: {'x-ha-policy': ['S', 'all']}}
 ```
 
 another example with message TTL of 20 seconds:
 
 ```yaml
-queue_options: {name: 'upload-picture', arguments: 'x-message-ttl:20000:I'}
+queue_options: {name: 'upload-picture', arguments: {'x-message-ttl': ['I', 20000]}}
 ```
 
 The argument value must be a list of datatype and value. Valid datatypes are:
@@ -158,7 +158,7 @@ The argument value must be a list of datatype and value. Valid datatypes are:
 * `F` - Table
 * `A` - Array
 
-You add different arguments by comma separating them. You first define the argument and then you define its value. The ':S' is an optional parameter (default is S). Adapt the `arguments` according to your needs.
+Adapt the `arguments` according to your needs.
 
 If you want to bind queue with specific routing keys you can declare it in producer or consumer config:
 
