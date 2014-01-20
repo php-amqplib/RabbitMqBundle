@@ -277,6 +277,31 @@ consumers:
         idle_timeout:     60
 ```
 
+#### Fair dispatching ####
+
+> You might have noticed that the dispatching still doesn't work exactly as we want. For example in a situation with two workers, when all odd messages are heavy and even messages are light, one worker will be constantly busy and the other one will do hardly any work. Well, RabbitMQ doesn't know anything about that and will still dispatch messages evenly.
+
+> This happens because RabbitMQ just dispatches a message when the message enters the queue. It doesn't look at the number of unacknowledged messages for a consumer. It just blindly dispatches every n-th message to the n-th consumer.
+
+> In order to defeat that we can use the basic.qos method with the prefetch_count=1 setting. This tells RabbitMQ not to give more than one message to a worker at a time. Or, in other words, don't dispatch a new message to a worker until it has processed and acknowledged the previous one. Instead, it will dispatch it to the next worker that is not still busy.
+
+From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
+
+Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing. 
+You should evaluate, as the blogpost reccommand, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
+
+With RabbitMqBundle, you can configure that qos_options per consumer like that:
+
+```yaml
+consumers:
+    upload_picture:
+        connection:       default
+        exchange_options: {name: 'upload-picture', type: direct}
+        queue_options:    {name: 'upload-picture'}
+        callback:         upload_picture_service
+        qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+```
+
 ### Callbacks ###
 
 Here's an example callback:
