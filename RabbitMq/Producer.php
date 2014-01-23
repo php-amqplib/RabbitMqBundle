@@ -26,7 +26,12 @@ class Producer extends BaseAmqp
 
         return $this;
     }
-    
+
+    protected function getBasicProperties()
+    {
+        return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
+    }
+
     /**
      * Publishes the message and merges additional properties with basic properties
      *
@@ -40,7 +45,7 @@ class Producer extends BaseAmqp
             $this->setupFabric();
         }
 
-        $msg = new AMQPMessage((string) $msgBody, array_merge($this->basicProperties, $additionalProperties));
+        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
         $this->ch->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
     }
 }
