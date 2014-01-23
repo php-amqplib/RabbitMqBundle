@@ -198,6 +198,8 @@ public function indexAction($name)
 
 As you can see, if in your configuration you have a producer called __upload\_picture__, then in the service container you will have a service called __old_sound_rabbit_mq.upload\_picture\_producer__.
 
+Besides the message itself, the `OldSound\RabbitMqBundle\RabbitMq\Producer#publish()` method also accepts an optional routing key parameter and an optional array of additional properties. The array of additional properties allows you to alter the properties with which an `PhpAmqpLib\Message\AMQPMessage` object gets constructed by default. This way, for example, you can change the application headers.
+
 You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message
 delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode.
 

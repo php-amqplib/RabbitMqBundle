@@ -14,7 +14,8 @@ abstract class BaseAmqp
     protected $queueDeclared = false;
     protected $routingKey = '';
     protected $autoSetupFabric = true;
-
+    protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+	
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
