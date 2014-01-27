@@ -265,6 +265,12 @@ If you want to establish a consumer memory limit, you can do it by using flag `-
 $ ./app/console rabbitmq:consumer -l 256
 ```
 
+If you want to remove all the messages awaiting in a queue, you can execute this command to purge this queue:
+
+```bash
+$ ./app/console rabbitmq:purge --no-confirmation upload_picture
+```
+
 #### Idle timeout ####
 
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:

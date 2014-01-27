@@ -6,29 +6,11 @@ use OldSound\RabbitMqBundle\Command\ConsumerCommand;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class ConsumerCommandTest extends \PHPUnit_Framework_TestCase
+class ConsumerCommandTest extends BaseCommandTest
 {
-    private $application;
-    private $definition;
-    private $helperSet;
-    private $command;
-
     protected function setUp()
     {
-        $this->application = $this->getMockBuilder('Symfony\\Bundle\\FrameworkBundle\\Console\\Application')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->definition = $this->getMockBuilder('Symfony\\Component\\Console\\Input\\InputDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->helperSet = $this->getMock('Symfony\\Component\\Console\\Helper\\HelperSet');
-
-        $this->application->expects($this->any())
-            ->method('getDefinition')
-            ->will($this->returnValue($this->definition));
-        $this->definition->expects($this->any())
-            ->method('getArguments')
-            ->will($this->returnValue(array()));
+        parent::setUp();
         $this->definition->expects($this->any())
             ->method('getOptions')
             ->will($this->returnValue(array(
