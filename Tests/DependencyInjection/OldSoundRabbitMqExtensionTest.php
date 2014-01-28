@@ -174,7 +174,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('foo.callback'), 'execute'))
+                    array(new Reference('foo.callback'))
                 )
             ),
             $definition->getMethodCalls()
@@ -225,7 +225,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('default.callback'), 'execute'))
+                    array(new Reference('default.callback'))
                 )
             ),
             $definition->getMethodCalls()
