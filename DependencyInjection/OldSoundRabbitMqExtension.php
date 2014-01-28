@@ -123,7 +123,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.consumer')
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+                ->addMethodCall('setCallback', array(new Reference($consumer['callback'])));
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
