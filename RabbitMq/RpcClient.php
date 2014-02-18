@@ -41,8 +41,10 @@ class RpcClient extends BaseAmqp
 
         $this->getChannel()->basic_cancel($this->queueName);
         $this->requests = 0;
+        $replies = $this->replies;
+        $this->replies = array();
 
-        return $this->replies;
+        return $replies;
     }
 
     public function processMessage(AMQPMessage $msg)
