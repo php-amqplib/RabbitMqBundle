@@ -33,6 +33,7 @@ class RpcClient extends BaseAmqp
 
     public function getReplies()
     {
+        $this->replies = array();
         $this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
 
         while (count($this->replies) < $this->requests) {
@@ -41,10 +42,8 @@ class RpcClient extends BaseAmqp
 
         $this->getChannel()->basic_cancel($this->queueName);
         $this->requests = 0;
-        $replies = $this->replies;
-        $this->replies = array();
 
-        return $replies;
+        return $this->replies;
     }
 
     public function processMessage(AMQPMessage $msg)
