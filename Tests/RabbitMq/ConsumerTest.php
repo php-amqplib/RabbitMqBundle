@@ -13,7 +13,8 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider processMessageProvider
      */
-    public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = null)
+    public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = null,
+        $useInteractive = false, $stopConsume = false)
     {
         $amqpConnection = $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
             ->disableOriginalConstructor()
@@ -23,15 +24,42 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $consumer = new Consumer($amqpConnection, $amqpChannel);
+        if (false === $useInteractive) {
+        $callback = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        } else {
+            $callback = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\InteractiveConsumerInterface')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $callbackFunction = function() use ($processFlag) { return $processFlag; }; // Create a callback function with a return value set by the data provider.
-        $consumer->setCallback($callbackFunction);
+            $callback
+                ->expects($this->once())
+                ->method('mustStopConsumer')
+                ->will($this->returnValue($stopConsume));
+
+            if (true === $stopConsume) {
+                $amqpChannel
+                    ->expects($this->once())
+                    ->method('basic_cancel');
+            }
+        }
+
+        $consumer = new Consumer($amqpConnection, $amqpChannel);
 
         // Create a default message
         $amqpMessage = new AMQPMessage('foo body');
         $amqpMessage->delivery_info['channel'] = $amqpChannel;
         $amqpMessage->delivery_info['delivery_tag'] = 0;
+
+        // Configure callback call
+        $callback
+            ->expects($this->once())
+            ->method('execute')
+            ->with($amqpMessage)
+            ->will($this->returnValue($processFlag));
+
+        $consumer->setCallback($callback);
 
         $amqpChannel->expects($this->any())
             ->method('basic_reject')
@@ -58,6 +86,8 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
             array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
             array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
             array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
+            array(null, 'basic_ack', null, true, false), // Remove message from queue only if callback return not false
+            array(null, 'basic_ack', null, true, true), // Remove message from queue only if callback return not false
         );
     }
 }

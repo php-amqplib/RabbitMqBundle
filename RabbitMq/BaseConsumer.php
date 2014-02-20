@@ -16,7 +16,7 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected $idleTimeout = 0;
 
-    public function setCallback($callback)
+    public function setCallback(ConsumerInterface $callback)
     {
         $this->callback = $callback;
     }

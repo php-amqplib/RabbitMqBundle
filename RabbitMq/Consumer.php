@@ -60,7 +60,7 @@ class Consumer extends BaseConsumer
     public function processMessage(AMQPMessage $msg)
     {
 
-        $processFlag = call_user_func($this->callback, $msg);
+        $processFlag = $this->callback->execute($msg);
 
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
@@ -79,7 +79,8 @@ class Consumer extends BaseConsumer
         $this->consumed++;
         $this->maybeStopConsumer();
 
-        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+        if ((!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) ||
+            ($this->callback instanceof InteractiveConsumerInterface && true === $this->callback->mustStopConsumer())) {
             $this->stopConsuming();
         }
     }
