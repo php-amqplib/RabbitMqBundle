@@ -375,6 +375,7 @@ rpc_servers:
     random_int:
         connection: default
         callback:   random_int_server
+        qos_options: {prefetch_size: 0, prefetch_count: 1, global: false}
 ```
 
 Here we have a very useful server: it returns random integers to its clients. The callback used to process the request will be the __random\_int\_server__ service. Now let's see how to invoke it from our controllers.
