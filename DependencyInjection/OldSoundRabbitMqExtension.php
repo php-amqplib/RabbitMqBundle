@@ -249,7 +249,13 @@ class OldSoundRabbitMqExtension extends Extension
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $server['connection']);
             }
-
+            if (array_key_exists('qos_options', $server)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $server['qos_options']['prefetch_size'],
+                    $server['qos_options']['prefetch_count'],
+                    $server['qos_options']['global']
+                ));
+            }
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
         }
     }
