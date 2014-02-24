@@ -225,7 +225,6 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['rpc_clients'] as $key => $client) {
             $definition = new Definition('%old_sound_rabbit_mq.rpc_client.class%');
             $definition
-                ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.rpc_client')
                 ->addMethodCall('initClient');
             $this->injectConnection($definition, $client['connection']);
