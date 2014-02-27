@@ -393,7 +393,13 @@ public function indexAction($name)
 {
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
-    $replies = $client->getReplies();
+    $timout = 5; // seconds
+    try {
+        $replies = $client->getReplies($timeout);
+        // process $replies['request_id'];
+    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
+        // handle timeout
+    }
 }
 ```
 
