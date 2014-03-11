@@ -46,6 +46,6 @@ class Producer extends BaseAmqp
         }
 
         $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
-        $this->ch->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
     }
 }
