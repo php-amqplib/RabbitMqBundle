@@ -63,7 +63,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
         if (!AMQP_WITHOUT_SIGNALS && extension_loaded('pcntl')) {
             if (!function_exists('pcntl_signal')) {
-                throw new \BadFunctionCallException("This function is referenced in the php.ini 'disable_functions' and can't be called.");
+                throw new \BadFunctionCallException("Function 'pcntl_signal' is referenced in the php.ini 'disable_functions' and can't be called.");
             }
 
             pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));

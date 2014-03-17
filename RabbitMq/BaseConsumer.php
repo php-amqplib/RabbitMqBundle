@@ -49,7 +49,7 @@ abstract class BaseConsumer extends BaseAmqp
     {
         if (extension_loaded('pcntl') && (defined('AMQP_WITHOUT_SIGNALS') ? !AMQP_WITHOUT_SIGNALS : true)) {
             if (!function_exists('pcntl_signal_dispatch')) {
-                throw new \BadFunctionCallException("This function is referenced in the php.ini 'disable_functions' and can't be called.");
+                throw new \BadFunctionCallException("Function 'pcntl_signal_dispatch' is referenced in the php.ini 'disable_functions' and can't be called.");
             }
 
             pcntl_signal_dispatch();
