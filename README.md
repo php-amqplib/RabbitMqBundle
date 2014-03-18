@@ -393,13 +393,7 @@ public function indexAction($name)
 {
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
-    $timout = 5; // seconds
-    try {
-        $replies = $client->getReplies($timeout);
-        // process $replies['request_id'];
-    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
-        // handle timeout
-    }
+    $replies = $client->getReplies();
 }
 ```
 
@@ -412,6 +406,23 @@ As you can see there, if our client id is __integer\_store__, then the service n
 The arguments we are sending are the __min__ and __max__ values for the `rand()` function. We send them by serializing an array. If our server expects JSON information, or XML, we will send such data here.
 
 The final piece is to get the reply. Our PHP script will block till the server returns a value. The __$replies__ variable will be an associative array where each reply from the server will contained in the respective __request\_id__ key.
+
+You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
+
+```php
+public function indexAction($name)
+{
+    $expiration = 5; // seconds
+    $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
+    $client->addRequest($body, $server, $requestId, $expiration);
+    try {
+        $replies = $client->getReplies();
+        // process $replies['request_id'];
+    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
+        // handle timeout
+    }
+}
+```
 
 As you can guess, we can also make __parallel RPC calls__.
 
