@@ -407,7 +407,7 @@ The arguments we are sending are the __min__ and __max__ values for the `rand()`
 
 The final piece is to get the reply. Our PHP script will block till the server returns a value. The __$replies__ variable will be an associative array where each reply from the server will contained in the respective __request\_id__ key.
 
-You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out:
+You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
 
 ```php
 public function indexAction($name)
