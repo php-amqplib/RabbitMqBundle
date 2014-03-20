@@ -32,7 +32,7 @@ Require the bundle in your composer.json file:
 ````
 {
     "require": {
-        "oldsound/rabbitmq-bundle": "1.2.*",
+        "oldsound/rabbitmq-bundle": "1.3.*",
     }
 }
 ```
@@ -393,7 +393,7 @@ public function indexAction($name)
 {
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
-    $timout = 5; // seconds
+    $timeout = 5; // seconds
     try {
         $replies = $client->getReplies($timeout);
         // process $replies['request_id'];
