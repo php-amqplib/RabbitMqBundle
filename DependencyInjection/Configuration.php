@@ -79,6 +79,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->booleanNode('expect_serialized_response')->defaultTrue()->end()
                         ->end()
                     ->end()
                 ->end()
