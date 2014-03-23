@@ -338,7 +338,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_client');
         $this->assertEquals(
-            array(array('initClient', array())),
+            array(array('initClient', array(true))),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
@@ -353,7 +353,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_client');
         $this->assertEquals(
-            array(array('initClient', array())),
+            array(array('initClient', array(true))),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
