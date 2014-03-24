@@ -1,3 +1,6 @@
+- 2014-02-24
+    * Add a parameter to RPC client configuration to disable auto unserialize when adding call results to results array.
+
 - 2013-01-18
     *  adds an an optional parameter for the AMQP Message Properties for the publish method of the Producer, so they can be set as well. For example, seeting the application_headers is now possible.
 
