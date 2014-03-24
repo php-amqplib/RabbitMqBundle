@@ -393,13 +393,7 @@ public function indexAction($name)
 {
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'random_int', 'request_id');
-    $timeout = 5; // seconds
-    try {
-        $replies = $client->getReplies($timeout);
-        // process $replies['request_id'];
-    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
-        // handle timeout
-    }
+    $replies = $client->getReplies();
 }
 ```
 
@@ -421,7 +415,24 @@ rpc_clients:
         connection: default
         expect_serialized_response: false
 ```
-        
+
+You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
+
+```php
+public function indexAction($name)
+{
+    $expiration = 5; // seconds
+    $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
+    $client->addRequest($body, $server, $requestId, $expiration);
+    try {
+        $replies = $client->getReplies();
+        // process $replies['request_id'];
+    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
+        // handle timeout
+    }
+}
+```
+
 As you can guess, we can also make __parallel RPC calls__.
 
 ### Parallel RPC ###
