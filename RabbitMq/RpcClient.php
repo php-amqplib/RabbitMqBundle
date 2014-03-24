@@ -10,11 +10,13 @@ class RpcClient extends BaseAmqp
     protected $requests = 0;
     protected $replies = array();
     protected $queueName;
+    protected $expectSerializedResponse;
     protected $timeout = 0;
 
-    public function initClient()
+    public function initClient($expectSerializedResponse = true)
     {
         list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, true);
+        $this->expectSerializedResponse = $expectSerializedResponse;
     }
 
     public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0)
@@ -32,7 +34,7 @@ class RpcClient extends BaseAmqp
         $this->getChannel()->basic_publish($msg, $server, $routingKey);
 
         $this->requests++;
-		
+
         if ($expiration > $this->timeout) {
             $this->timeout = $expiration;
         }
@@ -56,6 +58,11 @@ class RpcClient extends BaseAmqp
 
     public function processMessage(AMQPMessage $msg)
     {
-        $this->replies[$msg->get('correlation_id')] = unserialize($msg->body);
+        $messageBody = $msg->body;
+        if ($this->expectSerializedResponse) {
+            $messageBody = unserialize($messageBody);
+        }
+
+        $this->replies[$msg->get('correlation_id')] = $messageBody;
     }
 }

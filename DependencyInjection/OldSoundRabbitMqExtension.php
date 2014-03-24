@@ -226,7 +226,7 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition('%old_sound_rabbit_mq.rpc_client.class%');
             $definition
                 ->addTag('old_sound_rabbit_mq.rpc_client')
-                ->addMethodCall('initClient');
+                ->addMethodCall('initClient', array($client['expect_serialized_response']));
             $this->injectConnection($definition, $client['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $client['connection']);

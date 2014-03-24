@@ -407,6 +407,15 @@ The arguments we are sending are the __min__ and __max__ values for the `rand()`
 
 The final piece is to get the reply. Our PHP script will block till the server returns a value. The __$replies__ variable will be an associative array where each reply from the server will contained in the respective __request\_id__ key.
 
+By default the RCP Client expects the response to be serialized. If the server you are working with returns a non-serialized result then set the RPC client expect_serialized_response option to false. For example, if the integer_store server didn't serialize the result the client would be set as below:
+
+```yaml
+rpc_clients:
+    integer_store:
+        connection: default
+        expect_serialized_response: false
+```
+
 You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
 
 ```php
