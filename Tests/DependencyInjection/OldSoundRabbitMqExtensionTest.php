@@ -259,6 +259,68 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMultipleConsumerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.multi_test_consumer_multiple'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.multi_test_consumer_multiple');
+        $this->assertEquals(array(
+                array(
+                    'setExchangeOptions',
+                    array(
+                        array(
+                            'name'        => 'foo_multiple_exchange',
+                            'type'        => 'direct',
+                            'passive'     => false,
+                            'durable'     => true,
+                            'auto_delete' => false,
+                            'internal'    => false,
+                            'nowait'      => false,
+                            'arguments'   => null,
+                            'ticket'      => null,
+                        )
+                    )
+                ),
+                array(
+                    'setQueues',
+                    array(
+                        array(
+                            'multi_test_1' => array(
+                                'name'         => 'multi_test_1',
+                                'passive'      => false,
+                                'durable'      => true,
+                                'exclusive'    => false,
+                                'auto_delete'  => false,
+                                'nowait'       => false,
+                                'arguments'    => null,
+                                'ticket'       => null,
+                                'routing_keys' => array(),
+                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute')
+                            ),
+                            'foo_bar_2' => array(
+                                'name'         => 'foo_bar_2',
+                                'passive'      => true,
+                                'durable'      => false,
+                                'exclusive'    => true,
+                                'auto_delete'  => true,
+                                'nowait'       => true,
+                                'arguments'    => null,
+                                'ticket'       => null,
+                                'routing_keys' => array(
+                                    'android.#.upload',
+                                    'iphone.upload'
+                                ),
+                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute')
+                            )
+                        )
+                    )
+                )
+            ),
+            $definition->getMethodCalls()
+        );
+    }
+
     public function testFooAnonConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');

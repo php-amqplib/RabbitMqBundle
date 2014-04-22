@@ -17,11 +17,31 @@ class Configuration implements ConfigurationInterface
     {
         $tree = new TreeBuilder();
 
-        $tree->root('old_sound_rabbit_mq')
+        $rootNode = $tree->root('old_sound_rabbit_mq');
+
+        $rootNode
             ->children()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('enable_collector')->defaultValue(false)->end()
                 ->booleanNode('sandbox')->defaultValue(false)->end()
+            ->end()
+        ;
+
+        $this->addConnections($rootNode);
+        $this->addProducers($rootNode);
+        $this->addConsumers($rootNode);
+        $this->addMultipleConsumers($rootNode);
+        $this->addAnonConsumers($rootNode);
+        $this->addRpcClients($rootNode);
+        $this->addRpcServers($rootNode);
+
+        return $tree;
+    }
+
+    protected function addConnections(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('connections')
                     ->useAttributeAsKey('key')
                     ->canBeUnset()
@@ -36,7 +56,14 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                // producers
+            ->end()
+        ;
+    }
+
+    protected function addProducers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('producers')
                     ->canBeUnset()
                     ->useAttributeAsKey('key')
@@ -50,7 +77,14 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                // consumers
+            ->end()
+        ;
+    }
+
+    protected function addConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('consumers')
                     ->canBeUnset()
                     ->useAttributeAsKey('key')
@@ -73,6 +107,61 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+    }
+
+    protected function addMultipleConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('multiple_consumers')
+                ->canBeUnset()
+                ->useAttributeAsKey('key')
+                ->prototype('array')
+                    ->append($this->getExchangeConfiguration())
+                    ->children()
+                        ->scalarNode('connection')->defaultValue('default')->end()
+                        ->scalarNode('idle_timeout')->end()
+                        ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                        ->append($this->getMultipleQueuesConfiguration())
+                        ->arrayNode('qos_options')
+                            ->canBeUnset()
+                            ->children()
+                                ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                ->scalarNode('prefetch_count')->defaultValue(0)->end()
+                                ->booleanNode('global')->defaultFalse()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addAnonConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('anon_consumers')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->append($this->getExchangeConfiguration())
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('callback')->isRequired()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addRpcClients(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('rpc_clients')
                     ->canBeUnset()
                     ->useAttributeAsKey('key')
@@ -83,6 +172,14 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+    }
+
+    protected function addRpcServers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
                 ->arrayNode('rpc_servers')
                     ->canBeUnset()
                     ->useAttributeAsKey('key')
@@ -101,21 +198,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('anon_consumers')
-                    ->canBeUnset()
-                    ->useAttributeAsKey('key')
-                    ->prototype('array')
-                        ->append($this->getExchangeConfiguration())
-                        ->children()
-                            ->scalarNode('connection')->defaultValue('default')->end()
-                            ->scalarNode('callback')->isRequired()->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
         ;
-
-        return $tree;
     }
 
     protected function getExchangeConfiguration()
@@ -123,9 +207,10 @@ class Configuration implements ConfigurationInterface
         $node = new ArrayNodeDefinition('exchange_options');
 
         return $node
+            ->isRequired()
             ->children()
-                ->scalarNode('name')->end()
-                ->scalarNode('type')->end()
+                ->scalarNode('name')->isRequired()->end()
+                ->scalarNode('type')->isRequired()->end()
                 ->booleanNode('passive')->defaultValue(false)->end()
                 ->booleanNode('durable')->defaultValue(true)->end()
                 ->booleanNode('auto_delete')->defaultValue(false)->end()
@@ -141,9 +226,32 @@ class Configuration implements ConfigurationInterface
     {
         $node = new ArrayNodeDefinition('queue_options');
 
-        return $node
+        $this->addQueueNodeConfiguration($node);
+
+        return $node;
+    }
+
+    protected function getMultipleQueuesConfiguration()
+    {
+        $node = new ArrayNodeDefinition('queues');
+        $prototypeNode = $node->requiresAtLeastOneElement()->prototype('array');
+
+        $this->addQueueNodeConfiguration($prototypeNode);
+
+        $prototypeNode->children()
+            ->scalarNode('callback')->isRequired()->end()
+        ->end();
+
+        $prototypeNode->end();
+
+        return $node;
+    }
+
+    protected function addQueueNodeConfiguration(ArrayNodeDefinition $node)
+    {
+        $node
             ->children()
-                ->scalarNode('name')->end()
+                ->scalarNode('name')->isRequired()->end()
                 ->booleanNode('passive')->defaultFalse()->end()
                 ->booleanNode('durable')->defaultTrue()->end()
                 ->booleanNode('exclusive')->defaultFalse()->end()

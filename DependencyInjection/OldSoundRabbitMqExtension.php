@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -46,6 +48,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadConnections();
         $this->loadProducers();
         $this->loadConsumers();
+        $this->loadMultipleConsumers();
         $this->loadAnonConsumers();
         $this->loadRpcClients();
         $this->loadRpcServers();
@@ -146,6 +149,47 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $key), $definition);
+        }
+    }
+
+    protected function loadMultipleConsumers()
+    {
+        foreach ($this->config['multiple_consumers'] as $key => $consumer) {
+            $queues = array();
+
+            foreach ($consumer['queues'] as $queueName => $queueOptions) {
+                $queues[$queueOptions['name']]  = $queueOptions;
+                $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
+            }
+
+            $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
+            $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.multi_consumer')
+                ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
+                ->addMethodCall('setQueues', array($this->normalizeArgumentKeys($queues)));
+
+            if (array_key_exists('qos_options', $consumer)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $consumer['qos_options']['prefetch_size'],
+                    $consumer['qos_options']['prefetch_count'],
+                    $consumer['qos_options']['global']
+                ));
+            }
+
+            if(isset($consumer['idle_timeout'])) {
+                $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+            if (!$consumer['auto_setup_fabric']) {
+                $definition->addMethodCall('disableAutoSetupFabric');
+            }
+
+            $this->injectConnection($definition, $consumer['connection']);
+            if ($this->collectorEnabled) {
+                $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_multiple', $key), $definition);
         }
     }
 

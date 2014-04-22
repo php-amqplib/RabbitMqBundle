@@ -19,4 +19,5 @@ old_sound_rabbit_mq:
                 type:       direct
                 arguments:  {name: bar}
             queue_options:
+                name:       foo_queue
             callback:       consumer.callback
