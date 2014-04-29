@@ -469,12 +469,12 @@ Is very similar to the previous example, we just have an extra `addRequest` call
 ### Multiple Consumers ###
 
 It's a good practice to have a lot of queues for logic separation. With a simple consumer you will have to create one worker (consumer) per queue and it can be hard to manage when dealing
-with many evolutions (forget to add a line in your supervisord configuration ?). This is also useful for small queues as you may not want to have as many workers as queues, and want to regroup
+with many evolutions (forget to add a line in your supervisord configuration?). This is also useful for small queues as you may not want to have as many workers as queues, and want to regroup
 some tasks together without losing flexibility and separation principle.
 
 Multiple consumers allow you to handle this use case by listening to multiple queues on the same consumer.
 
-Here is how you can set a consumer with multiple queues :
+Here is how you can set a consumer with multiple queues:
 
 ```yaml
 multiple_consumers:
