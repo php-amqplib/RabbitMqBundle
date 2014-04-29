@@ -109,7 +109,7 @@ old_sound_rabbit_mq:
                     arguments:   null
                     ticket:      null
                     routing_keys:
-                      - 'android.#.upload'
+                      - 'android.upload'
                       - 'iphone.upload'
                     callback:        foo.multiple_test2.callback
 
