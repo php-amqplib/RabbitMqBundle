@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: brouznouf
- * Date: 22/04/2014
- * Time: 11:59
- */
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
