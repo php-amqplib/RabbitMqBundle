@@ -485,12 +485,12 @@ multiple_consumers:
             upload-picture:
                 name:     upload_picture
                 callback: upload_picture_service
-                routing:
+                routing_keys:
                     - picture
             upload-video:
                 name:     upload_video
                 callback: upload_video_service
-                routing:
+                routing_keys:
                     - video
             upload-stats:
                 name:     upload_stats
