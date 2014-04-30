@@ -124,13 +124,23 @@ old_sound_rabbit_mq:
     producers:
         upload_picture:
             connection:       default
-            exchange_options: {name: 'upload-picture', type: direct}
+            exchange_options: {name: 'picture', type: direct}
     consumers:
+        picture_stuff:
+            queues:
+                - upload_picture
+                - resize_picture
+    queues:
         upload_picture:
             connection:       default
-            exchange_options: {name: 'upload-picture', type: direct}
+            exchange_options: {name: 'picture', type: direct}
             queue_options:    {name: 'upload-picture'}
-            callback:         upload_picture_service
+            callback:         upload_picture_service   
+        resize_picture:
+            connection:       default
+            exchange_options: {name: 'picture', type: direct}
+            queue_options:    {name: 'resize-picture'}
+            callback:         resize_picture_service        
 ```
 
 Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `old_sound_rabbit_mq.upload_picture_producer` and `old_sound_rabbit_mq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
