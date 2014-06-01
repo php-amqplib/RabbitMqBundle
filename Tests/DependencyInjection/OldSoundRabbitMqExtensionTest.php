@@ -75,6 +75,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => true,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -114,6 +115,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -153,6 +155,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => true,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -204,6 +207,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -279,6 +283,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -343,6 +348,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => true,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -378,6 +384,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'nowait'      => false,
                             'arguments'   => null,
                             'ticket'      => null,
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -497,6 +504,21 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('setExchangeOptions', $calls[0][0]);
         $options = $calls[0][1];
         $this->assertEquals(array('name' => 'bar'), $options[0]['arguments']);
+    }
+
+    public function testProducerWithoutExplicitExchangeOptionsConnectsToAMQPDefault()
+    {
+        $container = $this->getContainer('no_exchange_options.yml');
+
+        $definition = $container->getDefinition('old_sound_rabbit_mq.producer_producer');
+        $calls = $definition->getMethodCalls();
+        $this->assertEquals('setExchangeOptions', $calls[0][0]);
+        $options = $calls[0][1];
+
+        $this->assertEquals('', $options[0]['name']);
+        $this->assertEquals('direct', $options[0]['type']);
+        $this->assertEquals(false, $options[0]['declare']);
+        $this->assertEquals(true, $options[0]['passive']);
     }
 
     private function getContainer($file, $debug = false)

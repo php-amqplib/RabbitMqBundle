@@ -207,7 +207,6 @@ class Configuration implements ConfigurationInterface
         $node = new ArrayNodeDefinition('exchange_options');
 
         return $node
-            ->isRequired()
             ->children()
                 ->scalarNode('name')->isRequired()->end()
                 ->scalarNode('type')->isRequired()->end()
@@ -216,6 +215,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('auto_delete')->defaultValue(false)->end()
                 ->booleanNode('internal')->defaultValue(false)->end()
                 ->booleanNode('nowait')->defaultValue(false)->end()
+                ->booleanNode('declare')->defaultValue(true)->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
             ->end()

@@ -93,6 +93,13 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition = new Definition($producer['class']);
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
+                //this producer doesn't define an exchange -> using AMQP Default
+                if (!isset($producer['exchange_options'])) {
+                    $producer['exchange_options']['name'] = '';
+                    $producer['exchange_options']['type'] = 'direct';
+                    $producer['exchange_options']['passive'] = true;
+                    $producer['exchange_options']['declare'] = false;
+                }
                 $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($producer['exchange_options'])));
                 //this producer doesn't define a queue
                 if (!isset($producer['queue_options'])) {
