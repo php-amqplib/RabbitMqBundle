@@ -308,7 +308,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                 'arguments'    => null,
                                 'ticket'       => null,
                                 'routing_keys' => array(
-                                    'android.#.upload',
+                                    'android.upload',
                                     'iphone.upload'
                                 ),
                                 'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute')
