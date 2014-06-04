@@ -23,7 +23,8 @@ abstract class BaseAmqp
         'internal' => false,
         'nowait' => false,
         'arguments' => null,
-        'ticket' => null
+        'ticket' => null,
+        'declare' => true,
     );
 
     protected $queueOptions = array(
@@ -96,7 +97,7 @@ abstract class BaseAmqp
      */
     public function setExchangeOptions(array $options = array())
     {
-        if (empty($options['name'])) {
+        if (!isset($options['name'])) {
             throw new \InvalidArgumentException('You must provide an exchange name');
         }
 
@@ -127,18 +128,20 @@ abstract class BaseAmqp
 
     protected function exchangeDeclare()
     {
-        $this->getChannel()->exchange_declare(
-            $this->exchangeOptions['name'],
-            $this->exchangeOptions['type'],
-            $this->exchangeOptions['passive'],
-            $this->exchangeOptions['durable'],
-            $this->exchangeOptions['auto_delete'],
-            $this->exchangeOptions['internal'],
-            $this->exchangeOptions['nowait'],
-            $this->exchangeOptions['arguments'],
-            $this->exchangeOptions['ticket']);
+        if ($this->exchangeOptions['declare']) {
+            $this->getChannel()->exchange_declare(
+                $this->exchangeOptions['name'],
+                $this->exchangeOptions['type'],
+                $this->exchangeOptions['passive'],
+                $this->exchangeOptions['durable'],
+                $this->exchangeOptions['auto_delete'],
+                $this->exchangeOptions['internal'],
+                $this->exchangeOptions['nowait'],
+                $this->exchangeOptions['arguments'],
+                $this->exchangeOptions['ticket']);
 
-        $this->exchangeDeclared = true;
+            $this->exchangeDeclared = true;
+        }
     }
 
     protected function queueDeclare()
