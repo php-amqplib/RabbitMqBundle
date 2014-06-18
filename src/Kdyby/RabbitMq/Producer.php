@@ -7,13 +7,19 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 
 /**
- * Prodcuer, that publishes AMQP Messages
+ * Producer, that publishes AMQP Messages
  */
 class Producer extends BaseAmqp
 {
 
+	/**
+	 * @var string
+	 */
 	protected $contentType = 'text/plain';
 
+	/**
+	 * @var string
+	 */
 	protected $deliveryMode = 2;
 
 

@@ -11,22 +11,52 @@ use PhpAmqpLib\Connection\AMQPLazyConnection;
 abstract class BaseAmqp
 {
 
+	/**
+	 * @var \PhpAmqpLib\Connection\AMQPConnection
+	 */
 	protected $conn;
 
+	/**
+	 * @var \PhpAmqpLib\Channel\AMQPChannel
+	 */
 	protected $ch;
 
+	/**
+	 * @var string
+	 */
 	protected $consumerTag;
 
+	/**
+	 * @var bool
+	 */
 	protected $exchangeDeclared = false;
 
+	/**
+	 * @var bool
+	 */
 	protected $queueDeclared = false;
 
+	/**
+	 * @var string
+	 */
 	protected $routingKey = '';
 
+	/**
+	 * @var bool
+	 */
 	protected $autoSetupFabric = true;
 
-	protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+	/**
+	 * @var array
+	 */
+	protected $basicProperties = array(
+		'content_type' => 'text/plain',
+		'delivery_mode' => 2
+	);
 
+	/**
+	 * @var array
+	 */
 	protected $exchangeOptions = array(
 		'passive' => false,
 		'durable' => true,
@@ -38,6 +68,9 @@ abstract class BaseAmqp
 		'declare' => true,
 	);
 
+	/**
+	 * @var array
+	 */
 	protected $queueOptions = array(
 		'name' => '',
 		'passive' => false,
@@ -46,7 +79,8 @@ abstract class BaseAmqp
 		'auto_delete' => false,
 		'nowait' => false,
 		'arguments' => null,
-		'ticket' => null
+		'ticket' => null,
+		'routing_keys' => array(),
 	);
 
 
@@ -54,7 +88,7 @@ abstract class BaseAmqp
 	/**
 	 * @param AMQPConnection $conn
 	 * @param AMQPChannel|null $ch
-	 * @param null $consumerTag
+	 * @param string $consumerTag
 	 */
 	public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
 	{
@@ -155,45 +189,49 @@ abstract class BaseAmqp
 
 	protected function exchangeDeclare()
 	{
-		if ($this->exchangeOptions['declare']) {
-			$this->getChannel()->exchange_declare(
-				$this->exchangeOptions['name'],
-				$this->exchangeOptions['type'],
-				$this->exchangeOptions['passive'],
-				$this->exchangeOptions['durable'],
-				$this->exchangeOptions['auto_delete'],
-				$this->exchangeOptions['internal'],
-				$this->exchangeOptions['nowait'],
-				$this->exchangeOptions['arguments'],
-				$this->exchangeOptions['ticket']);
-
-			$this->exchangeDeclared = true;
+		if (empty($this->exchangeOptions['declare'])) {
+			return;
 		}
+
+		$this->getChannel()->exchange_declare(
+			$this->exchangeOptions['name'],
+			$this->exchangeOptions['type'],
+			$this->exchangeOptions['passive'],
+			$this->exchangeOptions['durable'],
+			$this->exchangeOptions['auto_delete'],
+			$this->exchangeOptions['internal'],
+			$this->exchangeOptions['nowait'],
+			$this->exchangeOptions['arguments'],
+			$this->exchangeOptions['ticket']);
+
+		$this->exchangeDeclared = true;
 	}
 
 
 
 	protected function queueDeclare()
 	{
-		if (null !== $this->queueOptions['name']) {
-			list($queueName, ,) = $this->getChannel()->queue_declare(
-				$this->queueOptions['name'], $this->queueOptions['passive'],
-				$this->queueOptions['durable'], $this->queueOptions['exclusive'],
-				$this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-				$this->queueOptions['arguments'], $this->queueOptions['ticket']
-			);
-
-			if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
-				foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-					$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
-				}
-
-			} else {
-				$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
-			}
-
-			$this->queueDeclared = true;
+		if (empty($this->queueOptions['name'])) {
+			return;
 		}
+
+		list($queueName, ,) = $this->getChannel()->queue_declare(
+			$this->queueOptions['name'], $this->queueOptions['passive'],
+			$this->queueOptions['durable'], $this->queueOptions['exclusive'],
+			$this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
+			$this->queueOptions['arguments'], $this->queueOptions['ticket']
+		);
+
+		if (empty($this->queueOptions['routing_keys'])) {
+			$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+
+		} else {
+			foreach ($this->queueOptions['routing_keys'] as $routingKey) {
+				$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+			}
+		}
+
+		$this->queueDeclared = true;
 	}
 
 
