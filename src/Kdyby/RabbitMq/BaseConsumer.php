@@ -2,24 +2,43 @@
 
 namespace Kdyby\RabbitMq;
 
+use Nette\Utils\Callback;
+
+
 
 abstract class BaseConsumer extends AmqpMember
 {
 
+	/**
+	 * @var int
+	 */
 	protected $target;
 
+	/**
+	 * @var int
+	 */
 	protected $consumed = 0;
 
+	/**
+	 * @var callable
+	 */
 	protected $callback;
 
+	/**
+	 * @var int
+	 */
 	protected $forceStop = false;
 
+	/**
+	 * @var int
+	 */
 	protected $idleTimeout = 0;
 
 
 
 	public function setCallback($callback)
 	{
+		Callback::check($callback);
 		$this->callback = $callback;
 	}
 
@@ -50,7 +69,16 @@ abstract class BaseConsumer extends AmqpMember
 		if ($this->autoSetupFabric) {
 			$this->setupFabric();
 		}
-		$this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+
+		$this->getChannel()->basic_consume(
+			$this->queueOptions['name'],
+			$this->getConsumerTag(),
+			$noLocal = false,
+			$noAck = false,
+			$exclusive = false,
+			$nowait = false,
+			array($this, 'processMessage')
+		);
 	}
 
 
@@ -67,6 +95,7 @@ abstract class BaseConsumer extends AmqpMember
 
 		if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
 			$this->stopConsuming();
+
 		} else {
 			return;
 		}
@@ -110,9 +139,9 @@ abstract class BaseConsumer extends AmqpMember
 
 
 
-	public function setIdleTimeout($idleTimeout)
+	public function setIdleTimeout($seconds)
 	{
-		$this->idleTimeout = $idleTimeout;
+		$this->idleTimeout = $seconds;
 	}
 
 
@@ -121,4 +150,5 @@ abstract class BaseConsumer extends AmqpMember
 	{
 		return $this->idleTimeout;
 	}
+
 }

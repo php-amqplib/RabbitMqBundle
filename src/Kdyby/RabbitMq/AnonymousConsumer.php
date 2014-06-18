@@ -24,4 +24,5 @@ class AnonymousConsumer extends Consumer
 			'ticket' => null
 		));
 	}
+
 }

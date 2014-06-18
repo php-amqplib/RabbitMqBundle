@@ -2,7 +2,6 @@
 
 namespace Kdyby\RabbitMq;
 
-use Kdyby\RabbitMq\Exception\QueueNotFoundException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
@@ -49,18 +48,7 @@ class MultipleConsumer extends Consumer
 	protected function queueDeclare()
 	{
 		foreach ($this->queues as $name => $options) {
-			list($queueName, ,) = $this->getChannel()->queue_declare($name, $options['passive'],
-				$options['durable'], $options['exclusive'],
-				$options['auto_delete'], $options['nowait'],
-				$options['arguments'], $options['ticket']);
-
-			if (isset($options['routing_keys']) && count($options['routing_keys']) > 0) {
-				foreach ($options['routing_keys'] as $routingKey) {
-					$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
-				}
-			} else {
-				$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
-			}
+			$this->doQueueDeclare($name, $options);
 		}
 
 		$this->queueDeclared = true;

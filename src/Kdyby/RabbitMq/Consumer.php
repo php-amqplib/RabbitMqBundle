@@ -12,7 +12,7 @@ class Consumer extends BaseConsumer
 	/**
 	 * @var int $memoryLimit
 	 */
-	protected $memoryLimit = null;
+	protected $memoryLimit;
 
 
 
@@ -41,8 +41,6 @@ class Consumer extends BaseConsumer
 
 
 	/**
-	 * Consume the message
-	 *
 	 * @param int $msgAmount
 	 */
 	public function consume($msgAmount)
@@ -72,7 +70,6 @@ class Consumer extends BaseConsumer
 	public function processMessage(AMQPMessage $msg)
 	{
 		$processFlag = call_user_func($this->callback, $msg);
-
 		$this->handleProcessMessage($msg, $processFlag);
 	}
 
@@ -80,16 +77,19 @@ class Consumer extends BaseConsumer
 
 	protected function handleProcessMessage(AMQPMessage $msg, $processFlag)
 	{
-		if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
+		if ($processFlag === IConsumer::MSG_REJECT_REQUEUE || false === $processFlag) {
 			// Reject and requeue message to RabbitMQ
 			$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
-		} else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+
+		} elseif ($processFlag === IConsumer::MSG_SINGLE_NACK_REQUEUE) {
 			// NACK and requeue message to RabbitMQ
 			$msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], false, true);
+
 		} else {
-			if ($processFlag === ConsumerInterface::MSG_REJECT) {
+			if ($processFlag === IConsumer::MSG_REJECT) {
 				// Reject and drop
 				$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+
 			} else {
 				// Remove message from queue only if callback return not false
 				$msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
@@ -99,7 +99,7 @@ class Consumer extends BaseConsumer
 		$this->consumed++;
 		$this->maybeStopConsumer();
 
-		if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+		if ($this->isRamAlmostOverloaded()) {
 			$this->stopConsuming();
 		}
 	}
@@ -113,10 +113,11 @@ class Consumer extends BaseConsumer
 	 */
 	protected function isRamAlmostOverloaded()
 	{
-		if (memory_get_usage(true) >= ($this->getMemoryLimit() * 1024 * 1024)) {
-			return true;
-		} else {
-			return false;
+		if ($this->getMemoryLimit() === NULL) {
+			return FALSE;
 		}
+
+		return memory_get_usage(true) >= ($this->getMemoryLimit() * 1024 * 1024);
 	}
+
 }

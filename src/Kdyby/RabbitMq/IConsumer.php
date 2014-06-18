@@ -27,4 +27,12 @@ interface IConsumer
 	 */
 	const MSG_REJECT = -1;
 
+
+
+	function setExchangeOptions(array $options = array());
+
+	function setQueueOptions(array $options = array());
+
+	function setRoutingKey($routingKey);
+
 }

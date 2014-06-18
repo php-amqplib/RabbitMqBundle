@@ -38,4 +38,5 @@ class AMQPLoggedChannel extends AMQPChannel
 	{
 		return $this->basicPublishLog;
 	}
+
 }

@@ -25,6 +25,7 @@ class RpcServer extends BaseConsumer
 			$this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
 			$this->consumed++;
 			$this->maybeStopConsumer();
+
 		} catch (\Exception $e) {
 			$this->sendReply('error: ' . $e->getMessage(), $msg->get('reply_to'), $msg->get('correlation_id'));
 		}
@@ -34,7 +35,14 @@ class RpcServer extends BaseConsumer
 
 	protected function sendReply($result, $client, $correlationId)
 	{
-		$reply = new AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
-		$this->getChannel()->basic_publish($reply, '', $client);
+		$this->getChannel()->basic_publish(
+			new AMQPMessage($result, array(
+				'content_type' => 'text/plain',
+				'correlation_id' => $correlationId
+			)),
+			$exchange = '',
+			$client
+		);
 	}
+
 }

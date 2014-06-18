@@ -9,21 +9,43 @@ use PhpAmqpLib\Message\AMQPMessage;
 class RpcClient extends AmqpMember
 {
 
+	/**
+	 * @var int
+	 */
 	protected $requests = 0;
 
+	/**
+	 * @var array
+	 */
 	protected $replies = array();
 
+	/**
+	 * @var string
+	 */
 	protected $queueName;
 
+	/**
+	 * @var bool
+	 */
 	protected $expectSerializedResponse;
 
+	/**
+	 * @var int
+	 */
 	protected $timeout = 0;
 
 
 
 	public function initClient($expectSerializedResponse = true)
 	{
-		list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, true);
+		list($this->queueName,,) = $this->getChannel()->queue_declare(
+			"",
+			$passive = false,
+			$durable = false,
+			$exclusive = true,
+			$autoDelete = true
+		);
+
 		$this->expectSerializedResponse = $expectSerializedResponse;
 	}
 
@@ -35,11 +57,13 @@ class RpcClient extends AmqpMember
 			throw new \InvalidArgumentException('You must provide a $requestId');
 		}
 
-		$msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain',
+		$msg = new AMQPMessage($msgBody, array(
+			'content_type' => 'text/plain',
 			'reply_to' => $this->queueName,
 			'delivery_mode' => 1, // non durable
 			'expiration' => $expiration * 1000,
-			'correlation_id' => $requestId));
+			'correlation_id' => $requestId
+		));
 
 		$this->getChannel()->basic_publish($msg, $server, $routingKey);
 

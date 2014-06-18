@@ -61,7 +61,7 @@ abstract class AmqpMember extends Nette\Object
 	protected $exchangeOptions = array(
 		'passive' => false,
 		'durable' => true,
-		'auto_delete' => false,
+		'autoDelete' => false,
 		'internal' => false,
 		'nowait' => false,
 		'arguments' => null,
@@ -77,7 +77,7 @@ abstract class AmqpMember extends Nette\Object
 		'passive' => false,
 		'durable' => true,
 		'exclusive' => false,
-		'auto_delete' => false,
+		'autoDelete' => false,
 		'nowait' => false,
 		'arguments' => null,
 		'ticket' => null,
@@ -95,28 +95,24 @@ abstract class AmqpMember extends Nette\Object
 	{
 		$this->conn = $conn;
 		$this->ch = $ch;
+		$this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
 
 		if (!($conn instanceof AMQPLazyConnection)) {
 			$this->getChannel();
 		}
-
-		$this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
 	}
 
 
 
 	public function __destruct()
 	{
-		//TODO FIX!
-		// if (!empty($this->getChannel()) && !empty($this->conn))
-		// {
-		//     $this->getChannel()->close();
-		// }
-		//
-		// if (!empty($this->conn))
-		// {
-		//     $this->conn->close();
-		// }
+		if ($this->ch) {
+			$this->ch->close();
+		}
+
+		if ($this->conn->isConnected()) {
+			$this->conn->close();
+		}
 	}
 
 
@@ -199,7 +195,7 @@ abstract class AmqpMember extends Nette\Object
 			$this->exchangeOptions['type'],
 			$this->exchangeOptions['passive'],
 			$this->exchangeOptions['durable'],
-			$this->exchangeOptions['auto_delete'],
+			$this->exchangeOptions['autoDelete'],
 			$this->exchangeOptions['internal'],
 			$this->exchangeOptions['nowait'],
 			$this->exchangeOptions['arguments'],
@@ -229,7 +225,7 @@ abstract class AmqpMember extends Nette\Object
 			$options['passive'],
 			$options['durable'],
 			$options['exclusive'],
-			$options['auto_delete'],
+			$options['autoDelete'],
 			$options['nowait'],
 			$options['arguments'],
 			$options['ticket']

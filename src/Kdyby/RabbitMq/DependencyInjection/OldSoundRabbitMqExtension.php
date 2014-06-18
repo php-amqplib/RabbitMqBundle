@@ -146,8 +146,8 @@ class OldSoundRabbitMqExtension extends Extension
 
 			if (array_key_exists('qos_options', $consumer)) {
 				$definition->addMethodCall('setQosOptions', array(
-					$consumer['qos_options']['prefetch_size'],
-					$consumer['qos_options']['prefetch_count'],
+					$consumer['qos_options']['prefetchSize'],
+					$consumer['qos_options']['prefetchCount'],
 					$consumer['qos_options']['global']
 				));
 			}
@@ -189,8 +189,8 @@ class OldSoundRabbitMqExtension extends Extension
 
 			if (array_key_exists('qos_options', $consumer)) {
 				$definition->addMethodCall('setQosOptions', array(
-					$consumer['qos_options']['prefetch_size'],
-					$consumer['qos_options']['prefetch_count'],
+					$consumer['qos_options']['prefetchSize'],
+					$consumer['qos_options']['prefetchCount'],
 					$consumer['qos_options']['global']
 				));
 			}
@@ -323,8 +323,8 @@ class OldSoundRabbitMqExtension extends Extension
 			}
 			if (array_key_exists('qos_options', $server)) {
 				$definition->addMethodCall('setQosOptions', array(
-					$server['qos_options']['prefetch_size'],
-					$server['qos_options']['prefetch_count'],
+					$server['qos_options']['prefetchSize'],
+					$server['qos_options']['prefetchCount'],
 					$server['qos_options']['global']
 				));
 			}
