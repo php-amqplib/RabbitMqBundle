@@ -9,7 +9,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 /**
  * Producer, that publishes AMQP Messages
  */
-class Producer extends AmqpMember
+class Producer extends AmqpMember implements IProducer
 {
 
 	/**
