@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
+use Kdyby\RabbitMq\BaseConsumer as Consumer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

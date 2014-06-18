@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq;
+namespace Kdyby\RabbitMq;
 
 class AmqpPartsHolder
 {

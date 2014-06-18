@@ -1,8 +1,8 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq;
+namespace Kdyby\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\Exception\QueueNotFoundException;
+use Kdyby\RabbitMq\Exception\QueueNotFoundException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 

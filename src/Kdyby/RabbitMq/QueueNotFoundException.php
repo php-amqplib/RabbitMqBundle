@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq\Exception;
+namespace Kdyby\RabbitMq\Exception;
 
 class QueueNotFoundException extends \RuntimeException
 {

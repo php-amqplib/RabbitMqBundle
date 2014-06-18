@@ -6,16 +6,16 @@
 	<parameters>
 		<parameter key="old_sound_rabbit_mq.connection.class">PhpAmqpLib\Connection\AMQPConnection</parameter>
 		<parameter key="old_sound_rabbit_mq.lazy.connection.class">PhpAmqpLib\Connection\AMQPLazyConnection</parameter>
-		<parameter key="old_sound_rabbit_mq.producer.class">OldSound\RabbitMqBundle\RabbitMq\Producer</parameter>
-		<parameter key="old_sound_rabbit_mq.consumer.class">OldSound\RabbitMqBundle\RabbitMq\Consumer</parameter>
-		<parameter key="old_sound_rabbit_mq.multi_consumer.class">OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer</parameter>
-		<parameter key="old_sound_rabbit_mq.anon_consumer.class">OldSound\RabbitMqBundle\RabbitMq\AnonConsumer</parameter>
-		<parameter key="old_sound_rabbit_mq.rpc_client.class">OldSound\RabbitMqBundle\RabbitMq\RpcClient</parameter>
-		<parameter key="old_sound_rabbit_mq.rpc_server.class">OldSound\RabbitMqBundle\RabbitMq\RpcServer</parameter>
-		<parameter key="old_sound_rabbit_mq.logged.channel.class">OldSound\RabbitMqBundle\RabbitMq\AMQPLoggedChannel</parameter>
+		<parameter key="old_sound_rabbit_mq.producer.class">Kdyby\RabbitMq\Producer</parameter>
+		<parameter key="old_sound_rabbit_mq.consumer.class">Kdyby\RabbitMq\Consumer</parameter>
+		<parameter key="old_sound_rabbit_mq.multi_consumer.class">Kdyby\RabbitMq\MultipleConsumer</parameter>
+		<parameter key="old_sound_rabbit_mq.anon_consumer.class">Kdyby\RabbitMq\AnonConsumer</parameter>
+		<parameter key="old_sound_rabbit_mq.rpc_client.class">Kdyby\RabbitMq\RpcClient</parameter>
+		<parameter key="old_sound_rabbit_mq.rpc_server.class">Kdyby\RabbitMq\RpcServer</parameter>
+		<parameter key="old_sound_rabbit_mq.logged.channel.class">Kdyby\RabbitMq\AMQPLoggedChannel</parameter>
 		<parameter key="old_sound_rabbit_mq.data_collector.class">OldSound\RabbitMqBundle\DataCollector\MessageDataCollector</parameter>
-		<parameter key="old_sound_rabbit_mq.parts_holder.class">OldSound\RabbitMqBundle\RabbitMq\AmqpPartsHolder</parameter>
-		<parameter key="old_sound_rabbit_mq.fallback.class">OldSound\RabbitMqBundle\RabbitMq\Fallback</parameter>
+		<parameter key="old_sound_rabbit_mq.parts_holder.class">Kdyby\RabbitMq\AmqpPartsHolder</parameter>
+		<parameter key="old_sound_rabbit_mq.fallback.class">Kdyby\RabbitMq\Fallback</parameter>
 	</parameters>
 
 	<services>

@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq;
+namespace Kdyby\RabbitMq;
 
 
 abstract class BaseConsumer extends BaseAmqp
