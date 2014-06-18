@@ -3,7 +3,7 @@
 namespace Kdyby\RabbitMq;
 
 
-abstract class BaseConsumer extends BaseAmqp
+abstract class BaseConsumer extends AmqpMember
 {
 
 	protected $target;

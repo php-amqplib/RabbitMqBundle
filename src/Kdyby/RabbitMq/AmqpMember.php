@@ -2,13 +2,14 @@
 
 namespace Kdyby\RabbitMq;
 
+use Nette;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 
 
 
-abstract class BaseAmqp
+abstract class AmqpMember extends Nette\Object
 {
 
 	/**
@@ -215,23 +216,33 @@ abstract class BaseAmqp
 			return;
 		}
 
+		$this->doQueueDeclare($this->queueOptions['name'], $this->queueOptions);
+		$this->queueDeclared = true;
+	}
+
+
+
+	protected function doQueueDeclare($name, array $options)
+	{
 		list($queueName, ,) = $this->getChannel()->queue_declare(
-			$this->queueOptions['name'], $this->queueOptions['passive'],
-			$this->queueOptions['durable'], $this->queueOptions['exclusive'],
-			$this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-			$this->queueOptions['arguments'], $this->queueOptions['ticket']
+			$name,
+			$options['passive'],
+			$options['durable'],
+			$options['exclusive'],
+			$options['auto_delete'],
+			$options['nowait'],
+			$options['arguments'],
+			$options['ticket']
 		);
 
-		if (empty($this->queueOptions['routing_keys'])) {
+		if (empty($options['routing_keys'])) {
 			$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
 
 		} else {
-			foreach ($this->queueOptions['routing_keys'] as $routingKey) {
+			foreach ($options['routing_keys'] as $routingKey) {
 				$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
 			}
 		}
-
-		$this->queueDeclared = true;
 	}
 
 

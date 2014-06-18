@@ -16,7 +16,7 @@ class AmqpPartsHolder
 
 
 
-	public function addPart($type, BaseAmqp $part)
+	public function addPart($type, AmqpMember $part)
 	{
 		$this->parts[$type][] = $part;
 	}

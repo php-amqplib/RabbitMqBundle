@@ -6,7 +6,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 
 
-class RpcClient extends BaseAmqp
+class RpcClient extends AmqpMember
 {
 
 	protected $requests = 0;
