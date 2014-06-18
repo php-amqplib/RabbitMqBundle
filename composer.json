@@ -21,7 +21,7 @@
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
-		"symfony/console": "~2.4",
+		"kdyby/console": "dev-master",
 		"jakub-onderka/php-parallel-lint": "~0.6"
 	},
 	"support": {
