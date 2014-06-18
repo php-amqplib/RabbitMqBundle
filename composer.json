@@ -30,10 +30,10 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Kdyby\\Amqp\\": "src/"
+			"Kdyby\\RabbitMq\\": "src/"
 		},
 		"classmap": [
-			"src/Kdyby/Amqp/exceptions.php"
+			"src/Kdyby/RabbitMq/exceptions.php"
 		]
 	},
 	"extra": {
