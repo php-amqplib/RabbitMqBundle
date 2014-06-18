@@ -2,11 +2,9 @@
 
 namespace Kdyby\RabbitMq;
 
-use PhpAmqpLib\Message\AMQPMessage;
 
 
-
-interface ConsumerInterface
+interface IConsumer
 {
 
 	/**
@@ -29,7 +27,4 @@ interface ConsumerInterface
 	 */
 	const MSG_REJECT = -1;
 
-
-
-	public function execute(AMQPMessage $msg);
 }

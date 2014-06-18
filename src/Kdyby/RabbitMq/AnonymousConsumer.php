@@ -6,7 +6,7 @@ use PhpAmqpLib\Connection\AMQPConnection;
 
 
 
-class AnonConsumer extends Consumer
+class AnonymousConsumer extends Consumer
 {
 
 	public function __construct(AMQPConnection $conn)
@@ -18,7 +18,7 @@ class AnonConsumer extends Consumer
 			'passive' => false,
 			'durable' => false,
 			'exclusive' => true,
-			'auto_delete' => true,
+			'autoDelete' => true,
 			'nowait' => false,
 			'arguments' => null,
 			'ticket' => null
