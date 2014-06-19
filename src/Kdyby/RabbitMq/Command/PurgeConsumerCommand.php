@@ -1,7 +1,9 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
+use Kdyby\RabbitMq\Consumer;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,15 +14,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Command to purge a queue
  */
-class PurgeConsumerCommand extends ConsumerCommand
+class PurgeConsumerCommand extends Command
 {
+
+	/**
+	 * @inject
+	 * @var \Kdyby\RabbitMq\Connection
+	 */
+	public $connection;
+
+
 
 	protected function configure()
 	{
-		$this->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
+		$this
+			->setName('rabbitmq:purge')
+			->setDescription('Purges all messages in queue associated with given consumer')
+			->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
 			->addOption('no-confirmation', null, InputOption::VALUE_NONE, 'Whether it must be confirmed before purging');
-
-		$this->setName('rabbitmq:purge');
 	}
 
 
@@ -29,7 +40,7 @@ class PurgeConsumerCommand extends ConsumerCommand
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return void
+	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
@@ -44,8 +55,11 @@ class PurgeConsumerCommand extends ConsumerCommand
 			}
 		}
 
-		$this->consumer = $this->getContainer()
-			->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
-		$this->consumer->purge($input->getArgument('name'));
+		/** @var Consumer $consumer */
+		$consumer = $this->connection->getConsumer($input->getArgument('name'));
+		$consumer->purge($input->getArgument('name'));
+
+		return 0;
 	}
+
 }

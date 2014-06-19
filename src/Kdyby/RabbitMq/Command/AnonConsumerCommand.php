@@ -1,6 +1,14 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+
+namespace Kdyby\RabbitMq\Command;
+
+use Kdyby\RabbitMq\AnonymousConsumer;
+use Kdyby\RabbitMq\InvalidArgumentException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+
 
 class AnonConsumerCommand extends BaseConsumerCommand
 {
@@ -10,16 +18,24 @@ class AnonConsumerCommand extends BaseConsumerCommand
 		parent::configure();
 
 		$this->setName('rabbitmq:anon-consumer');
+		$this->setDescription('Starts an anonymouse configured consumer');
 
 		$this->getDefinition()->getOption('messages')->setDefault(1);
 		$this->getDefinition()->getOption('route')->setDefault('#');
-
 	}
 
 
 
-	protected function getConsumerService()
+	protected function initialize(InputInterface $input, OutputInterface $output)
 	{
-		return 'old_sound_rabbit_mq.%s_anon';
+		parent::initialize($input, $output);
+
+		if (!$this->consumer instanceof AnonymousConsumer) {
+			throw new InvalidArgumentException(
+				'Expected instance of Kdyby\RabbitMq\AnonymousConsumer, ' .
+				'but consumer ' . $input->getArgument('name'). ' is ' . get_class($this->consumer)
+			);
+		}
 	}
+
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,15 +10,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 
 
-class StdInProducerCommand extends BaseRabbitMqCommand
+class StdInProducerCommand extends Command
 {
+
+	/**
+	 * @inject
+	 * @var \Kdyby\RabbitMq\Connection
+	 */
+	public $connection;
+
+
 
 	protected function configure()
 	{
-		parent::configure();
-
 		$this
 			->setName('rabbitmq:stdin-producer')
+			->setDescription('Creates message from given STDIN and passes it to configured producer')
 			->addArgument('name', InputArgument::REQUIRED, 'Producer Name')
 			->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false);
 	}
@@ -36,7 +44,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
 	{
 		define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-		$producer = $this->getContainer()->get(sprintf('old_sound_rabbit_mq.%s_producer', $input->getArgument('name')));
+		$producer = $this->connection->getProducer($input->getArgument('name'));
 
 		$data = '';
 		while (!feof(STDIN)) {
@@ -45,4 +53,5 @@ class StdInProducerCommand extends BaseRabbitMqCommand
 
 		$producer->publish(serialize($data));
 	}
+
 }

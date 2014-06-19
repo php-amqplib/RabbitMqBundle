@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
 class ConsumerCommand extends BaseConsumerCommand
 {
@@ -10,12 +10,7 @@ class ConsumerCommand extends BaseConsumerCommand
 		parent::configure();
 
 		$this->setName('rabbitmq:consumer');
+		$this->setDescription('Starts a configured consumer');
 	}
 
-
-
-	protected function getConsumerService()
-	{
-		return 'old_sound_rabbit_mq.%s_consumer';
-	}
 }

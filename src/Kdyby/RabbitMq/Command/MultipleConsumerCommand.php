@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
 class MultipleConsumerCommand extends BaseConsumerCommand
 {

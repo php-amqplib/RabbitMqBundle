@@ -1,8 +1,9 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
 use Kdyby\RabbitMq\BaseConsumer as Consumer;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -10,16 +11,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 
 
-abstract class BaseConsumerCommand extends BaseRabbitMqCommand
+abstract class BaseConsumerCommand extends Command
 {
 
+	/**
+	 * @inject
+	 * @var \Kdyby\RabbitMq\Connection
+	 */
+	public $connection;
+
+	/**
+	 * @var Consumer|\Kdyby\RabbitMq\Consumer
+	 */
 	protected $consumer;
 
+	/**
+	 * @var int
+	 */
 	protected $amount;
-
-
-
-	abstract protected function getConsumerService();
 
 
 
@@ -43,8 +52,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
 	protected function configure()
 	{
-		parent::configure();
-
 		$this
 			->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
 			->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
@@ -57,18 +64,16 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
 
 	/**
-	 * Executes the current command.
-	 *
 	 * @param InputInterface $input An InputInterface instance
 	 * @param OutputInterface $output An OutputInterface instance
-	 *
-	 * @return integer 0 if everything went fine, or an error code
 	 *
 	 * @throws \InvalidArgumentException When the number of messages to consume is less than 0
 	 * @throws \BadFunctionCallException When the pcntl is not installed and option -s is true
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function initialize(InputInterface $input, OutputInterface $output)
 	{
+		parent::initialize($input, $output);
+
 		if (defined('AMQP_WITHOUT_SIGNALS') === false) {
 			define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
 		}
@@ -87,19 +92,32 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 			define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 		}
 
-		$this->amount = $input->getOption('messages');
-
-		if (0 > $this->amount) {
+		if (($this->amount = $input->getOption('messages')) < 0) {
 			throw new \InvalidArgumentException("The -m option should be null or greater than 0");
 		}
 
-		$this->consumer = $this->getContainer()
-			->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
+		$this->consumer = $this->connection->getConsumer($input->getArgument('name'));
 
 		if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
 			$this->consumer->setMemoryLimit($input->getOption('memory-limit'));
 		}
-		$this->consumer->setRoutingKey($input->getOption('route'));
+
+		if ($routingKey = $input->getOption('route')) {
+			$this->consumer->setRoutingKey($routingKey);
+		}
+	}
+
+
+
+	/**
+	 * @param InputInterface $input An InputInterface instance
+	 * @param OutputInterface $output An OutputInterface instance
+	 *
+	 * @return integer 0 if everything went fine, or an error code
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output)
+	{
 		$this->consumer->consume($this->amount);
 	}
+
 }

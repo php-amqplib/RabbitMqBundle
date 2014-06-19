@@ -176,6 +176,8 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				$meta['rpcServers'],
 			));
 		}
+
+		$this->loadConsole();
 	}
 
 
@@ -371,6 +373,29 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			}
 
 			$this->connectionsMeta[$config['connection']]['rpcSevers'][$name] = $serviceName;
+		}
+	}
+
+
+
+	private function loadConsole()
+	{
+		if (!class_exists('Kdyby\Console\DI\ConsoleExtension') || PHP_SAPI !== 'cli') {
+			return;
+		}
+
+		$builder = $this->getContainerBuilder();
+
+		foreach (array(
+			'Kdyby\RabbitMq\Command\ConsumerCommand',
+			'Kdyby\RabbitMq\Command\PurgeConsumerCommand',
+			'Kdyby\RabbitMq\Command\RpcServerCommand',
+			'Kdyby\RabbitMq\Command\SetupFabricCommand',
+			'Kdyby\RabbitMq\Command\StdInProducerCommand',
+		) as $i => $class) {
+			$builder->addDefinition($this->prefix('console.' . $i))
+				->setClass($class)
+				->addTag(Kdyby\Console\DI\ConsoleExtension::COMMAND_TAG);
 		}
 	}
 

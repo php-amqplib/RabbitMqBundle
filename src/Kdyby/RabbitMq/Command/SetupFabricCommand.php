@@ -1,15 +1,26 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Command;
+namespace Kdyby\RabbitMq\Command;
 
+use Kdyby\RabbitMq\AmqpMember;
+use Kdyby\RabbitMq\DI\RabbitMqExtension;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
 
-class SetupFabricCommand extends BaseRabbitMqCommand
+class SetupFabricCommand extends Command
 {
+
+	/**
+	 * @inject
+	 * @var \Nette\DI\Container
+	 */
+	public $container;
+
+
 
 	protected function configure()
 	{
@@ -27,13 +38,20 @@ class SetupFabricCommand extends BaseRabbitMqCommand
 			define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 		}
 
-
 		$output->writeln('Setting up the Rabbit MQ fabric');
 
-		$partsHolder = $this->getContainer()->get('old_sound_rabbit_mq.parts_holder');
-
-		foreach ($partsHolder->getParts('old_sound_rabbit_mq.base_amqp') as $baseAmqp) {
-			$baseAmqp->setupFabric();
+		foreach (array(
+			RabbitMqExtension::TAG_PRODUCER,
+			RabbitMqExtension::TAG_CONSUMER,
+			RabbitMqExtension::TAG_RPC_CLIENT,
+			RabbitMqExtension::TAG_RPC_SERVER
+		) as $tag) {
+			foreach ($this->container->findByTag($tag) as $serviceId => $meta) {
+				/** @var AmqpMember $service */
+				$service = $this->container->getService($serviceId);
+				$service->setupFabric();
+			}
 		}
 	}
+
 }
