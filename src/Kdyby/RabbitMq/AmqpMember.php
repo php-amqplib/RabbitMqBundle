@@ -13,12 +13,12 @@ abstract class AmqpMember extends Nette\Object
 {
 
 	/**
-	 * @var \PhpAmqpLib\Connection\AMQPConnection
+	 * @var Connection
 	 */
 	protected $conn;
 
 	/**
-	 * @var \PhpAmqpLib\Channel\AMQPChannel
+	 * @var Channel
 	 */
 	protected $ch;
 
@@ -59,6 +59,7 @@ abstract class AmqpMember extends Nette\Object
 	 * @var array
 	 */
 	protected $exchangeOptions = array(
+		'name' => NULL,
 		'passive' => false,
 		'durable' => true,
 		'autoDelete' => false,
@@ -87,14 +88,12 @@ abstract class AmqpMember extends Nette\Object
 
 
 	/**
-	 * @param AMQPConnection $conn
-	 * @param AMQPChannel|null $ch
+	 * @param Connection $conn
 	 * @param string $consumerTag
 	 */
-	public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
+	public function __construct(Connection $conn, $consumerTag = null)
 	{
 		$this->conn = $conn;
-		$this->ch = $ch;
 		$this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
 
 		if (!($conn instanceof AMQPLazyConnection)) {
@@ -132,8 +131,7 @@ abstract class AmqpMember extends Nette\Object
 
 
 	/**
-	 * @param  AMQPChannel $ch
-	 * @return void
+	 * @param AMQPChannel $ch
 	 */
 	public function setChannel(AMQPChannel $ch)
 	{
@@ -157,7 +155,7 @@ abstract class AmqpMember extends Nette\Object
 			throw new \InvalidArgumentException('You must provide an exchange type');
 		}
 
-		$this->exchangeOptions = array_merge($this->exchangeOptions, $options);
+		$this->exchangeOptions = $options + $this->exchangeOptions;
 	}
 
 
@@ -168,7 +166,7 @@ abstract class AmqpMember extends Nette\Object
 	 */
 	public function setQueueOptions(array $options = array())
 	{
-		$this->queueOptions = array_merge($this->queueOptions, $options);
+		$this->queueOptions = $options + $this->queueOptions;
 	}
 
 
