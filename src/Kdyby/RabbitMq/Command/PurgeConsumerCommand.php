@@ -12,7 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 
 /**
- * Command to purge a queue
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
  */
 class PurgeConsumerCommand extends Command
 {

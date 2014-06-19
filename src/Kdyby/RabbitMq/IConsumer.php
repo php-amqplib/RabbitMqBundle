@@ -4,6 +4,10 @@ namespace Kdyby\RabbitMq;
 
 
 
+/**
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
+ */
 interface IConsumer
 {
 

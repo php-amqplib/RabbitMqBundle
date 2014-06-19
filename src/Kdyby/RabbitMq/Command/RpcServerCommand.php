@@ -10,6 +10,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 
 
+/**
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
+ */
 class RpcServerCommand extends Command
 {
 

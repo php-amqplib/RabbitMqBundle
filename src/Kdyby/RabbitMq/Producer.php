@@ -7,7 +7,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 
 /**
- * Producer, that publishes AMQP Messages
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
  */
 class Producer extends AmqpMember implements IProducer
 {

@@ -5,6 +5,8 @@ Kdyby/RabbitMq
 [![Downloads this Month](https://img.shields.io/packagist/dm/kdyby/rabbitmq.svg)](https://packagist.org/packages/kdyby/rabbitmq)
 [![Latest stable](https://img.shields.io/packagist/v/kdyby/rabbitmq.svg)](https://packagist.org/packages/kdyby/rabbitmq)
 
+This is a fork of [videlalvaro/RabbitMqBundle](https://github.com/videlalvaro/RabbitMqBundle), originally developed by [Alvaro Videla](https://github.com/videlalvaro).
+
 
 Requirements
 ------------

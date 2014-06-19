@@ -6,6 +6,10 @@ use PhpAmqpLib\Connection\AMQPConnection;
 
 
 
+/**
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
+ */
 class AnonymousConsumer extends Consumer
 {
 

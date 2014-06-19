@@ -6,6 +6,10 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 
 
+/**
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
+ */
 class RpcClient extends AmqpMember
 {
 
@@ -103,4 +107,5 @@ class RpcClient extends AmqpMember
 
 		$this->replies[$msg->get('correlation_id')] = $messageBody;
 	}
+
 }

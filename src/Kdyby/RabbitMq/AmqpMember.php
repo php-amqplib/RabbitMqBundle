@@ -9,6 +9,10 @@ use PhpAmqpLib\Connection\AMQPLazyConnection;
 
 
 
+/**
+ * @author Alvaro Videla <videlalvaro@gmail.com>
+ * @author Filip Procházka <filip@prochazka.su>
+ */
 abstract class AmqpMember extends Nette\Object
 {
 
