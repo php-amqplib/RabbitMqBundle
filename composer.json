@@ -17,7 +17,7 @@
 	],
 	"require": {
 		"nette/nette": "~2.1@dev",
-		"videlalvaro/php-amqplib": "@dev"
+		"videlalvaro/php-amqplib": "~2.2"
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
