@@ -26,7 +26,7 @@
 	},
 	"support": {
 		"email": "filip@prochazka.su",
-		"issues": "https://github.com/kdyby/amqp/issues"
+		"issues": "https://github.com/Kdyby/RabbitMq/issues"
 	},
 	"autoload": {
 		"psr-0": {
