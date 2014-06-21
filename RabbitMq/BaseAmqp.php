@@ -57,16 +57,13 @@ abstract class BaseAmqp
 
     public function __destruct()
     {
-        //TODO FIX!
-        // if (!empty($this->getChannel()) && !empty($this->conn))
-        // {
-        //     $this->getChannel()->close();
-        // }
-        //
-        // if (!empty($this->conn))
-        // {
-        //     $this->conn->close();
-        // }
+        if ($this->ch) {
+            $this->ch->close();
+        }
+        
+        if ($this->conn->isConnected()) {
+            $this->conn->close();
+        }
     }
 
     /**
