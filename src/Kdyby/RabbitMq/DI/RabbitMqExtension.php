@@ -376,7 +376,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				));
 			}
 
-			$this->connectionsMeta[$config['connection']]['rpcSevers'][$name] = $serviceName;
+			$this->connectionsMeta[$config['connection']]['rpcServers'][$name] = $serviceName;
 		}
 	}
 
