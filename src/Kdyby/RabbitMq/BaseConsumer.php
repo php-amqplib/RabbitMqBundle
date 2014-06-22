@@ -38,6 +38,20 @@ abstract class BaseConsumer extends AmqpMember
 	 */
 	protected $idleTimeout = 0;
 
+	/**
+	 * @var array
+	 */
+	protected $qosOptions = array(
+		'prefetchSize' => 0,
+		'prefetchCount' => 0,
+		'global' => FALSE
+	);
+
+	/**
+	 * @var bool
+	 */
+	protected $qosDeclared = FALSE;
+
 
 
 	public function setCallback($callback)
@@ -138,7 +152,39 @@ abstract class BaseConsumer extends AmqpMember
 	 */
 	public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
 	{
-		$this->getChannel()->basic_qos($prefetchSize, $prefetchCount, $global);
+		$this->qosOptions = array(
+			'prefetchSize' => $prefetchSize,
+			'prefetchCount' => $prefetchCount,
+			'global' => $global,
+		);
+	}
+
+
+
+	public function setupFabric()
+	{
+		if (!$this->qosDeclared) {
+			$this->qosDeclare();
+		}
+
+		parent::setupFabric();
+	}
+
+
+
+	protected function qosDeclare()
+	{
+		if (!array_filter($this->qosOptions)) {
+			return;
+		}
+
+		$this->getChannel()->basic_qos(
+			$this->qosOptions['prefetchSize'],
+			$this->qosOptions['prefetchCount'],
+			$this->qosOptions['global']
+		);
+
+		$this->qosDeclared = TRUE;
 	}
 
 
