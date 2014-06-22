@@ -235,16 +235,13 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			}
 
 			$config['exchange'] = $this->mergeConfig($config['exchange'], $this->exchangeDefaults);
-			Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item '%' of producer {$this->name}.{$name}");
-
-			$config['queue'] = $this->mergeConfig($config['queue'], $this->queueDefaults);
-			Nette\Utils\Validators::assertField($config['queue'], 'name', 'string:3..', "The config item '%' of producer {$this->name}.{$name}");
+			Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
 
 			$producer = $builder->addDefinition($serviceName = $this->prefix('producer.' . $name))
 				->setFactory($config['class'], array('@' . $this->connectionsMeta[$config['connection']]['serviceId']))
 				->setClass('Kdyby\RabbitMq\IProducer')
 				->addSetup('setExchangeOptions', array($config['exchange']))
-				->addSetup('setQueueOptions', array($config['queue']))
+				->addSetup('setQueueOptions', array($this->mergeConfig($config['queue'], $this->queueDefaults)))
 				->addSetup('setContentType', array($config['contentType']))
 				->addSetup('setDeliveryMode', array($config['deliveryMode']))
 				->addTag(self::TAG_PRODUCER);
