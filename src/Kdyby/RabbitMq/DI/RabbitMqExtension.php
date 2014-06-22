@@ -279,6 +279,10 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				foreach ($config['queues'] as $queueName => $queueConfig) {
 					$queueConfig['name'] = $queueName;
 					$config['queues'][$queueName] = $this->mergeConfig($queueConfig, $this->queueDefaults);
+
+					if (isset($queueConfig['callback'])) {
+						list($config['queues'][$queueName]['callback']) = $this->filterArgs($queueConfig['callback']);
+					}
 				}
 
 				$consumer
@@ -289,12 +293,12 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				$consumer
 					->setClass('Kdyby\RabbitMq\Consumer')
 					->addSetup('setQueueOptions', array($this->mergeConfig($config['queue'], $this->queueDefaults)))
-					->addSetup('setCallback', array($config['callback']));
+					->addSetup('setCallback', $this->filterArgs($config['callback']));
 
 			} else {
 				$consumer
 					->setClass('Kdyby\RabbitMq\AnonymousConsumer')
-					->addSetup('setCallback', array($config['callback']));
+					->addSetup('setCallback', $this->filterArgs($config['callback']));
 			}
 
 			$consumer->setArguments(array('@' . $this->connectionsMeta[$config['connection']]['serviceId']));
@@ -356,11 +360,10 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in rpc server {$this->name}.{$name} was not defined.");
 			}
 
-
 			$rpcServer = $builder->addDefinition($serviceName = $this->prefix('rpcServer.' . $name))
 				->setClass('Kdyby\RabbitMq\RpcServer', array('@' . $this->connectionsMeta[$config['connection']]['serviceId']))
 				->addSetup('initServer', array($name))
-				->addSetup('setCallback', array($config['callback']))
+				->addSetup('setCallback', $this->filterArgs($config['callback']))
 				->addTag(self::TAG_RPC_SERVER)
 				->setAutowired(FALSE);
 
@@ -405,6 +408,17 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	protected function mergeConfig($config, $defaults)
 	{
 		return Config\Helpers::merge($config, $this->compiler->getContainerBuilder()->expand($defaults));
+	}
+
+
+
+	/**
+	 * @param string|\stdClass $statement
+	 * @return Nette\DI\Statement[]
+	 */
+	public static function filterArgs($statement)
+	{
+		return Nette\DI\Compiler::filterArguments(array(is_string($statement) ? new Nette\DI\Statement($statement) : $statement));
 	}
 
 
