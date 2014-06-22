@@ -142,15 +142,26 @@ class Connection extends PhpAmqpLib\Connection\AMQPLazyConnection implements ICo
 		}
 
 		$this->connect();
-
 		$id = $id ? $id : $this->get_free_channel_id();
+
+		return $this->channels[$id] = $this->doCreateChannel($id);
+	}
+
+
+
+	/**
+	 * @param string $id
+	 * @return Channel
+	 */
+	protected function doCreateChannel($id)
+	{
 		$channel = new Channel($this->connection, $id);
 
 		if ($this->panel) {
 			$channel->injectPanel($this->panel);
 		}
 
-		return $this->channels[$id];
+		return $channel;
 	}
 
 }
