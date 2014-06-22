@@ -48,8 +48,8 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	public $connectionDefaults = array(
 		'host' => '127.0.0.1',
 		'port' => 5672,
-		'user' => 'guest',
-		'password' => 'guest',
+		'user' => NULL,
+		'password' => NULL,
 		'vhost' => '/',
 	);
 
@@ -194,6 +194,9 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 		foreach ($connections as $name => $config) {
 			$config = $this->mergeConfig($config, $this->connectionDefaults);
+
+			Nette\Utils\Validators::assertField($config, 'user', 'string:3..', "The config item '%' of connection {$this->name}.{$name}");
+			Nette\Utils\Validators::assertField($config, 'password', 'string:3..', "The config item '%' of connection {$this->name}.{$name}");
 
 			$connection = $builder->addDefinition($serviceName = $this->prefix($name . '.connection'))
 				->setClass('Kdyby\RabbitMq\Connection')
