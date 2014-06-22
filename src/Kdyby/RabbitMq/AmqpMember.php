@@ -32,16 +32,6 @@ abstract class AmqpMember extends Nette\Object
 	protected $consumerTag;
 
 	/**
-	 * @var bool
-	 */
-	protected $exchangeDeclared = false;
-
-	/**
-	 * @var bool
-	 */
-	protected $queueDeclared = false;
-
-	/**
 	 * @var string
 	 */
 	protected $routingKey = '';
@@ -75,6 +65,11 @@ abstract class AmqpMember extends Nette\Object
 	);
 
 	/**
+	 * @var bool
+	 */
+	protected $exchangeDeclared = false;
+
+	/**
 	 * @var array
 	 */
 	protected $queueOptions = array(
@@ -88,6 +83,11 @@ abstract class AmqpMember extends Nette\Object
 		'ticket' => null,
 		'routing_keys' => array(),
 	);
+
+	/**
+	 * @var bool
+	 */
+	protected $queueDeclared = false;
 
 
 
