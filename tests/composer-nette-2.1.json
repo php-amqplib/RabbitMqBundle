@@ -16,13 +16,12 @@
 		}
 	],
 	"require": {
-		"nette/nette": "~2.1@dev",
+		"nette/nette": "2.1.*",
 
-		"videlalvaro/php-amqplib": "~2.4.0@dev"
+		"videlalvaro/php-amqplib": "~2.2"
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
-		"mockery/mockery": "~0.9.1",
 		"kdyby/console": "dev-master",
 		"jakub-onderka/php-parallel-lint": "~0.6"
 	},
@@ -37,10 +36,5 @@
 		"classmap": [
 			"src/Kdyby/RabbitMq/exceptions.php"
 		]
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "0.1-dev"
-		}
 	}
 }

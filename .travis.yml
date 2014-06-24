@@ -1,16 +1,28 @@
 language: php
 
+env:
+  - NETTE=nette-2.1
+  - NETTE=default # 2.2
+  - NETTE=nette-dev
+
 php:
-  - 5.3
+  - 5.3.3
   - 5.4
   - 5.5
+  - 5.6
+  - hhvm
 
-env:
-    - SYMFONY_VERSION="2.1.*"
-    - SYMFONY_VERSION="2.2.*"
-    - SYMFONY_VERSION="2.3.*"
+matrix:
+  allow_failures:
+    - php: hhvm
 
 before_script:
-    - composer self-update
-    - composer require --no-update symfony/framework-bundle:${SYMFONY_VERSION}
-    - composer install --prefer-source
+  - "php tests/prepare-composer.php"
+  - composer self-update
+  - composer install --no-interaction --prefer-source --dev
+  - ./vendor/bin/parallel-lint -e php,phpt --exclude vendor .
+
+script: ./vendor/bin/tester -c ./tests/php.ini-unix ./tests/KdybyTests/
+
+after_failure:
+  - 'for i in $(find ./tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done'

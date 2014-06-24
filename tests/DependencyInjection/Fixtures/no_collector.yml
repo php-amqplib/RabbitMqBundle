@@ -1,6 +1,0 @@
-old_sound_rabbit_mq:
-
-    enable_collector: true
-
-    connections:
-        default:

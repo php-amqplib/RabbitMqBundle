@@ -16,13 +16,32 @@
 		}
 	],
 	"require": {
-		"nette/nette": "~2.1@dev",
+		"nette/nette": "@dev",
+		"nette/application": "@dev",
+		"nette/bootstrap": "@dev",
+		"nette/caching": "@dev",
+		"nette/component-model": "@dev",
+		"nette/database": "@dev",
+		"nette/di": "@dev",
+		"nette/finder": "@dev",
+		"nette/forms": "@dev",
+		"nette/http": "@dev",
+		"nette/mail": "@dev",
+		"nette/neon": "@dev",
+		"nette/php-generator": "@dev",
+		"nette/reflection": "@dev",
+		"nette/robot-loader": "@dev",
+		"nette/safe-stream": "@dev",
+		"nette/security": "@dev",
+		"nette/tokenizer": "@dev",
+		"nette/utils": "@dev",
+		"latte/latte": "@dev",
+		"tracy/tracy": "@dev",
 
-		"videlalvaro/php-amqplib": "~2.4.0@dev"
+		"videlalvaro/php-amqplib": "~2.2"
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
-		"mockery/mockery": "~0.9.1",
 		"kdyby/console": "dev-master",
 		"jakub-onderka/php-parallel-lint": "~0.6"
 	},
@@ -37,10 +56,5 @@
 		"classmap": [
 			"src/Kdyby/RabbitMq/exceptions.php"
 		]
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "0.1-dev"
-		}
 	}
 }
