@@ -2,6 +2,7 @@
 
 namespace Kdyby\RabbitMq;
 
+use Nette\Utils\Callback;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
@@ -13,6 +14,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 class MultipleConsumer extends Consumer
 {
 
+	/**
+	 * @var array[]|callable[][]
+	 */
 	protected $queues = array();
 
 
@@ -26,7 +30,15 @@ class MultipleConsumer extends Consumer
 
 	public function setQueues(array $queues)
 	{
-		$this->queues = $queues;
+		$this->queues = array();
+		foreach ($queues as $name => $queue) {
+			if (!isset($queue['callback'])) {
+				throw new InvalidArgumentException("The queue '$name' is missing a callback.");
+			}
+
+			Callback::check($queue['callback']);
+			$this->queues[$name] = $queue;
+		}
 	}
 
 
@@ -38,11 +50,9 @@ class MultipleConsumer extends Consumer
 		}
 
 		foreach ($this->queues as $name => $options) {
-			//PHP 5.3 Compliant
-			$currentObject = $this;
-
-			$this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use ($currentObject, $name) {
-				$this->processQueueMessage($name, $msg);
+			$self = $this;
+			$this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use ($self, $name) {
+				$self->processQueueMessage($name, $msg);
 			});
 		}
 	}
