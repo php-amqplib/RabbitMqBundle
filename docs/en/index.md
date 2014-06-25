@@ -124,7 +124,7 @@ public function actionDefault()
 {
     $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
 
-    $producer = $this->bunny->getProducer('uploadPicture');
+    $producer = $this->serviceLocator->getService('rabbitmq.producer.uploadPicture');
     $producer->publish(serialize($msg));
 }
 ```
