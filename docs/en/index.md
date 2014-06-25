@@ -28,24 +28,24 @@ Add the `rabbitmq` section in your configuration file:
 
 ```yaml
 rabbitmq:
-    connection:
+	connection:
 		host: localhost
 		port: 5672
 		user: 'guest'
 		password: 'guest'
 		vhost: '/'
-
-    producers:
-        uploadPicture:
-            connection: default
-            exchange: {name: 'upload-picture', type: direct}
-
-    consumers:
-        uploadPicture:
-            connection: default
-            exchange: {name: 'upload-picture', type: direct}
-            queue: {name: 'upload-picture'}
-            callback: [@MyApp\UploadPictureService, processUpload]
+	
+	producers:
+		uploadPicture:
+			connection: default
+			exchange: {name: 'upload-picture', type: direct}
+	
+	consumers:
+		uploadPicture:
+			connection: default
+			exchange: {name: 'upload-picture', type: direct}
+			queue: {name: 'upload-picture'}
+			callback: [@MyApp\UploadPictureService, processUpload]
 ```
 
 Here we configure the connection service and the message endpoints that our application will have. Connection configured like this will be automatically named `default`.
@@ -59,14 +59,14 @@ And if you don't specify a connection for the client, the client will not look f
 
 ```yaml
 rabbitmq:
-    connection:
-    	foo: # this connection is defined as first, so it's "the default" for all application clients
+	connection:
+		foo: # this connection is defined as first, so it's "the default" for all application clients
 			host: the_other_server.com
 			port: 5672
 			user: 'bar'
 			password: 'secret'
-
-    	default:
+		
+		default:
 			user: 'guest'
 			password: 'secret'
 ```
@@ -98,10 +98,10 @@ If you want to bind queue with specific routing keys you can declare it in produ
 
 ```yaml
 queue:
-    name: "upload-picture"
-    routingKeys:
-      - 'android.#.upload'
-      - 'iphone.upload'
+	name: "upload-picture"
+	routingKeys:
+	  - 'android.#.upload'
+	  - 'iphone.upload'
 ```
 
 
@@ -122,10 +122,10 @@ After you move the picture to its final location, you will publish a message to 
 ```php
 public function actionDefault()
 {
-    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+	$msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
 
-    $producer = $this->serviceLocator->getService('rabbitmq.producer.uploadPicture');
-    $producer->publish(serialize($msg));
+	$producer = $this->serviceLocator->getService('rabbitmq.producer.uploadPicture');
+	$producer->publish(serialize($msg));
 }
 ```
 
@@ -157,22 +157,22 @@ $producer->setContentType('application/json');
 You can also configure these in the config
 
 ```yaml
-    ...
-    producers:
-        uploadPicture:
-            contentType: application/json
-            deliveryMode: 1
-    ...
+	...
+	producers:
+		uploadPicture:
+			contentType: application/json
+			deliveryMode: 1
+	...
 ```
 
 If you need to use a custom class for a producer (which should inherit from `Kdyby\RabbitMq\Producer`), you can use the `class` option:
 
 ```yaml
-    ...
-    producers:
-        uploadPicture:
-            class: My\Custom\Producer
-    ...
+	...
+	producers:
+		uploadPicture:
+			class: My\Custom\Producer
+	...
 ```
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
@@ -185,11 +185,13 @@ Depending on the specified `callback` for such consumer will be the behavior it 
 Let's review the consumer configuration from above:
 
 ```yaml
-consumers:
-    uploadPicture:
-        exchange: {name: 'upload-picture', type: direct}
-        queue: {name: 'upload-picture'}
-        callback: [@MyApp\UploadPictureService, processUpload]
+	...
+	consumers:
+		uploadPicture:
+			exchange: {name: 'upload-picture', type: direct}
+			queue: {name: 'upload-picture'}
+			callback: [@MyApp\UploadPictureService, processUpload]
+	...
 ```
 
 As we see there, the `callback` option has a reference to a service of type `MyApp\UploadPictureService`.
@@ -247,9 +249,11 @@ $ php www/index.php rabbitmq:purge --no-confirmation uploadPicture
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idleTimeout` in seconds:
 
 ```yaml
-consumers:
-    uploadPicture:
-        idleTimeout: 60
+	...
+	consumers:
+		uploadPicture:
+			idleTimeout: 60
+	...
 ```
 
 #### Fair dispatching
@@ -276,9 +280,11 @@ You should evaluate, as the blog post recommend, the right value of prefetchSize
 With RabbitMqBundle, you can configure that qos per consumer like that:
 
 ```yaml
-consumers:
-    uploadPicture:
-        qos: {prefetchSize: 0, prefetchCount: 1, global: false}
+	...
+	consumers:
+		uploadPicture:
+			qos: {prefetchSize: 0, prefetchCount: 1, global: false}
+	...
 ```
 
 ### Callbacks
@@ -300,16 +306,16 @@ class UploadPictureConsumer implements IConsumer
 	 * Process picture upload.
 	 * $msg will be an instance of `PhpAmqpLib\Message\AMQPMessage` with the $msg->body being the data sent over RabbitMQ.
 	 */
-    public function process(AMQPMessage $msg)
-    {
-        $isUploadSuccess = $this->someUploadPictureMethod();
-        if (!$isUploadSuccess) {
-            // If your image upload failed due to a temporary error you can return false
-            // from your callback so the message will be rejected by the consumer and re-queued by RabbitMQ.
-            // Any other value not equal to false will acknowledge the message and remove it from the queue
-            return false;
-        }
-    }
+	public function process(AMQPMessage $msg)
+	{
+		$isUploadSuccess = $this->someUploadPictureMethod();
+		if (!$isUploadSuccess) {
+			// If your image upload failed due to a temporary error you can return false
+			// from your callback so the message will be rejected by the consumer and re-queued by RabbitMQ.
+			// Any other value not equal to false will acknowledge the message and remove it from the queue
+			return false;
+		}
+	}
 
 }
 ```
@@ -341,15 +347,17 @@ To achieve this we have to implement RPC calls into our application. This extens
 Let's add a RPC client and server into the configuration:
 
 ```yaml
-rpcClients:
-    integerStore:
-        connection: default
-
-rpcServers:
-    randomInt:
-        connection: default
-        callback: [@Random\Integer, next]
-        qos: {prefetchSize: 0, prefetchCount: 1, global: false}
+	...
+	rpcClients:
+		integerStore:
+			connection: default
+	
+	rpcServers:
+		randomInt:
+			connection: default
+			callback: [@Random\Integer, next]
+			qos: {prefetchSize: 0, prefetchCount: 1, global: false}
+	...
 ```
 
 Here we have a very useful server: it returns random integers to its clients.
@@ -370,9 +378,9 @@ public $bunny;
 
 public function actionDefault()
 {
-    $client = $this->bunny->getRpcClient('integerStore');
-    $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'randomInt', 'request_id');
-    $replies = $client->getReplies();
+	$client = $this->bunny->getRpcClient('integerStore');
+	$client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'randomInt', 'request_id');
+	$replies = $client->getReplies();
 }
 ```
 
@@ -393,10 +401,12 @@ By default the RCP Client expects the response to be serialized. If the server y
 For example, if the `integerStore` server didn't serialize the result the client would be set as below:
 
 ```yaml
-rpcClients:
-    integerStore:
-        connection: default
-        expectSerializedResponse: false
+	...
+	rpcClients:
+		integerStore:
+			connection: default
+			expectSerializedResponse: false
+	...
 ```
 
 You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out.
@@ -405,17 +415,17 @@ Setting expiration for messages works only for RabbitMQ 3.x and above. Visit htt
 ```php
 public function actionDefault()
 {
-    $client = $this->bunny->getRpcClient('integerStore');
+	$client = $this->bunny->getRpcClient('integerStore');
 
-    $expiration = 5; // seconds
-    $client->addRequest($body, $server, $requestId, $expiration);
+	$expiration = 5; // seconds
+	$client->addRequest($body, $server, $requestId, $expiration);
 
-    try {
-        $replies = $client->getReplies();
-        // process $replies['request_id'];
-    } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
-        // handle timeout
-    }
+	try {
+		$replies = $client->getReplies();
+		// process $replies['request_id'];
+	} catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
+		// handle timeout
+	}
 }
 ```
 
@@ -429,18 +439,20 @@ If you execute them sequentially, then your page will be ready to deliver in abo
 With Kdyby/RabbitMq we can do such parallel calls with ease. Let's define a parallel client in the config and another RPC server:
 
 ```yaml
-rpcClients:
-    parallel:
-        connection: default
-
-rpcServers:
-    charCount:
-        connection: default
-        callback: [@MyApp\CharacterCounter, count]
-
-    randomInt:
-        connection: default
-        callback: [@Random\Integer, next]
+	...
+	rpcClients:
+		parallel:
+			connection: default
+	
+	rpcServers:
+		charCount:
+			connection: default
+			callback: [@MyApp\CharacterCounter, count]
+	
+		randomInt:
+			connection: default
+			callback: [@Random\Integer, next]
+	...
 ```
 
 Then this code should go in our presenter:
@@ -448,12 +460,12 @@ Then this code should go in our presenter:
 ```php
 public function indexAction($name)
 {
-    $client = $this->bunny->getRpcClient('integerStore');
+	$client = $this->bunny->getRpcClient('integerStore');
 
-    $client->addRequest($name, 'charCount', 'charCount');
-    $client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'randomInt', 'randomInt');
+	$client->addRequest($name, 'charCount', 'charCount');
+	$client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'randomInt', 'randomInt');
 
-    $replies = $client->getReplies();
+	$replies = $client->getReplies();
 }
 ```
 
@@ -471,25 +483,27 @@ Multiple consumers allow you to handle this use case by listening to multiple qu
 Here is how you can set a consumer with multiple queues:
 
 ```yaml
-multiple_consumers:
-    upload:
-        exchange: {name: 'upload', type: direct}
-        queues:
-            upload-picture:
-                name: uploadPicture
-                callback: [@MyApp\MediaStorage, uploadPicture]
-                routingKeys:
-                    - picture
-
-            upload-video:
-                name: upload_video
-                callback: [@MyApp\MediaStorage, uploadVideo]
-                routingKeys:
-                    - video
-
-            upload-stats:
-                name: upload_stats
-                callback: [@MyApp\MediaStorage, uploadStats]
+	...
+	consumers:
+		upload:
+			exchange: {name: 'upload', type: direct}
+			queues:
+				upload-picture:
+					name: uploadPicture
+					callback: [@MyApp\MediaStorage, uploadPicture]
+					routingKeys:
+						- picture
+	
+				upload-video:
+					name: upload_video
+					callback: [@MyApp\MediaStorage, uploadVideo]
+					routingKeys:
+						- video
+	
+				upload-stats:
+					name: upload_stats
+					callback: [@MyApp\MediaStorage, uploadStats]
+	...
 ```
 
 The callback is now specified under each queues and it's service should implement the `IConsumer` (it's optional).
@@ -524,10 +538,12 @@ Is it called Anonymous because it won't specify a queue name, but it will wait f
 Now, how to configure and run such consumer? By simply **not specifying** the queue options.
 
 ```yaml
+	...
 	consumers:
 		logsWatcher:
 			exchange: {name: 'app-logs', type: topic}
 			callback: [@App\LogWatcher, consume]
+	...
 ```
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
@@ -535,9 +551,11 @@ There we specify the exchange name and it's type along with the callback that sh
 This Anonymous Consumer is now able to listen to Producers, which are linked to the same exchange and of type _topic_:
 
 ```yaml
-    producers:
-        appLogs:
-            exchange: {name: 'app-logs', type: topic}
+	...
+	producers:
+		appLogs:
+			exchange: {name: 'app-logs', type: topic}
+	...
 ```
 
 To start an _Anonymous Consumer_ we use the following command:
@@ -553,10 +571,12 @@ The only new option compared to the commands that we have seen before is the one
 There's a Command that reads data from STDIN and publishes it to a RabbitMQ queue. To use it first you have to configure a `producer` service in your configuration file like this:
 
 ```yaml
-producers:
-    words:
-      connection: default
-      exchange: {name: 'words', type: direct}
+	...
+	producers:
+		words:
+			connection: default
+			exchange: {name: 'words', type: direct}
+	...
 ```
 
 That producer will publish messages to the `words` direct exchange. Of course you can adapt the configuration to whatever you like.
@@ -610,13 +630,15 @@ $ php www/index.php rabbitmq:setup-fabric
 When desired, you can configure your consumers and producers to assume the RabbitMQ fabric is already defined. To do this, add the following to your configuration:
 
 ```yaml
-producers:
-    uploadPicture:
-      autoSetupFabric: false
+	...
+	producers:
+		uploadPicture:
+			autoSetupFabric: off
 
-consumers:
-    uploadPicture:
-      autoSetupFabric: false
+	consumers:
+		uploadPicture:
+			autoSetupFabric: off
+	...
 ```
 
 By default a consumer or producer will declare everything it needs with RabbitMQ when it starts.
