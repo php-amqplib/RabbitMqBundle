@@ -88,6 +88,10 @@ abstract class BaseConsumer extends AmqpMember
 			$this->setupFabric();
 		}
 
+		if ( ! $this->qosDeclared) {
+			$this->qosDeclare();
+		}
+
 		$this->getChannel()->basic_consume(
 			$this->queueOptions['name'],
 			$this->getConsumerTag(),
@@ -157,17 +161,6 @@ abstract class BaseConsumer extends AmqpMember
 			'prefetchCount' => $prefetchCount,
 			'global' => $global,
 		);
-	}
-
-
-
-	public function setupFabric()
-	{
-		if (!$this->qosDeclared) {
-			$this->qosDeclare();
-		}
-
-		parent::setupFabric();
 	}
 
 
