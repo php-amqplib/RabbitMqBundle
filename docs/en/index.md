@@ -2,19 +2,6 @@
 
 This library incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library.
 
-The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library.
-Therefore publishing messages to RabbitMQ from a presenter is as easy as:
-
-
-
-Later when you want to consume 50 messages out of the `uploadPictures` queue, you just run on the CLI:
-
-```bash
-$ ./app/console rabbitmq:consumer -m 50 uploadPicture
-```
-
-All the examples expect a running RabbitMQ server.
-
 
 ## Installation
 
