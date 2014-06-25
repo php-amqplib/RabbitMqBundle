@@ -5,6 +5,9 @@ env:
   - NETTE=default # 2.2
   - NETTE=nette-dev
 
+services:
+  - rabbitmq
+
 php:
   - 5.3.3
   - 5.4
