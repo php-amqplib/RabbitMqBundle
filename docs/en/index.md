@@ -107,12 +107,12 @@ queue:
 
 ## Producers, Consumers, What?
 
-In a messaging application, the process sending messages to the broker is called __producer__ while the process receiving those messages is called __consumer__.
+In a messaging application, the process sending messages to the broker is called `producer` while the process receiving those messages is called `consumer`.
 In your application you will have several of them that you can list under their respective entries in the configuration.
 
 ### Producer
 
-A producer will be used to send messages to the server. In the AMQP Model, messages are sent to an __exchange__,
+A producer will be used to send messages to the server. In the AMQP Model, messages are sent to an `exchange`,
 this means that in the configuration for a producer you will have to specify the connection options along with the exchange options,
 which usually will be the name of the exchange and the type of it.
 
@@ -129,8 +129,8 @@ public function actionDefault()
 }
 ```
 
-As you can see, if in your configuration you have a producer called __uploadPicture__,
-then in the service container you will have a service called __rabbitmq.producer.uploadPicture__.
+As you can see, if in your configuration you have a producer called `uploadPicture`,
+then in the service container you will have a service called `rabbitmq.producer.uploadPicture`.
 But because it's better to use autowiring, you should use the `Connection` service to get the producer.
 
 ```php
@@ -143,12 +143,12 @@ public function actionDefault()
 }
 ```
 
-Besides the message itself, the `Kdyby\RabbitMq\Producer#publish()` method also accepts an optional routing key parameter and an optional array of additional properties.
+Besides the message itself, the `Kdyby\RabbitMq\Producer::publish()` method also accepts an optional routing key parameter and an optional array of additional properties.
 The array of additional properties allows you to alter the properties with which an `PhpAmqpLib\Message\AMQPMessage` object gets constructed by default.
 This way, for example, you can change the application headers.
 
-You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message
-delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode.
+You can use `setContentType` and `setDeliveryMode` methods in order to set the message content type and the message
+delivery mode respectively. Default values are `text/plain` for content type and `2` for delivery mode.
 
 ```php
 $producer->setContentType('application/json');
@@ -180,8 +180,8 @@ The next piece of the puzzle is to have a consumer that will take the message ou
 
 ### Consumers
 
-A consumer will connect to the server and start a __loop__  waiting for incoming messages to process.
-Depending on the specified __callback__ for such consumer will be the behavior it will have.
+A consumer will connect to the server and start a **loop**  waiting for incoming messages to process.
+Depending on the specified `callback` for such consumer will be the behavior it will have.
 Let's review the consumer configuration from above:
 
 ```yaml
@@ -192,19 +192,19 @@ consumers:
         callback: [@MyApp\UploadPictureService, processUpload]
 ```
 
-As we see there, the __callback__ option has a reference to a service of type `MyApp\UploadPictureService`.
+As we see there, the `callback` option has a reference to a service of type `MyApp\UploadPictureService`.
 When the consumer gets a message from the server it will execute the callback.
 If for testing or debugging purposes you need to specify a different callback, then you can change it there.
 Also, the callback service should implement the marker interface `IConsumer` (it's optional).
 
-The remaining options are the __exchange__ and the __queue__.
-The __exchange__ options should be the same ones as those used for the __producer__.
-In the __queue__ options we will provide a __queue name__. Why?
+The remaining options are the `exchange` and the `queue`.
+The `exchange` options should be the same ones as those used for the `producer`.
+In the `queue` options we will provide a **queue name**. Why?
 
-As we said, messages in AMQP are published to an __exchange__. This doesn't mean the message has reached a __queue__.
-For this to happen, first we need to create such __queue__ and then bind it to the __exchange__.
-The cool thing about this is that you can bind several __queues__ to one __exchange__, in that way one message can arrive to several destinations.
-The advantage of this approach is the __decoupling__ from the producer and the consumer.
+As we said, messages in AMQP are published to an `exchange`. This doesn't mean the message has reached a `queue`.
+For this to happen, first we need to create such `queue` and then bind it to the `exchange`.
+The cool thing about this is that you can bind several `queues` to one `exchange`, in that way one message can arrive to several destinations.
+The advantage of this approach is the **decoupling** from the producer and the consumer.
 The producer does not care about how many consumers will process his messages. All it needs is that his message arrives to the server.
 In this way we can expand the actions we perform every time a picture is uploaded without the need to change code in our presenter.
 
@@ -215,9 +215,9 @@ $ php www/index.php rabbitmq:consumer -m 50 uploadPicture
 ```
 
 What does this mean? First of all, we've used [Kdyby/Console](https://github.com/Kdyby/Console/blob/master/docs/en/index.md) here, so have a look at it and then come back.
-We are executing the __uploadPicture__ consumer telling it to consume only 50 messages.
+We are executing the `uploadPicture` consumer telling it to consume only 50 messages.
 Every time the consumer receives a message from the server, it will execute the configured callback passing the AMQP message as an instance of the `PhpAmqpLib\Message\AMQPMessage` class.
-The message body can be obtained by calling `$msg->body`. By default the consumer will process messages in an __endless loop__ for some definition of _endless_.
+The message body can be obtained by calling `$msg->body`. By default the consumer will process messages in an **endless loop** for some definition of _endless_.
 
 If you want to be sure that consumer will finish executing instantly on Unix signal, you can run command with flag `-w`.
 
@@ -286,9 +286,7 @@ consumers:
 Here's an example callback:
 
 ```php
-<?php
-
-//src/Acme/Consumer/UploadPictureConsumer.php
+<?php //src/Acme/Consumer/UploadPictureConsumer.php
 
 namespace Acme\Consumer;
 
@@ -318,7 +316,7 @@ class UploadPictureConsumer implements IConsumer
 
 As you can see, this is as simple as implementing one method: `IConsumer::execute`.
 
-Keep in mind that your callbacks _need to be registered_ as normal services. Then you can inject the database service, bussines logic classes, logger, and so on.
+Keep in mind that your callbacks _need to be registered_ as normal services. Then you can inject the database service, business logic classes, logger, and so on.
 
 See [doc/AMQPMessage](https://github.com/videlalvaro/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
@@ -378,21 +376,21 @@ public function actionDefault()
 }
 ```
 
-If our client id is __integerStore__, then the service name will be __rabbitmq.rpcClient.integerStore__. But then again, we can get the `RpcClient` from the `Connection`.
+If our client id is `integerStore`, then the service name will be `rabbitmq.rpcClient.integerStore`. But then again, we can get the `RpcClient` from the `Connection`.
 Once we get that object, we place a request on the server by calling `addRequest` that expects three parameters:
 
 - The arguments to be sent to the remote procedure call.
-- The name of the RPC server, in our case __randomInt__.
-- A request identifier for our call, in this case __request\_id__.
+- The name of the RPC server, in our case `randomInt`.
+- A request identifier for our call, in this case `request_id`.
 
-The arguments we are sending are the __min__ and __max__ values for the `rand()` function. We send them by serializing an array.
+The arguments we are sending are the `min` and `max` values for the `rand()` function. We send them by serializing an array.
 If our server expects JSON information, or XML, we will send such data here.
 
 The final piece is to get the reply. Our PHP script will block till the server returns a value.
-The `$replies` variable will be an associative array where each reply from the server will contained in the respective __request\_id__ key.
+The `$replies` variable will be an associative array where each reply from the server will contained in the respective `request_id` key.
 
 By default the RCP Client expects the response to be serialized. If the server you are working with returns a non-serialized result then set the RPC client `expectSerializedResponse` option to false.
-For example, if the __integerStore__ server didn't serialize the result the client would be set as below:
+For example, if the `integerStore` server didn't serialize the result the client would be set as below:
 
 ```yaml
 rpcClients:
@@ -421,14 +419,14 @@ public function actionDefault()
 }
 ```
 
-As you can guess, we can also make __parallel RPC calls__.
+As you can guess, we can also make `parallel RPC calls`.
 
 
 ### Parallel RPC
 
 Let's say that for rendering some webpage, you need to perform two database queries, one taking 5 seconds to complete and the other one taking 2 seconds –very expensive queries–.
 If you execute them sequentially, then your page will be ready to deliver in about 7 seconds. If you run them in parallel then you will have your page served in about 5 seconds.
-With Kdyby\RabbitMq we can do such parallel calls with ease. Let's define a parallel client in the config and another RPC server:
+With Kdyby/RabbitMq we can do such parallel calls with ease. Let's define a parallel client in the config and another RPC server:
 
 ```yaml
 rpcClients:
@@ -495,7 +493,7 @@ multiple_consumers:
 ```
 
 The callback is now specified under each queues and it's service should implement the `IConsumer` (it's optional).
-All the options of `queues-options` in the consumer are available for each queue.
+All the options of `queues` in the consumer are available for each queue.
 
 Be aware that all queues are under the same exchange, it's up to you to set the correct routing for callbacks.
 
@@ -504,7 +502,7 @@ Be aware that all queues are under the same exchange, it's up to you to set the 
 
 Now, why will we ever need anonymous consumers? This sounds like some internet threat or something… Keep reading.
 
-In AMQP there's a type of exchange called __topic__ where the messages are routed to queues based on –you guess– the topic of the message.
+In AMQP there's a type of exchange called **topic** where the messages are routed to queues based on –you guess– the topic of the message.
 We can send logs about our application to a RabbiMQ topic exchange using as topic the hostname where the log was created and the severity of such log.
 The message body will be the log content and our routing keys the will be like this:
 
@@ -514,11 +512,11 @@ The message body will be the log content and our routing keys the will be like t
 - ...
 
 Since we don't want to be filling up queues with unlimited logs what we can do is that when we want to monitor the system,
-we can launch a consumer that creates a queue and attaches to the __logs__ exchange based on some topic, for example, we would like to see all the errors reported by our servers.
-The routing key will be something like: __\#.error__. In such case we have to come up with a queue name, bind it to the exchange, get the logs, unbind it and delete the queue.
+we can launch a consumer that creates a queue and attaches to the `logs` exchange based on some topic, for example, we would like to see all the errors reported by our servers.
+The routing key will be something like: `#.error`. In such case we have to come up with a queue name, bind it to the exchange, get the logs, unbind it and delete the queue.
 
 Luckily, AMPQ provides a way to do this automatically, if you provide the right options when you declare and bind the queue.
-The problem is that you don't want to remember all those options. For such reason we implemented the __Anonymous Consumer__ pattern.
+The problem is that you don't want to remember all those options. For such reason we implemented the `Anonymous Consumer` pattern.
 
 When we start an Anonymous Consumer, it will take care of such details and we just have to think about implementing the callback for when the messages arrive.
 Is it called Anonymous because it won't specify a queue name, but it will wait for RabbitMQ to assign a random one to it.
@@ -529,7 +527,7 @@ Now, how to configure and run such consumer? By simply **not specifying** the qu
 	consumers:
 		logsWatcher:
 			exchange: {name: 'app-logs', type: topic}
-			callback: [App\LogWatcher, consume]
+			callback: [@App\LogWatcher, consume]
 ```
 
 There we specify the exchange name and it's type along with the callback that should be executed when a message arrives.
@@ -548,7 +546,7 @@ To start an _Anonymous Consumer_ we use the following command:
 $ php www/index.php rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
 ```
 
-The only new option compared to the commands that we have seen before is the one that specifies the __routing key__: `-r '#.error'`.
+The only new option compared to the commands that we have seen before is the one that specifies the routing key `-r '#.error'`.
 
 ### STDIN Producer
 
