@@ -38,10 +38,11 @@
 		"latte/latte": "@dev",
 		"tracy/tracy": "@dev",
 
-		"videlalvaro/php-amqplib": "~2.2"
+		"videlalvaro/php-amqplib": "~2.4.0@dev"
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
+		"mockery/mockery": "~0.9.1",
 		"kdyby/console": "dev-master",
 		"jakub-onderka/php-parallel-lint": "~0.6"
 	},
