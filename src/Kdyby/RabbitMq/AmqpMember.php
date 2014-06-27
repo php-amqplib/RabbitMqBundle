@@ -188,7 +188,7 @@ abstract class AmqpMember extends Nette\Object
 
 	protected function exchangeDeclare()
 	{
-		if (empty($this->exchangeOptions['declare'])) {
+		if (empty($this->exchangeOptions['declare']) || empty($this->exchangeOptions['name'])) {
 			return;
 		}
 

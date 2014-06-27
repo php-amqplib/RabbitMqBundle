@@ -140,6 +140,11 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	 */
 	protected $connectionsMeta = array();
 
+	/**
+	 * @var array
+	 */
+	private $producersConfig = array();
+
 
 
 	public function loadConfiguration()
@@ -237,23 +242,28 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in producer {$this->name}.{$name} was not defined.");
 			}
 
-			$config['exchange'] = $this->mergeConfig($config['exchange'], $this->exchangeDefaults);
-			Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
-
 			$producer = $builder->addDefinition($serviceName = $this->prefix('producer.' . $name))
 				->setFactory($config['class'], array('@' . $this->connectionsMeta[$config['connection']]['serviceId']))
 				->setClass('Kdyby\RabbitMq\IProducer')
-				->addSetup('setExchangeOptions', array($config['exchange']))
-				->addSetup('setQueueOptions', array($this->mergeConfig($config['queue'], $this->queueDefaults)))
 				->addSetup('setContentType', array($config['contentType']))
 				->addSetup('setDeliveryMode', array($config['deliveryMode']))
 				->addTag(self::TAG_PRODUCER);
+
+			if (!empty($config['exchange'])) {
+				$config['exchange'] = $this->mergeConfig($config['exchange'], $this->exchangeDefaults);
+				Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
+				$producer->addSetup('setExchangeOptions', array($config['exchange']));
+			}
+
+			$config['queue'] = $this->mergeConfig($config['queue'], $this->queueDefaults);
+			$producer->addSetup('setQueueOptions', array($config['queue']));
 
 			if (!$config['autoSetupFabric']) {
 				$producer->addSetup('disableAutoSetupFabric');
 			}
 
 			$this->connectionsMeta[$config['connection']]['producers'][$name] = $serviceName;
+			$this->producersConfig[$name] = $config;
 		}
 	}
 
@@ -265,15 +275,19 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 
 		foreach ($consumers as $name => $config) {
 			$config = $this->mergeConfig($config, $this->consumersDefaults);
+			$config = $this->extendConsumerFromProducer($name, $config);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
 				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in consumer {$this->name}.{$name} was not defined.");
 			}
 
 			$consumer = $builder->addDefinition($serviceName = $this->prefix('consumer.' . $name))
-				->addSetup('setExchangeOptions', array($this->mergeConfig($config['exchange'], $this->exchangeDefaults)))
 				->addTag(self::TAG_CONSUMER)
 				->setAutowired(FALSE);
+
+			if (!empty($config['exchange']['name'])) {
+				$consumer->addSetup('setExchangeOptions', array($this->mergeConfig($config['exchange'], $this->exchangeDefaults)));
+			}
 
 			if (!empty($config['queues']) && empty($config['queue'])) {
 				foreach ($config['queues'] as $queueName => $queueConfig) {
@@ -322,6 +336,37 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 
 			$this->connectionsMeta[$config['connection']]['consumers'][$name] = $serviceName;
 		}
+	}
+
+
+
+	private function extendConsumerFromProducer(&$consumerName, $config)
+	{
+		if (isset($config[Config\Helpers::EXTENDS_KEY])) {
+			$producerName = $config[Config\Helpers::EXTENDS_KEY];
+
+		} elseif ($m = Nette\Utils\Strings::match($consumerName, '~^(?P<consumerName>[^>\s]+)\s*\<\s*(?P<producerName>[^>\s]+)\z~')) {
+			$consumerName = $m['consumerName'];
+			$producerName = $m['producerName'];
+
+		} else {
+			return $config;
+		}
+
+		if ( ! isset($this->producersConfig[$producerName])) {
+			throw new Nette\Utils\AssertionException("Consumer {$this->name}.{$consumerName} cannot extend unknown producer {$this->name}.{$producerName}.");
+		}
+		$producerConfig = $this->producersConfig[$producerName];
+
+		if (!empty($producerConfig['exchange'])) {
+			$config['exchange'] = $this->mergeConfig($config['exchange'], $producerConfig['exchange']);
+		}
+
+		if (empty($config['queues']) && !empty($producerConfig['queue'])) {
+			$config['queue'] = $this->mergeConfig($config['queue'], $producerConfig['queue']);
+		}
+
+		return $config;
 	}
 
 
