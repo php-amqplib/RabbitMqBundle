@@ -63,7 +63,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'queue' => array(),
 		'contentType' => 'text/plain',
 		'deliveryMode' => 2,
-		'autoSetupFabric' => TRUE,
+		'autoSetupFabric' => '%debugMode%',
 	);
 
 	/**
@@ -77,7 +77,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'callback' => NULL,
 		'qos' => array(),
 		'idleTimeout' => NULL,
-		'autoSetupFabric' => TRUE,
+		'autoSetupFabric' => '%debugMode%',
 	);
 
 	/**
