@@ -252,6 +252,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			if (!empty($config['exchange'])) {
 				$config['exchange'] = $this->mergeConfig($config['exchange'], $this->exchangeDefaults);
 				Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
+				Nette\Utils\Validators::assertField($config['exchange'], 'type', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
 				$producer->addSetup('setExchangeOptions', array($config['exchange']));
 			}
 
@@ -285,7 +286,9 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				->addTag(self::TAG_CONSUMER)
 				->setAutowired(FALSE);
 
-			if (!empty($config['exchange']['name'])) {
+			if (!empty($config['exchange'])) {
+				Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of consumer {$this->name}.{$name}");
+				Nette\Utils\Validators::assertField($config['exchange'], 'type', 'string:3..', "The config item 'exchange.%' of consumer {$this->name}.{$name}");
 				$consumer->addSetup('setExchangeOptions', array($this->mergeConfig($config['exchange'], $this->exchangeDefaults)));
 			}
 
