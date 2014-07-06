@@ -36,24 +36,6 @@ abstract class BaseConsumerCommand extends Command
 
 
 
-	public function stopConsumer()
-	{
-		if ($this->consumer instanceof Consumer) {
-			$this->consumer->forceStopConsumer();
-		} else {
-			exit();
-		}
-	}
-
-
-
-	public function restartConsumer()
-	{
-		// TODO: Implement restarting of consumer
-	}
-
-
-
 	protected function configure()
 	{
 		$this
@@ -87,9 +69,26 @@ abstract class BaseConsumerCommand extends Command
 				throw new \BadFunctionCallException("Function 'pcntl_signal' is referenced in the php.ini 'disable_functions' and can't be called.");
 			}
 
-			pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
-			pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
-			pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
+			pcntl_signal(SIGTERM, function () {
+				if ($this->consumer) {
+					pcntl_signal(SIGTERM, SIG_DFL);
+					$this->consumer->forceStopConsumer();
+				}
+			});
+			pcntl_signal(SIGINT, function () {
+				if ($this->consumer) {
+					pcntl_signal(SIGINT, SIG_DFL);
+					$this->consumer->forceStopConsumer();
+				}
+			});
+			pcntl_signal(SIGHUP, function () {
+				if ($this->consumer) {
+					pcntl_signal(SIGHUP, SIG_DFL);
+					$this->consumer->forceStopConsumer();
+				}
+
+				// TODO: Implement restarting of consumer
+			});
 		}
 
 		if (defined('AMQP_DEBUG') === false) {

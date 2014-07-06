@@ -2,6 +2,8 @@
 
 namespace Kdyby\RabbitMq;
 
+use PhpAmqpLib\Exception\AMQPExceptionInterface;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -14,6 +16,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  * @method onStart(RpcServer $self)
  * @method onConsume(RpcServer $self, AMQPMessage $msg)
  * @method onReply(RpcServer $self, $result)
+ * @method onError(RpcServer $self, AMQPExceptionInterface $e)
  */
 class RpcServer extends BaseConsumer
 {
@@ -38,6 +41,11 @@ class RpcServer extends BaseConsumer
 	 */
 	public $onStop = array();
 
+	/**
+	 * @var array
+	 */
+	public $onError = array();
+
 
 
 	public function initServer($name)
@@ -51,18 +59,32 @@ class RpcServer extends BaseConsumer
 	public function start($msgAmount = 0)
 	{
 		$this->target = $msgAmount;
-
 		$this->setupConsumer();
-
 		$this->onStart($this);
-		while (count($this->getChannel()->callbacks)) {
-			$this->maybeStopConsumer();
 
-			try {
-				$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
-			} catch (AMQPTimeoutException $e) {
-				// nothing bad happened, right?
+		try {
+			while (count($this->getChannel()->callbacks)) {
+				$this->maybeStopConsumer();
+
+				try {
+					$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+				} catch (AMQPTimeoutException $e) {
+					// nothing bad happened, right?
+				}
 			}
+
+		} catch (AMQPRuntimeException $e) {
+			// sending kill signal to the consumer causes the stream_select to return false
+			// the reader doesn't like the false value, so it throws AMQPRuntimeException
+			$this->maybeStopConsumer();
+			if ( ! $this->forceStop) {
+				$this->onError($this, $e);
+				throw $e;
+			}
+
+		} catch (AMQPExceptionInterface $e) {
+			$this->onError($this, $e);
+			throw $e;
 		}
 	}
 
