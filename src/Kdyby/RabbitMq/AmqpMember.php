@@ -12,6 +12,9 @@ use PhpAmqpLib\Connection\AMQPLazyConnection;
 /**
  * @author Alvaro Videla <videlalvaro@gmail.com>
  * @author Filip Procházka <filip@prochazka.su>
+ *
+ * @property $exchangeOptions
+ * @property $queueOptions
  */
 abstract class AmqpMember extends Nette\Object
 {
@@ -165,12 +168,32 @@ abstract class AmqpMember extends Nette\Object
 
 
 	/**
+	 * @return array
+	 */
+	public function getExchangeOptions()
+	{
+		return $this->exchangeOptions;
+	}
+
+
+
+	/**
 	 * @param  array $options
 	 * @return void
 	 */
 	public function setQueueOptions(array $options = array())
 	{
 		$this->queueOptions = $options + $this->queueOptions;
+	}
+
+
+
+	/**
+	 * @return array
+	 */
+	public function getQueueOptions()
+	{
+		return $this->queueOptions;
 	}
 
 
