@@ -54,6 +54,10 @@ class MultipleConsumer extends Consumer
 			$this->setupFabric();
 		}
 
+		if ( ! $this->qosDeclared) {
+			$this->qosDeclare();
+		}
+
 		foreach ($this->queues as $name => $options) {
 			$self = $this;
 			$this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use ($self, $name) {
