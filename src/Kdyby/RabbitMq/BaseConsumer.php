@@ -44,7 +44,7 @@ abstract class BaseConsumer extends AmqpMember
 	/**
 	 * @var int
 	 */
-	protected $forceStop = false;
+	protected $forceStop = FALSE;
 
 	/**
 	 * @var int
@@ -156,7 +156,7 @@ abstract class BaseConsumer extends AmqpMember
 
 	public function forceStopConsumer()
 	{
-		$this->forceStop = true;
+		$this->forceStop = TRUE;
 	}
 
 
@@ -169,7 +169,7 @@ abstract class BaseConsumer extends AmqpMember
 	 * @param int $prefetchCount
 	 * @param bool $global
 	 */
-	public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
+	public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = FALSE)
 	{
 		$this->qosOptions = array(
 			'prefetchSize' => $prefetchSize,
