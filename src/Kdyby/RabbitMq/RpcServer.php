@@ -65,7 +65,12 @@ class RpcServer extends BaseConsumer
 		try {
 			while (count($this->getChannel()->callbacks)) {
 				$this->maybeStopConsumer();
-				$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+
+				try {
+					$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+				} catch (AMQPTimeoutException $e) {
+					// nothing bad happened, right?
+				}
 			}
 
 		} catch (AMQPRuntimeException $e) {
