@@ -15,6 +15,11 @@ class MultipleConsumer extends Consumer
 {
 
 	/**
+	 * @var array
+	 */
+	public $onConsume = array();
+
+	/**
 	 * @var array[]|callable[][]
 	 */
 	protected $queues = array();
@@ -76,8 +81,8 @@ class MultipleConsumer extends Consumer
 			throw new QueueNotFoundException();
 		}
 
+		$this->onConsume($this, $msg);
 		$processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
-
 		$this->handleProcessMessage($msg, $processFlag);
 	}
 }

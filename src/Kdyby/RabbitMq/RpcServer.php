@@ -9,9 +9,34 @@ use PhpAmqpLib\Message\AMQPMessage;
 /**
  * @author Alvaro Videla <videlalvaro@gmail.com>
  * @author Filip Procházka <filip@prochazka.su>
+ *
+ * @method onConsume(RpcServer $self, AMQPMessage $msg)
+ * @method onReply(RpcServer $self, $result)
  */
 class RpcServer extends BaseConsumer
 {
+
+	/**
+	 * @var array
+	 */
+	public $onConsume = array();
+
+	/**
+	 * @var array
+	 */
+	public $onReply = array();
+
+	/**
+	 * @var array
+	 */
+	public $onStart = array();
+
+	/**
+	 * @var array
+	 */
+	public $onStop = array();
+
+
 
 	public function initServer($name)
 	{
@@ -25,7 +50,9 @@ class RpcServer extends BaseConsumer
 	{
 		try {
 			$msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+			$this->onConsume($this, $msg);
 			$result = call_user_func($this->callback, $msg);
+			$this->onReply($this, $result);
 			$this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
 			$this->consumed++;
 			$this->maybeStopConsumer();
