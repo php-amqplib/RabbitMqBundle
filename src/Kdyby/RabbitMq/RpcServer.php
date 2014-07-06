@@ -2,6 +2,7 @@
 
 namespace Kdyby\RabbitMq;
 
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
@@ -55,7 +56,13 @@ class RpcServer extends BaseConsumer
 
 		$this->onStart($this);
 		while (count($this->getChannel()->callbacks)) {
-			$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+			$this->maybeStopConsumer();
+
+			try {
+				$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+			} catch (AMQPTimeoutException $e) {
+				// nothing bad happened, right?
+			}
 		}
 	}
 

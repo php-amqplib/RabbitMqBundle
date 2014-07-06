@@ -2,6 +2,7 @@
 
 namespace Kdyby\RabbitMq;
 
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
@@ -80,13 +81,17 @@ class Consumer extends BaseConsumer
 	public function consume($msgAmount)
 	{
 		$this->target = $msgAmount;
-
 		$this->setupConsumer();
-
 		$this->onStart($this);
+
 		while (count($this->getChannel()->callbacks)) {
 			$this->maybeStopConsumer();
-			$this->getChannel()->wait(null, false, $this->getIdleTimeout());
+
+			try {
+				$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+			} catch (AMQPTimeoutException $e) {
+				// nothing bad happened, right?
+			}
 		}
 	}
 
