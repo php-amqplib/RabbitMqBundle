@@ -10,6 +10,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  * @author Alvaro Videla <videlalvaro@gmail.com>
  * @author Filip Procházka <filip@prochazka.su>
  *
+ * @method onStart(RpcServer $self)
  * @method onConsume(RpcServer $self, AMQPMessage $msg)
  * @method onReply(RpcServer $self, $result)
  */
@@ -42,6 +43,20 @@ class RpcServer extends BaseConsumer
 	{
 		$this->setExchangeOptions(array('name' => $name, 'type' => 'direct'));
 		$this->setQueueOptions(array('name' => $name . '-queue'));
+	}
+
+
+
+	public function start($msgAmount = 0)
+	{
+		$this->target = $msgAmount;
+
+		$this->setupConsumer();
+
+		$this->onStart($this);
+		while (count($this->getChannel()->callbacks)) {
+			$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
+		}
 	}
 
 

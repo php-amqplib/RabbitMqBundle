@@ -10,16 +10,10 @@ use Nette\Utils\Callback;
  * @author Alvaro Videla <videlalvaro@gmail.com>
  * @author Filip Procházka <filip@prochazka.su>
  *
- * @method onStart(BaseConsumer $self)
  * @method onStop(BaseConsumer $self)
  */
 abstract class BaseConsumer extends AmqpMember
 {
-
-	/**
-	 * @var array
-	 */
-	public $onStart = array();
 
 	/**
 	 * @var array
@@ -71,20 +65,6 @@ abstract class BaseConsumer extends AmqpMember
 	{
 		Callback::check($callback);
 		$this->callback = $callback;
-	}
-
-
-
-	public function start($msgAmount = 0)
-	{
-		$this->target = $msgAmount;
-
-		$this->setupConsumer();
-
-		$this->onStart($this);
-		while (count($this->getChannel()->callbacks)) {
-			$this->getChannel()->wait();
-		}
 	}
 
 
