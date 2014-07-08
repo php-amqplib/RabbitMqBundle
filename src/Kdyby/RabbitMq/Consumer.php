@@ -89,6 +89,15 @@ class Consumer extends BaseConsumer
 		$this->setupConsumer();
 		$this->onStart($this);
 
+		$previousErrorHandler = set_error_handler(function ($severity, $message, $file, $line, $context) use (&$previousErrorHandler) {
+			if (!preg_match('~stream_select\\(\\)~i', $message)) {
+				$args = func_get_args();
+				return call_user_func_array($previousErrorHandler, $args);
+			}
+
+			throw new AMQPRuntimeException($message . ' in ' . $file . ':' . $line, (int) $severity);
+		});
+
 		try {
 			while (count($this->getChannel()->callbacks)) {
 				$this->maybeStopConsumer();
@@ -101,6 +110,8 @@ class Consumer extends BaseConsumer
 			}
 
 		} catch (AMQPRuntimeException $e) {
+			restore_error_handler();
+
 			// sending kill signal to the consumer causes the stream_select to return false
 			// the reader doesn't like the false value, so it throws AMQPRuntimeException
 			$this->maybeStopConsumer();
@@ -110,6 +121,8 @@ class Consumer extends BaseConsumer
 			}
 
 		} catch (AMQPExceptionInterface $e) {
+			restore_error_handler();
+
 			$this->onError($this, $e);
 			throw $e;
 		}
