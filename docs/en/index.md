@@ -460,7 +460,7 @@ Then this code should go in our presenter:
 ```php
 public function indexAction($name)
 {
-	$client = $this->bunny->getRpcClient('integerStore');
+	$client = $this->bunny->getRpcClient('parallel');
 
 	$client->addRequest($name, 'charCount', 'charCount');
 	$client->addRequest(serialize(array('min' => 0, 'max' => 10)), 'randomInt', 'randomInt');
