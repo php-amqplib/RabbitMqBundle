@@ -15,7 +15,7 @@ abstract class BaseAmqp
     protected $routingKey = '';
     protected $autoSetupFabric = true;
     protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
-	
+
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
@@ -64,6 +64,15 @@ abstract class BaseAmqp
         if ($this->conn->isConnected()) {
             $this->conn->close();
         }
+    }
+
+    public function reconnect()
+    {
+        if (!$this->conn->isConnected()) {
+            return;
+        }
+
+        $this->conn->reconnect();
     }
 
     /**

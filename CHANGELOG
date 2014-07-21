@@ -1,3 +1,6 @@
+- 2014-07-21
+    * Added `reconnect` method into `OldSound\RabbitMqBundle\RabbitMq\BaseAmqp`
+
 - 2014-02-24
     * Add a parameter to RPC client configuration to disable auto unserialize when adding call results to results array.
 
