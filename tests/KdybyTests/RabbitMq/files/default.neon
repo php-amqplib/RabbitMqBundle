@@ -3,11 +3,11 @@ rabbitmq:
 
 	connection:
 		foo_connection:
-			host:     127.0.0.1
-			port:     5672
-			user:     guest
+			host: 127.0.0.1
+			port: 5672
+			user: guest
 			password: guest
-			vhost:    /
+			vhost: '/'
 
 		default:
 			user: guest
@@ -16,46 +16,46 @@ rabbitmq:
 
 	producers:
 		foo_producer:
-			connection:      foo_connection
+			connection: foo_connection
 			exchange:
-				name:        foo_exchange
-				type:        direct
-				passive:     true
-				durable:     false
-				autoDelete:  true
-				internal:    true
-				nowait:      true
-				arguments:   null
-				ticket:      null
+				name: foo_exchange
+				type: direct
+				passive: true
+				durable: false
+				autoDelete: true
+				internal: true
+				nowait: true
+				arguments: null
+				ticket: null
 
 		default_producer:
 			exchange:
-				name:       default_exchange
-				type:       direct
+				name: default_exchange
+				type: direct
 
 
 	consumers:
 		foo_consumer:
-			connection:      foo_connection
+			connection: foo_connection
 			exchange:
-				name:        foo_exchange
-				type:        direct
-				passive:     true
-				durable:     true
-				autoDelete:  true
-				internal:    true
-				nowait:      true
-				arguments:   null
-				ticket:      null
+				name: foo_exchange
+				type: direct
+				passive: true
+				durable: true
+				autoDelete: true
+				internal: true
+				nowait: true
+				arguments: null
+				ticket: null
 			queue:
-				name:        foo_queue
-				passive:     true
-				durable:     false
-				exclusive:   true
+				name: foo_queue
+				passive: true
+				durable: false
+				exclusive: true
 				autoDelete:  true
-				nowait:      true
-				arguments:   null
-				ticket:      null
+				nowait: true
+				arguments: null
+				ticket: null
 				routingKeys:
 				  - 'android.#.upload'
 				  - 'iphone.upload'
@@ -63,79 +63,79 @@ rabbitmq:
 
 		default_consumer:
 			exchange:
-				name:        default_exchange
-				type:        direct
+				name: default_exchange
+				type: direct
 			queue:
-				name:        default_queue
+				name: default_queue
 			callback: [KdybyTests\RabbitMq\Callback, staticProcess]
 
 		qos_test_consumer:
-			connection:         foo_connection
+			connection: foo_connection
 			exchange:
-				name:           foo_exchange
-				type:           direct
+				name: foo_exchange
+				type: direct
 			queue:
-				name:           foo_queue
+				name: foo_queue
 			qos:
-				prefetchSize:   1024
+				prefetchSize: 1024
 				prefetchCount:  1
-				global:         true
+				global: true
 			callback: [@collecting_callback, process]
 
 		multi_test_consumer:
 			connection: foo_connection
 			exchange:
-				name:           foo_multiple_exchange
-				type:           direct
+				name: foo_multiple_exchange
+				type: direct
 			queues:
 				multi-test-1:
-					name:        multi_test_1
+					name: multi_test_1
 					callback: [@KdybyTests\RabbitMq\Callback, process]
 				multi-test-2:
-					name:        foo_bar_2
-					passive:     true
-					durable:     false
-					exclusive:   true
+					name: foo_bar_2
+					passive: true
+					durable: false
+					exclusive: true
 					autoDelete:  true
-					nowait:      true
-					arguments:   null
-					ticket:      null
+					nowait: true
+					arguments: null
+					ticket: null
 					routingKeys:
 					  - 'android.upload'
 					  - 'iphone.upload'
 					callback: KdybyTests\RabbitMq\Callback()
 
 		foo_anon_consumer:
-			connection:      foo_connection
+			connection: foo_connection
 			exchange:
-				name:        foo_anon_exchange
-				type:        direct
-				passive:     true
-				durable:     false
+				name: foo_anon_exchange
+				type: direct
+				passive: true
+				durable: false
 				autoDelete:  true
-				internal:    true
-				nowait:      true
-				arguments:   null
-				ticket:      null
+				internal: true
+				nowait: true
+				arguments: null
+				ticket: null
 			callback: KdybyTests\RabbitMq\Callback()
 
 		default_anon_consumer:
 			exchange:
-				name:        default_anon_exchange
-				type:        direct
+				name: default_anon_exchange
+				type: direct
 			callback: KdybyTests\RabbitMq\Callback()
 
 
 	rpcClients:
 		foo_client:
-			connection:      foo_connection
+			connection: foo_connection
 
 		default_client:
 
 
 	rpcServers:
 		foo_server:
-			connection:      foo_connection
+			connection: foo_connection
 			callback: KdybyTests\RabbitMq\Callback()
 
 		default_server:
