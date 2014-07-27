@@ -57,8 +57,8 @@ rabbitmq:
 				arguments: null
 				ticket: null
 				routingKeys:
-				  - 'android.#.upload'
-				  - 'iphone.upload'
+					- 'android.#.upload'
+					- 'iphone.upload'
 			callback: KdybyTests\RabbitMq\Callback()
 
 		default_consumer:
@@ -101,8 +101,8 @@ rabbitmq:
 					arguments: null
 					ticket: null
 					routingKeys:
-					  - 'android.upload'
-					  - 'iphone.upload'
+						- 'android.upload'
+						- 'iphone.upload'
 					callback: KdybyTests\RabbitMq\Callback()
 
 		foo_anon_consumer:
