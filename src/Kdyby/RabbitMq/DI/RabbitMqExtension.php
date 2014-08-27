@@ -40,6 +40,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'rpcClients' => array(),
 		'rpcServers' => array(),
 		'debugger' => '%debugMode%',
+		'autoSetupFabric' => '%debugMode%',
 	);
 
 	/**
@@ -63,7 +64,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'queue' => array(),
 		'contentType' => 'text/plain',
 		'deliveryMode' => 2,
-		'autoSetupFabric' => '%debugMode%',
+		'autoSetupFabric' => NULL, // inherits from `rabbitmq: autoSetupFabric:`
 	);
 
 	/**
@@ -77,7 +78,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'callback' => NULL,
 		'qos' => array(),
 		'idleTimeout' => NULL,
-		'autoSetupFabric' => '%debugMode%',
+		'autoSetupFabric' => NULL, // inherits from `rabbitmq: autoSetupFabric:`
 	);
 
 	/**
@@ -156,6 +157,8 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			throw new Nette\Utils\AssertionException("Unexpected key '" . implode("', '", $unexpected) . "' in configuration of {$this->name}.");
 		}
 
+		$builder->parameters[$this->name] = $config;
+
 		$this->loadConnections($config['connection']);
 		$this->loadProducers($config['producers']);
 		$this->loadConsumers($config['consumers']);
@@ -184,6 +187,8 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 
 		$this->loadConsole();
+
+		unset($builder->parameters[$this->name]);
 	}
 
 
@@ -236,7 +241,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		foreach ($producers as $name => $config) {
-			$config = $this->mergeConfig($config, $this->producersDefaults);
+			$config = $this->mergeConfig($config, array('autoSetupFabric' => $builder->parameters[$this->name]['autoSetupFabric']) + $this->producersDefaults);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
 				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in producer {$this->name}.{$name} was not defined.");
@@ -259,7 +264,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			$config['queue'] = $this->mergeConfig($config['queue'], $this->queueDefaults);
 			$producer->addSetup('setQueueOptions', array($config['queue']));
 
-			if (!$config['autoSetupFabric']) {
+			if ($config['autoSetupFabric'] === FALSE) {
 				$producer->addSetup('disableAutoSetupFabric');
 			}
 
@@ -275,7 +280,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		foreach ($consumers as $name => $config) {
-			$config = $this->mergeConfig($config, $this->consumersDefaults);
+			$config = $this->mergeConfig($config, array('autoSetupFabric' => $builder->parameters[$this->name]['autoSetupFabric']) + $this->consumersDefaults);
 			$config = $this->extendConsumerFromProducer($name, $config);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
@@ -333,7 +338,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				$consumer->addSetup('setIdleTimeout', array($config['idleTimeout']));
 			}
 
-			if (!$config['autoSetupFabric']) {
+			if ($config['autoSetupFabric'] === FALSE) {
 				$consumer->addSetup('disableAutoSetupFabric');
 			}
 
