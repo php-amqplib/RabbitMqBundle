@@ -32,7 +32,7 @@ Require the bundle in your composer.json file:
 ````
 {
     "require": {
-        "oldsound/rabbitmq-bundle": "1.3.*",
+        "oldsound/rabbitmq-bundle": "1.*",
     }
 }
 ```
