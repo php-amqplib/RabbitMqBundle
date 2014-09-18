@@ -28,7 +28,7 @@ interface ConsumerInterface
 
 
     /**
-     * @param AMQPMessage The message
+     * @param AMQPMessage $msg The message
      * @return mixed false to reject and requeue, any other value to aknowledge
      */
     public function execute(AMQPMessage $msg);
