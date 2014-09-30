@@ -143,8 +143,14 @@ class Consumer extends BaseConsumer
 	public function processMessage(AMQPMessage $msg)
 	{
 		$this->onConsume($this, $msg);
-		$processFlag = call_user_func($this->callback, $msg);
-		$this->handleProcessMessage($msg, $processFlag);
+		try {
+			$processFlag = call_user_func($this->callback, $msg);
+			$this->handleProcessMessage($msg, $processFlag);
+
+		} catch (\Exception $e) {
+			$this->onReject($this, $msg, IConsumer::MSG_REJECT_REQUEUE);
+			throw $e;
+		}
 	}
 
 
