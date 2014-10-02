@@ -19,7 +19,7 @@ class RpcClient extends BaseAmqp
         $this->expectSerializedResponse = $expectSerializedResponse;
     }
 
-    public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0)
+    public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0, $mandatory = false, $immediate = false)
     {
         if (empty($requestId)) {
             throw new \InvalidArgumentException('You must provide a $requestId');
@@ -31,7 +31,7 @@ class RpcClient extends BaseAmqp
                                                'expiration' => $expiration*1000,
                                                'correlation_id' => $requestId));
 
-        $this->getChannel()->basic_publish($msg, $server, $routingKey);
+        $this->getChannel()->basic_publish($msg, $server, $routingKey, $mandatory, $immediate);
 
         $this->requests++;
 
