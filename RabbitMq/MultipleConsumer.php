@@ -65,4 +65,11 @@ class MultipleConsumer extends Consumer
 
         $this->handleProcessMessage($msg, $processFlag);
     }
+
+    public function stopConsuming()
+    {
+        foreach ($this->queues as $name => $options) {
+            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name));
+        }
+    }
 }
