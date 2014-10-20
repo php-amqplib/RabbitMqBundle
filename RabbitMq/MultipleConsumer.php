@@ -30,7 +30,7 @@ class MultipleConsumer extends Consumer
             $currentObject = $this;
 
             $this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use($currentObject, $name) {
-                $this->processQueueMessage($name, $msg);
+                $currentObject->processQueueMessage($name, $msg);
             });
         }
     }
