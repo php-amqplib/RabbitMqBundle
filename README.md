@@ -363,7 +363,7 @@ And that's it!
 
 ### RPC or Reply/Response ###
 
-So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes is pretty easy to achieve such things with Symfony2.
+So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony2.
 
 Let's add a RPC client and server into the configuration:
 
