@@ -26,7 +26,7 @@
 
 		"nette/tester": "@dev",
 		"mockery/mockery": "~0.9.1",
-		"kdyby/console": "dev-nette-2.1",
+		"kdyby/console": "~2.3",
 		"jakub-onderka/php-parallel-lint": "~0.7"
 	},
 	"support": {
