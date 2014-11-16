@@ -16,11 +16,32 @@
 		}
 	],
 	"require": {
-		"nette/nette": "~2.1@dev",
+	  	"nette/di": "~2.2@dev",
+		"nette/utils": "~2.2@dev",
 
 		"videlalvaro/php-amqplib": "~2.4.0@dev"
 	},
 	"require-dev": {
+		"nette/nette": "~2.2@dev",
+		"nette/application": "~2.2@dev",
+		"nette/bootstrap": "~2.2@dev",
+		"nette/caching": "~2.2@dev",
+		"nette/component-model": "~2.2@dev",
+		"nette/database": "~2.2@dev",
+		"nette/finder": "~2.2@dev",
+		"nette/forms": "~2.2@dev",
+		"nette/http": "~2.2@dev",
+		"nette/mail": "~2.2@dev",
+		"nette/neon": "~2.2@dev",
+		"nette/php-generator": "~2.2@dev",
+		"nette/reflection": "~2.2@dev",
+		"nette/robot-loader": "~2.2@dev",
+		"nette/safe-stream": "~2.2@dev",
+		"nette/security": "~2.2@dev",
+		"nette/tokenizer": "~2.2@dev",
+		"latte/latte": "~2.2@dev",
+		"tracy/tracy": "~2.2@dev",
+
 		"nette/tester": "@dev",
 		"mockery/mockery": "~0.9.1",
 		"kdyby/console": "dev-master",
@@ -40,7 +61,7 @@
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "0.1-dev"
+			"dev-master": "1.0-dev"
 		}
 	}
 }
