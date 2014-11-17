@@ -115,12 +115,18 @@ Add the `old_sound_rabbit_mq` section in your configuration file:
 old_sound_rabbit_mq:
     connections:
         default:
-            host:     'localhost'
-            port:     5672
-            user:     'guest'
-            password: 'guest'
-            vhost:    '/'
-            lazy:     false
+            host:      'localhost'
+            port:      5672
+            user:      'guest'
+            password:  'guest'
+            vhost:     '/'
+            lazy:      false
+
+            # requires php-amqplib v2.4.1+
+            keepalive:            false
+
+            # requires php-amqplib v2.4.1+
+            heartbeat:            0
     producers:
         upload_picture:
             connection:       default
