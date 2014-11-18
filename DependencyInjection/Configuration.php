@@ -53,7 +53,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('password')->defaultValue('guest')->end()
                             ->scalarNode('vhost')->defaultValue('/')->end()
                             ->booleanNode('lazy')->defaultFalse()->end()
-                            ->booleanNode('keepalive')->defaultFalse()->info('requires php-amqplib v2.4.1+')->end()
+                            ->booleanNode('keepalive')->defaultFalse()->info('requires php-amqplib v2.4.1+ and PHP5.4+')->end()
                             ->scalarNode('heartbeat')->defaultValue(0)->info('requires php-amqplib v2.4.1+')->end()
                         ->end()
                     ->end()
