@@ -69,10 +69,12 @@ class Panel extends Nette\Object implements IBarPanel
 		}
 
 		ob_start();
-		$esc = callback('Nette\Templating\Helpers::escapeHtml');
+		$esc = class_exists('Nette\Templating\Helpers')
+			? ['Nette\Templating\Helpers', 'escapeHtml']
+			: ['Latte\Runtime\Filters', 'escapeHtml'];
 		$click = class_exists('\Tracy\Dumper')
 			? function ($o, $c = FALSE) { return \Tracy\Dumper::toHtml($o, array('collapse' => $c)); }
-			: callback('\Tracy\Helpers::clickableDump');
+			: ['Tracy\Helpers', 'clickableDump'];
 
 		require __DIR__ . '/panel.phtml';
 		return ob_get_clean();
