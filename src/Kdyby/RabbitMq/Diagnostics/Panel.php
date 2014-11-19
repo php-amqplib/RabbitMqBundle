@@ -99,28 +99,8 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	public function register(Connection $connection)
 	{
-		self::getDebuggerBar()->addPanel($this);
+		Debugger::getBar()->addPanel($this);
 		return $this;
-	}
-
-
-
-	/**
-	 * @return Bar
-	 */
-	private static function getDebuggerBar()
-	{
-		return method_exists('Tracy\Debugger', 'getBar') ? Debugger::getBar() : Debugger::$bar;
-	}
-
-
-
-	/**
-	 * @return BlueScreen
-	 */
-	private static function getDebuggerBlueScreen()
-	{
-		return method_exists('Tracy\Debugger', 'getBlueScreen') ? Debugger::getBlueScreen() : Debugger::$blueScreen;
 	}
 
 }
