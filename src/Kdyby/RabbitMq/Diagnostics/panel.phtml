@@ -9,29 +9,53 @@
     #tracy-debug .nette-rabbitMqPanel table th { width: 80px; }
 </style>
 
-<h1>Published messages: <?php echo $esc(count($this->messages)); ?></h1>
+<h1>
+	Published messages: <?php echo $esc(count($this->messages)); ?>,
+	workers: <?php echo $esc($runningWorkers); ?>/<?php echo $esc($configuredWorkers); ?>
+</h1>
 <div class="nette-inner tracy-inner nette-rabbitMqPanel">
-	<?php foreach($this->messages as $message): ?>
+	<?php if ($runningWorkers): ?>
 		<table width="690">
 			<tr>
-				<th width="250">Exchange:</th>
-				<td><code><?php echo $esc($message['exchange']); ?></code></td>
+				<th>Worker name</th>
+				<th>Running instances</th>
 			</tr>
-			<?php if (!empty($message['routingKey'])): ?><tr>
-				<th>Routing&nbsp;key:</th>
-				<td><code><?php echo $esc($message['routingKey']); ?></code></td>
-			</tr><?php endif; ?>
-			<?php $properties = $message['msg']->get_properties(); if (!empty($properties)): ?><tr>
-				<th>Properties:</th>
-				<td><?php echo $click($properties, TRUE); ?></td>
-			</tr><?php endif; ?>
-			<?php if (!empty($message['msg']->delivery_info)): ?><tr>
-				<th>Delivery&nbsp;info:</th>
-				<td><?php echo $click($message['msg']->delivery_info, TRUE); ?></td>
-			</tr><?php endif; ?>
-			<tr>
-				<td colspan="2"><?php echo is_scalar($message['msg']->body) ? ('<code>' . $esc($message['msg']->body) . '</code>') : $click($message['msg']->body, TRUE); ?></td>
-			</tr>
-		</table><br>
-	<?php endforeach; ?>
+			<?php foreach ($workers as $serviceName => $instances): ?>
+				<tr>
+					<td><?php echo $esc($serviceName); ?></td>
+					<td><strong><?php if ($instances === FALSE) { ?>Error<?php } else { ?><?php echo $esc($instances); ?><?php } ?></strong></td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+	<?php endif; ?>
+
+	<?php if ($this->messages): ?>
+		<?php if ($runningWorkers): ?>
+			<br><h2>Messages:</h2>
+		<?php endif; ?>
+
+		<?php foreach($this->messages as $message): ?>
+			<table width="690">
+				<tr>
+					<th width="250">Exchange:</th>
+					<td><code><?php echo $esc($message['exchange']); ?></code></td>
+				</tr>
+				<?php if (!empty($message['routingKey'])): ?><tr>
+					<th>Routing&nbsp;key:</th>
+					<td><code><?php echo $esc($message['routingKey']); ?></code></td>
+				</tr><?php endif; ?>
+				<?php $properties = $message['msg']->get_properties(); if (!empty($properties)): ?><tr>
+					<th>Properties:</th>
+					<td><?php echo $click($properties, TRUE); ?></td>
+				</tr><?php endif; ?>
+				<?php if (!empty($message['msg']->delivery_info)): ?><tr>
+					<th>Delivery&nbsp;info:</th>
+					<td><?php echo $click($message['msg']->delivery_info, TRUE); ?></td>
+				</tr><?php endif; ?>
+				<tr>
+					<td colspan="2"><?php echo is_scalar($message['msg']->body) ? ('<code>' . $esc($message['msg']->body) . '</code>') : $click($message['msg']->body, TRUE); ?></td>
+				</tr>
+			</table><br>
+		<?php endforeach; ?>
+	<?php endif; ?>
 </div>

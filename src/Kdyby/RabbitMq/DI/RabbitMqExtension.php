@@ -171,6 +171,10 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			if ($config['debugger']) {
 				$builder->addDefinition($panelService = $meta['serviceId'] . '.panel')
 					->setClass('Kdyby\RabbitMq\Diagnostics\Panel')
+					->addSetup('injectServiceMap', array(
+						$meta['consumers'],
+						$meta['rpcServers'],
+					))
 					->setInject(FALSE)
 					->setAutowired(FALSE);
 

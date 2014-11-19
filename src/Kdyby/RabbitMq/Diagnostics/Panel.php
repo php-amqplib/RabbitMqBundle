@@ -35,6 +35,21 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	private $messages = array();
 
+	/**
+	 * @var array
+	 */
+	private $serviceMap = array();
+
+
+
+	public function injectServiceMap(array $consumers, array $rpcServers)
+	{
+		$this->serviceMap = array(
+			'consumer' => $consumers,
+			'rpcServer' => $rpcServers,
+		);
+	}
+
 
 
 	/**
@@ -64,8 +79,38 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	public function getPanel()
 	{
-		if (!$this->messages) {
-			return NULL;
+		$isRunning = function ($type, $name) {
+			if (strncasecmp(PHP_OS, 'WIN', 3) == 0) {
+				return FALSE; // sry, I don't know how to do this
+			}
+
+			$command = sprintf('ps aux |grep %s |grep %s',
+				($type === 'consumer' ? 'rabbitmq:consumer' : 'rabbitmq:rpc-server'),
+				escapeshellarg($name)
+			);
+
+			if (!@exec($command, $output)) {
+				return FALSE;
+			}
+
+			$instances = 0;
+			foreach ($output as $line) {
+				if (stripos($line, '|grep') === FALSE) {
+					$instances += 1;
+				}
+			}
+
+			return $instances;
+		};
+
+		$workers = array();
+		$runningWorkers = $configuredWorkers = 0;
+		foreach ($this->serviceMap as $type => $services) {
+			foreach ($services as $name => $serviceId) {
+				$workers[$key = $type . '/' . $name] = $isRunning($type, $name);
+				$runningWorkers += (int) $workers[$key];
+				$configuredWorkers++;
+			}
 		}
 
 		ob_start();
