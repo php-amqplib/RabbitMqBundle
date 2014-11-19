@@ -79,7 +79,16 @@ class OldSoundRabbitMqExtension extends Extension
                 $connection['port'],
                 $connection['user'],
                 $connection['password'],
-                $connection['vhost']
+                $connection['vhost'],
+                false,      // insist
+                'AMQPLAIN', // login_method
+                null,       // login_response
+                'en_US',    // locale
+                3,          // connection_timeout
+                3,          // read_write_timeout
+                null,       // context
+                $connection['keepalive'],
+                $connection['heartbeat'],
             ));
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);

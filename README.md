@@ -121,6 +121,12 @@ old_sound_rabbit_mq:
             password: 'guest'
             vhost:    '/'
             lazy:     false
+
+            # requires php-amqplib v2.4.1+ and PHP5.4+
+            keepalive: false
+
+            # requires php-amqplib v2.4.1+
+            heartbeat: 0
     producers:
         upload_picture:
             connection:       default
