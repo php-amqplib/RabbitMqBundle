@@ -41,6 +41,7 @@ class Configuration implements ConfigurationInterface
     protected function addConnections(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('connection')
             ->children()
                 ->arrayNode('connections')
                     ->useAttributeAsKey('key')
@@ -65,6 +66,7 @@ class Configuration implements ConfigurationInterface
     protected function addProducers(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('producer')
             ->children()
                 ->arrayNode('producers')
                     ->canBeUnset()
@@ -86,6 +88,7 @@ class Configuration implements ConfigurationInterface
     protected function addConsumers(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('consumer')
             ->children()
                 ->arrayNode('consumers')
                     ->canBeUnset()
@@ -116,6 +119,7 @@ class Configuration implements ConfigurationInterface
     protected function addMultipleConsumers(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('multiple_consumer')
             ->children()
                 ->arrayNode('multiple_consumers')
                 ->canBeUnset()
@@ -144,6 +148,7 @@ class Configuration implements ConfigurationInterface
     protected function addAnonConsumers(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('anon_consumer')
             ->children()
                 ->arrayNode('anon_consumers')
                     ->canBeUnset()
@@ -163,6 +168,7 @@ class Configuration implements ConfigurationInterface
     protected function addRpcClients(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('rpc_client')
             ->children()
                 ->arrayNode('rpc_clients')
                     ->canBeUnset()
@@ -181,6 +187,7 @@ class Configuration implements ConfigurationInterface
     protected function addRpcServers(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('rpc_server')
             ->children()
                 ->arrayNode('rpc_servers')
                     ->canBeUnset()
