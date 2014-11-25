@@ -139,6 +139,7 @@ class Configuration implements ConfigurationInterface
                                 ->booleanNode('global')->defaultFalse()->end()
                             ->end()
                         ->end()
+                        ->scalarNode('queues_provider')->defaultNull()->end()
                     ->end()
                 ->end()
             ->end()
@@ -243,7 +244,7 @@ class Configuration implements ConfigurationInterface
     protected function getMultipleQueuesConfiguration()
     {
         $node = new ArrayNodeDefinition('queues');
-        $prototypeNode = $node->requiresAtLeastOneElement()->prototype('array');
+        $prototypeNode = $node->prototype('array');
 
         $this->addQueueNodeConfiguration($prototypeNode);
 
