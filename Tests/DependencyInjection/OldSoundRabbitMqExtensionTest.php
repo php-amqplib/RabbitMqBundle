@@ -320,6 +320,12 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             )
                         )
                     )
+                ),
+                array(
+                    'setQueuesProvider',
+                    array(
+                        new Reference('foo.queues_provider')
+                    )
                 )
             ),
             $definition->getMethodCalls()

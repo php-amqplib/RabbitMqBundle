@@ -488,6 +488,7 @@ multiple_consumers:
     upload:
         connection:       default
         exchange_options: {name: 'upload', type: direct}
+        queues_provider: queues_provider_service
         queues:
             upload-picture:
                 name:     upload_picture
@@ -508,6 +509,9 @@ The callback is now specified under each queues and must implement the `Consumer
 All the options of `queues-options` in the consumer are available for each queue.
 
 Be aware that all queues are under the same exchange, it's up to you to set the correct routing for callbacks.
+
+The `queues_provider` is a optional service that dynamically provides queues.
+It must implement `QueuesProviderInterface`
 
 ### Anonymous Consumers ###
 

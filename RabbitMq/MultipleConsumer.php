@@ -2,12 +2,33 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use OldSound\RabbitMqBundle\Provider\QueuesProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\Exception\QueueNotFoundException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class MultipleConsumer extends Consumer
 {
     protected $queues = array();
+
+    /**
+     * Queues provider
+     *
+     * @var QueuesProviderInterface
+     */
+    protected $queuesProvider = null;
+
+    /**
+     * QueuesProvider setter
+     *
+     * @param QueuesProviderInterface $queuesProvider
+     *
+     * @return self
+     */
+    public function setQueuesProvider(QueuesProviderInterface $queuesProvider)
+    {
+        $this->queuesProvider = $queuesProvider;
+        return $this;
+    }
 
     public function getQueueConsumerTag($queue)
     {
@@ -21,6 +42,8 @@ class MultipleConsumer extends Consumer
 
     protected function setupConsumer()
     {
+        $this->mergeQueues();
+
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
@@ -70,6 +93,19 @@ class MultipleConsumer extends Consumer
     {
         foreach ($this->queues as $name => $options) {
             $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name));
+        }
+    }
+
+    /**
+     * Merges static and provided queues into one array
+     */
+    protected function mergeQueues()
+    {
+        if ($this->queuesProvider) {
+            $this->queues = array_merge(
+                $this->queues,
+                $this->queuesProvider->getQueues()
+            );
         }
     }
 }

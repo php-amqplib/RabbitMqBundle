@@ -173,6 +173,13 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['multiple_consumers'] as $key => $consumer) {
             $queues = array();
 
+            if (empty($consumer['queues']) && empty($consumer['queues_provider'])) {
+                throw new InvalidConfigurationException(
+                    "Error on loading $key multiple consumer. " .
+                    "Either 'queues' or 'queues_provider' parameters should be defined."
+                );
+            }
+
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
                 $queues[$queueOptions['name']]  = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
@@ -184,6 +191,13 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.multi_consumer')
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueues', array($this->normalizeArgumentKeys($queues)));
+
+            if ($consumer['queues_provider']) {
+                $definition->addMethodCall(
+                    'setQueuesProvider',
+                    array(new Reference($consumer['queues_provider']))
+                );
+            }
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
