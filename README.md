@@ -121,6 +121,8 @@ old_sound_rabbit_mq:
             password: 'guest'
             vhost:    '/'
             lazy:     false
+            connection_timeout: 3
+            read_write_timeout: 3
 
             # requires php-amqplib v2.4.1+ and PHP5.4+
             keepalive: false

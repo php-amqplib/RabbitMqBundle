@@ -84,8 +84,8 @@ class OldSoundRabbitMqExtension extends Extension
                 'AMQPLAIN', // login_method
                 null,       // login_response
                 'en_US',    // locale
-                3,          // connection_timeout
-                3,          // read_write_timeout
+                $connection['connection_timeout'],
+                $connection['read_write_timeout'],
                 null,       // context
                 $connection['keepalive'],
                 $connection['heartbeat'],
