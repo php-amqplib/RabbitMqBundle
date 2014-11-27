@@ -178,9 +178,10 @@ queue_options:
 
 ### Important notice - Lazy Connections ###
 
-In current Symfony release (v2.3) all services are fully bootstrapped for each request, a lazy loading support
-will be added in the future to save resources. Services in this bundle, by default, will open connections
-to the brokers at loading time, i.e. during every web request, unless you set `lazy: true` in your connection configuration.
+In a Symfony environment all services are fully bootstrapped for each request, from version >= 2.3 you can declare
+a service as lazy ([Lazy Services](http://symfony.com/doc/master/components/dependency_injection/lazy_services.html)).
+This bundle still doesn't support new Lazy Services feature but you can set `lazy: true` in your connection
+configuration to avoid unnecessary connections to your message broker in every request.
 It's extremely recommended to use lazy connections because performance reasons, nevertheless lazy option is disabled
 by default to avoid possible breaks in applications already using this bundle.
 
