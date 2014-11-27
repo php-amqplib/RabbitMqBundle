@@ -61,7 +61,7 @@ abstract class BaseAmqp
             $this->ch->close();
         }
         
-        if ($this->conn->isConnected()) {
+        if ($this->conn && $this->conn->isConnected()) {
             $this->conn->close();
         }
     }
