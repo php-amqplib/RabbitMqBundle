@@ -10,6 +10,15 @@ old_sound_rabbit_mq:
             password: foo_password
             vhost:    /foo
 
+        ssl_connection:
+            host:     ssl_host
+            port:     123
+            user:     ssl_user
+            password: ssl_password
+            vhost:    /ssl
+            ssl_context:
+                verify_peer: false
+
         lazy_connection:
             host:     lazy_host
             port:     456
