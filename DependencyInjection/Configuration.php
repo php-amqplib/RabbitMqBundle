@@ -263,7 +263,7 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
-                ->scalarNode('name')->isRequired()->end()
+                ->scalarNode('name')->end()
                 ->booleanNode('passive')->defaultFalse()->end()
                 ->booleanNode('durable')->defaultTrue()->end()
                 ->booleanNode('exclusive')->defaultFalse()->end()
