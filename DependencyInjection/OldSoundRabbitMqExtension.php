@@ -330,6 +330,9 @@ class OldSoundRabbitMqExtension extends Extension
                     $server['qos_options']['global']
                 ));
             }
+            if (array_key_exists('queue_options', $server)) {
+                $definition->addMethodCall('setQueueOptions', array($server['queue_options']));
+            }
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
         }
     }

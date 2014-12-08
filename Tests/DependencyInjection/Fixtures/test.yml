@@ -148,3 +148,8 @@ old_sound_rabbit_mq:
 
         default_server:
             callback:        default_server.callback
+
+        server_with_queue_options:
+            callback:        server_with_queue_options.callback
+            queue_options:
+                name: "server_with_queue_options-queue"

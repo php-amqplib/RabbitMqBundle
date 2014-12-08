@@ -196,6 +196,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->useAttributeAsKey('key')
                     ->prototype('array')
+                        ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('callback')->isRequired()->end()
