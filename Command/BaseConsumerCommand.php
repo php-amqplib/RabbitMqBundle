@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Command;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,7 +20,13 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
     public function stopConsumer()
     {
         if ($this->consumer instanceof Consumer) {
+            // Process current message, then halt consumer
             $this->consumer->forceStopConsumer();
+
+            // Halt consumer if waiting for a new message from the queue
+            try {
+                $this->consumer->stopConsuming();
+            } catch (AMQPTimeoutException $e) {}
         } else {
             exit();
         }
