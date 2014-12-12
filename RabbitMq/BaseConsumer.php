@@ -56,6 +56,11 @@ abstract class BaseConsumer extends BaseAmqp
             pcntl_signal_dispatch();
         }
 
+        if ($this->callback instanceof StalledAwareInterface) {
+            if ($this->callback->isStalled()) {
+                $this->forceStopConsumer();
+            }
+        }
         if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
         } else {
