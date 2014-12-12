@@ -177,7 +177,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('foo.callback'), 'execute'))
+                    array(new Reference('foo.callback'))
                 )
             ),
             $definition->getMethodCalls()
@@ -229,7 +229,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('default.callback'), 'execute'))
+                    array(new Reference('default.callback'))
                 )
             ),
             $definition->getMethodCalls()
@@ -301,7 +301,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                 'arguments'    => null,
                                 'ticket'       => null,
                                 'routing_keys' => array(),
-                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute')
+                                'callback'     => new Reference('foo.multiple_test1.callback')
                             ),
                             'foo_bar_2' => array(
                                 'name'         => 'foo_bar_2',
@@ -316,7 +316,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                     'android.upload',
                                     'iphone.upload'
                                 ),
-                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute')
+                                'callback'     => new Reference('foo.multiple_test2.callback')
                             )
                         )
                     )
@@ -360,7 +360,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('foo_anon.callback'), 'execute'))
+                    array(new Reference('foo_anon.callback'))
                 )
             ),
             $definition->getMethodCalls()
@@ -396,7 +396,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'setCallback',
-                    array(array(new Reference('default_anon.callback'), 'execute'))
+                    array(new Reference('default_anon.callback'))
                 )
             ),
             $definition->getMethodCalls()
@@ -444,7 +444,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_server');
         $this->assertEquals(array(
                 array('initServer', array('foo_server')),
-                array('setCallback', array(array(new Reference('foo_server.callback'), 'execute'))),
+                array('setCallback', array(new Reference('foo_server.callback'))),
             ),
             $definition->getMethodCalls()
         );
@@ -461,7 +461,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_server');
         $this->assertEquals(array(
                 array('initServer', array('default_server')),
-                array('setCallback', array(array(new Reference('default_server.callback'), 'execute'))),
+                array('setCallback', array(new Reference('default_server.callback'))),
             ),
             $definition->getMethodCalls()
         );

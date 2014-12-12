@@ -59,7 +59,7 @@ class Consumer extends BaseConsumer
 
     public function processMessage(AMQPMessage $msg)
     {
-        $processFlag = call_user_func($this->callback, $msg);
+        $processFlag = $this->callback->execute($msg);
 
         $this->handleProcessMessage($msg, $processFlag);
     }
