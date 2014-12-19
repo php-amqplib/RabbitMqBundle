@@ -18,6 +18,17 @@ old_sound_rabbit_mq:
             vhost:    /lazy
             lazy:     true
 
+        ssl_connection:
+            host:     ssl_host
+            port:     678
+            user:     ssl_user
+            password: ssl_password
+            vhost:    /ssl
+            ssl:      true
+            ssl_options:
+              verify_peer: true
+              capath: /etc/ssl/certs/
+
         default:
 
     producers:
