@@ -2,8 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
-
 abstract class BaseConsumer extends BaseAmqp
 {
     protected $target;
@@ -56,12 +54,9 @@ abstract class BaseConsumer extends BaseAmqp
             pcntl_signal_dispatch();
         }
 
-        if ($this->callback instanceof StalledAwareInterface) {
-            if ($this->callback->isStalled()) {
-                $this->forceStopConsumer();
-            }
-        }
-        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+        if ($this->forceStop || ($this->consumed >= $this->target && $this->target > 0)
+            || ($this->callback instanceof StalledAwareConsumerInterface && $this->callback->isStalled())
+        ) {
             $this->stopConsuming();
         } else {
             return;

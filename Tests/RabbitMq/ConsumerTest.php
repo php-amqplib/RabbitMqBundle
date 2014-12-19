@@ -31,7 +31,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('execute')
             ->withAnyParameters()
-            ->will($this->returnCallback(function() use ($processFlag) { return $processFlag; }));
+            ->will($this->returnValue($processFlag));
         $consumer->setCallback($callbackFunction);
 
         // Create a default message
