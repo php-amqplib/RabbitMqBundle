@@ -69,17 +69,61 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadConnections()
     {
         foreach ($this->config['connections'] as $key => $connection) {
-            $classParam =
-                $connection['lazy']
-                    ? '%old_sound_rabbit_mq.lazy.connection.class%'
-                    : '%old_sound_rabbit_mq.connection.class%';
+            if (isset($connection['ssl']) && $connection['ssl'] === true) {
+                $classParam = '%old_sound_rabbit_mq.ssl.connection.class%';
+                $arguments = $this->createSslConnectionArguments($connection);
+            } elseif (isset($connection['lazy']) && $connection['lazy'] === true) {
+                $classParam = '%old_sound_rabbit_mq.lazy.connection.class%';
+                $arguments = $this->createConnectionArguments($connection);
+            } else {
+                $classParam = '%old_sound_rabbit_mq.connection.class%';
+                $arguments = $this->createConnectionArguments($connection);
+            }
 
-            $definition = new Definition($classParam, array(
-                $connection['host'],
-                $connection['port'],
-                $connection['user'],
-                $connection['password'],
-                $connection['vhost'],
+            $definition = new Definition($classParam, $arguments);
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
+        }
+    }
+
+    /**
+     * @param array $connection
+     * @return array
+     */
+    protected function createConnectionArguments(array $connection)
+    {
+        return array(
+            $connection['host'],
+            $connection['port'],
+            $connection['user'],
+            $connection['password'],
+            $connection['vhost'],
+            false,      // insist
+            'AMQPLAIN', // login_method
+            null,       // login_response
+            'en_US',    // locale
+            $connection['connection_timeout'],
+            $connection['read_write_timeout'],
+            null,       // context
+            $connection['keepalive'],
+            $connection['heartbeat'],
+        );
+    }
+
+    /**
+     * @param array $connection
+     * @return array
+     */
+    protected function createSslConnectionArguments(array $connection)
+    {
+        return array(
+            $connection['host'],
+            $connection['port'],
+            $connection['user'],
+            $connection['password'],
+            $connection['vhost'],
+            $connection['ssl_options'],
+            array(
                 false,      // insist
                 'AMQPLAIN', // login_method
                 null,       // login_response
@@ -89,11 +133,10 @@ class OldSoundRabbitMqExtension extends Extension
                 null,       // context
                 $connection['keepalive'],
                 $connection['heartbeat'],
-            ));
-
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
-        }
+            )
+        );
     }
+
 
     protected function loadProducers()
     {
