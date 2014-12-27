@@ -15,6 +15,7 @@ use Nette;
 use Nette\DI\Compiler;
 use Nette\PhpGenerator as Code;
 use Nette\DI\Config;
+use Nette\Utils\Validators;
 
 
 
@@ -152,6 +153,34 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
+
+		foreach ($this->compiler->getExtensions() as $extension) {
+			if ($extension instanceof IConnectionProvider) {
+				$connection = $extension->getConnection();
+				Validators::assert($connection, 'array:1..');
+				$config['connection'] = array_merge($config['connection'], $connection);
+			}
+			if ($extension instanceof IProducersProvider) {
+				$producers = $extension->getProducers();
+				Validators::assert($producers, 'array:1..');
+				$config['producers'] = array_merge($config['producers'], $producers);
+			}
+			if ($extension instanceof IConsumersProvider) {
+				$consumers = $extension->getConsumers();
+				Validators::assert($consumers, 'array:1..');
+				$config['consumers'] = array_merge($config['consumers'], $consumers);
+			}
+			if ($extension instanceof IRpcClientsProvider) {
+				$rpcClients = $extension->getRpcClients();
+				Validators::assert($rpcClients, 'array:1..');
+				$config['rpcClients'] = array_merge($config['rpcClients'], $rpcClients);
+			}
+			if ($extension instanceof IRpcServersProvider) {
+				$rpcServers = $extension->getRpcServers();
+				Validators::assert($rpcServers, 'array:1..');
+				$config['rpcServers'] = array_merge($config['rpcServers'], $rpcServers);
+			}
+		}
 
 		if ($unexpected = array_diff(array_keys($config), array_keys($this->defaults))) {
 			throw new Nette\Utils\AssertionException("Unexpected key '" . implode("', '", $unexpected) . "' in configuration of {$this->name}.");
