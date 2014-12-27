@@ -24,5 +24,6 @@ interface IConsumersProvider
 	 *
 	 * @return array
 	 */
-	function getConsumers();
+	function getRabbitConsumers();
 }
+

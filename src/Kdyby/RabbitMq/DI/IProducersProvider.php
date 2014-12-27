@@ -24,5 +24,6 @@ interface IProducersProvider
 	 *
 	 * @return array
 	 */
-	function getProducers();
+	function getRabbitProducers();
 }
+

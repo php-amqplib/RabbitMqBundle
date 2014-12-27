@@ -155,28 +155,23 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$config = $this->getConfig($this->defaults);
 
 		foreach ($this->compiler->getExtensions() as $extension) {
-			if ($extension instanceof IConnectionProvider) {
-				$connection = $extension->getConnection();
-				Validators::assert($connection, 'array:1..');
-				$config['connection'] = array_merge($config['connection'], $connection);
-			}
 			if ($extension instanceof IProducersProvider) {
-				$producers = $extension->getProducers();
+				$producers = $extension->getRabbitProducers();
 				Validators::assert($producers, 'array:1..');
 				$config['producers'] = array_merge($config['producers'], $producers);
 			}
 			if ($extension instanceof IConsumersProvider) {
-				$consumers = $extension->getConsumers();
+				$consumers = $extension->getRabbitConsumers();
 				Validators::assert($consumers, 'array:1..');
 				$config['consumers'] = array_merge($config['consumers'], $consumers);
 			}
 			if ($extension instanceof IRpcClientsProvider) {
-				$rpcClients = $extension->getRpcClients();
+				$rpcClients = $extension->getRabbitRpcClients();
 				Validators::assert($rpcClients, 'array:1..');
 				$config['rpcClients'] = array_merge($config['rpcClients'], $rpcClients);
 			}
 			if ($extension instanceof IRpcServersProvider) {
-				$rpcServers = $extension->getRpcServers();
+				$rpcServers = $extension->getRabbitRpcServers();
 				Validators::assert($rpcServers, 'array:1..');
 				$config['rpcServers'] = array_merge($config['rpcServers'], $rpcServers);
 			}

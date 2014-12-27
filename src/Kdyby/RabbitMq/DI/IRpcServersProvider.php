@@ -24,5 +24,6 @@ interface IRpcServersProvider
 	 *
 	 * @return array
 	 */
-	function getRpcServers();
+	function getRabbitRpcServers();
 }
+
