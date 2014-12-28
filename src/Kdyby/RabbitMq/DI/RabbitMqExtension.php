@@ -524,4 +524,3 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	}
 
 }
-
