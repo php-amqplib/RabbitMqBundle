@@ -26,4 +26,3 @@ interface IConsumersProvider
 	 */
 	function getRabbitConsumers();
 }
-

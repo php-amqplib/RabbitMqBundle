@@ -26,4 +26,3 @@ interface IProducersProvider
 	 */
 	function getRabbitProducers();
 }
-

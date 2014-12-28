@@ -26,4 +26,3 @@ interface IRpcClientsProvider
 	 */
 	function getRabbitRpcClients();
 }
-
