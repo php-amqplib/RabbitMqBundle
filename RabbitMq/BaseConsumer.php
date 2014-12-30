@@ -55,7 +55,7 @@ abstract class BaseConsumer extends BaseAmqp
         }
 
         if ($this->forceStop || ($this->consumed >= $this->target && $this->target > 0)
-            || ($this->callback instanceof StalledAwareConsumerInterface && $this->callback->isStalled())
+            || ($this->callback instanceof StallableConsumerInterface && $this->callback->isStalled())
         ) {
             $this->stopConsuming();
         } else {

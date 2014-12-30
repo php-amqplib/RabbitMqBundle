@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-interface StalledAwareConsumerInterface extends ConsumerInterface
+interface StallableConsumerInterface extends ConsumerInterface
 {
     /**
      * Is Consumer stalled?

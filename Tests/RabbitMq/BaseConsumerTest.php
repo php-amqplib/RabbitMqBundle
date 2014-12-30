@@ -24,7 +24,7 @@ class BaseConsumerTest extends \PHPUnit_Framework_TestCase
         $baseConsumer->expects($this->never())
             ->method('stopConsuming');
 
-        $consumer = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\StalledAwareConsumerInterface');
+        $consumer = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\StallableConsumerInterface');
         $consumer->expects($this->once())
             ->method('isStalled')
             ->will($this->returnValue(false));
@@ -55,7 +55,7 @@ class BaseConsumerTest extends \PHPUnit_Framework_TestCase
         $baseConsumer->expects($this->once())
             ->method('stopConsuming');
 
-        $consumer = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\StalledAwareConsumerInterface');
+        $consumer = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\StallableConsumerInterface');
         $consumer->expects($this->once())
             ->method('isStalled')
             ->will($this->returnValue(true));
