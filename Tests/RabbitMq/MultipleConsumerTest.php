@@ -237,12 +237,15 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
      * Prepare callback
      *
      * @param $processFlag
-     * @return callable
+     * @return ConsumerInterface
      */
     private function prepareCallback($processFlag)
     {
-        return function($msg) use (&$lastQueue, $processFlag) {
-            return $processFlag;
-        };
+        $mock = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\ConsumerInterface');
+        $mock->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue($processFlag));
+
+        return $mock;
     }
-} 
+}
