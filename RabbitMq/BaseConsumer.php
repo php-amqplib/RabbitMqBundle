@@ -15,8 +15,17 @@ abstract class BaseConsumer extends BaseAmqp
 
     protected $idleTimeout = 0;
 
-    public function setCallback(ConsumerInterface $callback)
+    public function setCallback($callback)
     {
+        if (!$callback instanceof ConsumerInterface) {
+            if (!is_callable($callback)) {
+                throw new \InvalidArgumentException(
+                    'callback should be an instance of '
+                    . 'OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface or callable'
+                );
+            }
+            $callback = new BasicConsumer($callback);
+        }
         $this->callback = $callback;
     }
 
