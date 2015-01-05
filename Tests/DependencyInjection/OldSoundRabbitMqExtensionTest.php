@@ -25,6 +25,27 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
+    public function testSslConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.ssl_connection'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.connection.ssl_connection');
+        $this->assertEquals('ssl_host', $definition->getArgument(0));
+        $this->assertEquals(123, $definition->getArgument(1));
+        $this->assertEquals('ssl_user', $definition->getArgument(2));
+        $this->assertEquals('ssl_password', $definition->getArgument(3));
+        $this->assertEquals('/ssl', $definition->getArgument(4));
+
+        $context = $definition->getArgument(11);
+        $this->assertInternalType('resource', $context);
+        $this->assertEquals('stream-context', get_resource_type($context));
+        $options = stream_context_get_options($context);
+        $this->assertEquals(array('ssl' => array('verify_peer' => false)), $options);
+
+        $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
+    }
+
     public function testLazyConnectionDefinition()
     {
         $container = $this->getContainer('test.yml');

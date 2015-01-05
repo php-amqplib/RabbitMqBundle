@@ -74,6 +74,8 @@ class OldSoundRabbitMqExtension extends Extension
                     ? '%old_sound_rabbit_mq.lazy.connection.class%'
                     : '%old_sound_rabbit_mq.connection.class%';
 
+            $context = ! empty($connection['ssl_context'])
+                ? stream_context_create(array('ssl' => $connection['ssl_context'])) : null;
             $definition = new Definition($classParam, array(
                 $connection['host'],
                 $connection['port'],
@@ -86,7 +88,7 @@ class OldSoundRabbitMqExtension extends Extension
                 'en_US',    // locale
                 $connection['connection_timeout'],
                 $connection['read_write_timeout'],
-                null,       // context
+                $context,   // context
                 $connection['keepalive'],
                 $connection['heartbeat'],
             ));
