@@ -489,6 +489,34 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
     }
 
+    public function testRpcServerWithQueueOptionsDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.server_with_queue_options_server'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_queue_options_server');
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.server_with_queue_options');
+        $this->assertEquals(array(
+                array('initServer', array('server_with_queue_options')),
+                array('setCallback', array(array(new Reference('server_with_queue_options.callback'), 'execute'))),
+                array('setQueueOptions', array(array(
+                    'name'         => 'server_with_queue_options-queue',
+                    'passive'      => false,
+                    'durable'      => true,
+                    'exclusive'    => false,
+                    'auto_delete'  => false,
+                    'nowait'       => false,
+                    'arguments'    => null,
+                    'ticket'       => null,
+                    'routing_keys' => array(),
+                ))),
+            ),
+            $definition->getMethodCalls()
+        );
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
+    }
+
     public function testHasCollectorWhenChannelsExist()
     {
         $container = $this->getContainer('collector.yml');

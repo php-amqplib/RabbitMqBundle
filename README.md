@@ -304,7 +304,7 @@ consumers:
 
 From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
 
-Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing. 
+Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing.
 You should evaluate, as the blogpost reccommand, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
 
 With RabbitMqBundle, you can configure that qos_options per consumer like that:
@@ -385,7 +385,10 @@ rpc_servers:
         connection: default
         callback:   random_int_server
         qos_options: {prefetch_size: 0, prefetch_count: 1, global: false}
+        queue_options: {name: random_int_queue, durable: false, auto_delete: true}
 ```
+
+*For a full configuration reference please use the `php app/console config:dump-reference old_sound_rabbit_mq` command.*
 
 Here we have a very useful server: it returns random integers to its clients. The callback used to process the request will be the __random\_int\_server__ service. Now let's see how to invoke it from our controllers.
 
