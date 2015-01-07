@@ -2,9 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
-
-abstract class BaseConsumer extends BaseAmqp
+abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
     protected $target;
 
