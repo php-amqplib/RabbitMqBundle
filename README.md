@@ -516,7 +516,11 @@ All the options of `queues-options` in the consumer are available for each queue
 Be aware that all queues are under the same exchange, it's up to you to set the correct routing for callbacks.
 
 The `queues_provider` is a optional service that dynamically provides queues.
-It must implement `QueuesProviderInterface`
+It must implement `QueuesProviderInterface`.
+
+Be aware that queues providers are responsible for the proper calls to `setDequeuer` and that callbacks are callables 
+(not `ConsumerInterface`). In case service providing queues implements `DequeuerAwareInterface`, a call to
+`setDequeuer` is added to the definition of the service with a `DequeuerInterface` currently being a `MultipleConsumer`.
 
 ### Anonymous Consumers ###
 
