@@ -27,36 +27,31 @@ class AMQPConnectionFactory
             $class = new \ReflectionClass($class);
         }
         $this->class = $class;
-        $this->parameters = $this->mergeDefaultConnectionParameters($parameters);
-        if ($this->parameters['ssl_context']) {
-            $this->parameters['ssl_context'] = stream_context_create(array('ssl' => $this->parameters['ssl_context']));
+        $this->parameters = array_merge($this->parameters, $parameters);
+        if (is_array($this->parameters['ssl_context'])) {
+            $this->parameters['ssl_context'] = ! empty($this->parameters['ssl_context'])
+                ? stream_context_create(array('ssl' => $this->parameters['ssl_context']))
+                : null;
         }
     }
 
     public function createConnection()
     {
-        $connection = $this->parameters;
-
         return $this->class->newInstance(
-            $connection['host'],
-            $connection['port'],
-            $connection['user'],
-            $connection['password'],
-            $connection['vhost'],
+            $this->parameters['host'],
+            $this->parameters['port'],
+            $this->parameters['user'],
+            $this->parameters['password'],
+            $this->parameters['vhost'],
             false,      // insist
             'AMQPLAIN', // login_method
             null,       // login_response
             'en_US',    // locale
-            $connection['connection_timeout'],
-            $connection['read_write_timeout'],
-            $connection['ssl_context'],
-            $connection['keepalive'],
-            $connection['heartbeat']
+            $this->parameters['connection_timeout'],
+            $this->parameters['read_write_timeout'],
+            $this->parameters['ssl_context'],
+            $this->parameters['keepalive'],
+            $this->parameters['heartbeat']
         );
-    }
-
-    private function mergeDefaultConnectionParameters(array $parameters)
-    {
-        return array_merge($this->parameters, $parameters);
     }
 }
