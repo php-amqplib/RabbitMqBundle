@@ -17,11 +17,22 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection.foo_connection'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.foo_connection');
-        $this->assertEquals('foo_host', $definition->getArgument(0));
-        $this->assertEquals(123, $definition->getArgument(1));
-        $this->assertEquals('foo_user', $definition->getArgument(2));
-        $this->assertEquals('foo_password', $definition->getArgument(3));
-        $this->assertEquals('/foo', $definition->getArgument(4));
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.foo_connection'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.foo_connection');
+        $this->assertEquals('old_sound_rabbit_mq.connection_factory.foo_connection', $definition->getFactoryService());
+        $this->assertEquals(array(
+            'host' => 'foo_host',
+            'port' => 123,
+            'user' => 'foo_user',
+            'password' => 'foo_password',
+            'vhost' => '/foo',
+            'lazy' => false,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(),
+            'keepalive' => null,
+            'heartbeat' => 0,
+        ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
@@ -31,18 +42,24 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection.ssl_connection'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.ssl_connection');
-        $this->assertEquals('ssl_host', $definition->getArgument(0));
-        $this->assertEquals(123, $definition->getArgument(1));
-        $this->assertEquals('ssl_user', $definition->getArgument(2));
-        $this->assertEquals('ssl_password', $definition->getArgument(3));
-        $this->assertEquals('/ssl', $definition->getArgument(4));
-
-        $context = $definition->getArgument(11);
-        $this->assertInternalType('resource', $context);
-        $this->assertEquals('stream-context', get_resource_type($context));
-        $options = stream_context_get_options($context);
-        $this->assertEquals(array('ssl' => array('verify_peer' => false)), $options);
-
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.ssl_connection'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.ssl_connection');
+        $this->assertEquals('old_sound_rabbit_mq.connection_factory.ssl_connection', $definition->getFactoryService());
+        $this->assertEquals(array(
+            'host' => 'ssl_host',
+            'port' => 123,
+            'user' => 'ssl_user',
+            'password' => 'ssl_password',
+            'vhost' => '/ssl',
+            'lazy' => false,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(
+                'verify_peer' => false,
+            ),
+            'keepalive' => null,
+            'heartbeat' => 0,
+        ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
@@ -52,11 +69,22 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection.lazy_connection'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_connection');
-        $this->assertEquals('lazy_host', $definition->getArgument(0));
-        $this->assertEquals(456, $definition->getArgument(1));
-        $this->assertEquals('lazy_user', $definition->getArgument(2));
-        $this->assertEquals('lazy_password', $definition->getArgument(3));
-        $this->assertEquals('/lazy', $definition->getArgument(4));
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.lazy_connection'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.lazy_connection');
+        $this->assertEquals('old_sound_rabbit_mq.connection_factory.lazy_connection', $definition->getFactoryService());
+        $this->assertEquals(array(
+            'host' => 'lazy_host',
+            'port' => 456,
+            'user' => 'lazy_user',
+            'password' => 'lazy_password',
+            'vhost' => '/lazy',
+            'lazy' => true,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(),
+            'keepalive' => null,
+            'heartbeat' => 0,
+        ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
 
@@ -66,11 +94,22 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection.default'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.default');
-        $this->assertEquals('localhost', $definition->getArgument(0));
-        $this->assertEquals(5672, $definition->getArgument(1));
-        $this->assertEquals('guest', $definition->getArgument(2));
-        $this->assertEquals('guest', $definition->getArgument(3));
-        $this->assertEquals('/', $definition->getArgument(4));
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.default'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.default');
+        $this->assertEquals('old_sound_rabbit_mq.connection_factory.default', $definition->getFactoryService());
+        $this->assertEquals(array(
+            'host' => 'localhost',
+            'port' => 5672,
+            'user' => 'guest',
+            'password' => 'guest',
+            'vhost' => '/',
+            'lazy' => false,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(),
+            'keepalive' => null,
+            'heartbeat' => 0,
+        ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 

@@ -74,24 +74,16 @@ class OldSoundRabbitMqExtension extends Extension
                     ? '%old_sound_rabbit_mq.lazy.connection.class%'
                     : '%old_sound_rabbit_mq.connection.class%';
 
-            $context = ! empty($connection['ssl_context'])
-                ? stream_context_create(array('ssl' => $connection['ssl_context'])) : null;
-            $definition = new Definition($classParam, array(
-                $connection['host'],
-                $connection['port'],
-                $connection['user'],
-                $connection['password'],
-                $connection['vhost'],
-                false,      // insist
-                'AMQPLAIN', // login_method
-                null,       // login_response
-                'en_US',    // locale
-                $connection['connection_timeout'],
-                $connection['read_write_timeout'],
-                $context,   // context
-                $connection['keepalive'],
-                $connection['heartbeat'],
+            $definition = new Definition('%old_sound_rabbit_mq.connection_factory.class%', array(
+                $classParam, $connection,
             ));
+            $definition->setPublic(false);
+            $factoryName = sprintf('old_sound_rabbit_mq.connection_factory.%s', $key);
+            $this->container->setDefinition($factoryName, $definition);
+
+            $definition = new Definition($classParam);
+            $definition->setFactoryService($factoryName);
+            $definition->setFactoryMethod('createConnection');
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
         }
