@@ -21,11 +21,14 @@ class AMQPConnectionFactory
         'heartbeat'          => 0,
     );
 
+    /**
+     * Constructor
+     *
+     * @param string $class      FQCN of AMQPConnection class to instantiate.
+     * @param array  $parameters Map containing parameters resolved by Extension.
+     */
     public function __construct($class, array $parameters)
     {
-        if (is_string($class)) {
-            $class = new \ReflectionClass($class);
-        }
         $this->class = $class;
         $this->parameters = array_merge($this->parameters, $parameters);
         if (is_array($this->parameters['ssl_context'])) {
@@ -37,7 +40,7 @@ class AMQPConnectionFactory
 
     public function createConnection()
     {
-        return $this->class->newInstance(
+        return new $this->class(
             $this->parameters['host'],
             $this->parameters['port'],
             $this->parameters['user'],
