@@ -136,7 +136,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.consumer')
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+                ->addMethodCall('setCallback', array(new Reference($consumer['callback'])));
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
@@ -176,7 +176,7 @@ class OldSoundRabbitMqExtension extends Extension
 
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
                 $queues[$queueOptions['name']]  = $queueOptions;
-                $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
+                $queues[$queueOptions['name']]['callback'] = new Reference($queueOptions['callback']);
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
@@ -225,7 +225,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.anon_consumer')
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($anon['exchange_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($anon['callback']), 'execute')));
+                ->addMethodCall('setCallback', array(new Reference($anon['callback'])));
             $this->injectConnection($definition, $anon['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);
@@ -312,7 +312,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.rpc_server')
                 ->addMethodCall('initServer', array($key))
-                ->addMethodCall('setCallback', array(array(new Reference($server['callback']), 'execute')));
+                ->addMethodCall('setCallback', array(new Reference($server['callback'])));
             $this->injectConnection($definition, $server['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $server['connection']);

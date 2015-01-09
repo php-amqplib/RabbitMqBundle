@@ -2,14 +2,13 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
-
 abstract class BaseConsumer extends BaseAmqp
 {
     protected $target;
 
     protected $consumed = 0;
 
+    /** @var ConsumerInterface */
     protected $callback;
 
     protected $forceStop = false;
@@ -18,6 +17,15 @@ abstract class BaseConsumer extends BaseAmqp
 
     public function setCallback($callback)
     {
+        if (!$callback instanceof ConsumerInterface) {
+            if (!is_callable($callback)) {
+                throw new \InvalidArgumentException(
+                    'callback should be an instance of '
+                    . 'OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface or callable'
+                );
+            }
+            $callback = new BasicConsumer($callback);
+        }
         $this->callback = $callback;
     }
 
@@ -55,7 +63,9 @@ abstract class BaseConsumer extends BaseAmqp
             pcntl_signal_dispatch();
         }
 
-        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+        if ($this->forceStop || ($this->consumed >= $this->target && $this->target > 0)
+            || ($this->callback instanceof StallableConsumerInterface && $this->callback->isStalled())
+        ) {
             $this->stopConsuming();
         } else {
             return;

@@ -16,7 +16,7 @@ class RpcServer extends BaseConsumer
     {
         try {
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
-            $result = call_user_func($this->callback, $msg);
+            $result = $this->callback->execute($msg);
             $this->sendReply(serialize($result), $msg->get('reply_to'), $msg->get('correlation_id'));
             $this->consumed++;
             $this->maybeStopConsumer();

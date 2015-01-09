@@ -25,7 +25,13 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new Consumer($amqpConnection, $amqpChannel);
 
-        $callbackFunction = function() use ($processFlag) { return $processFlag; }; // Create a callback function with a return value set by the data provider.
+        // Create a callback function with a return value set by the data provider.
+        $callbackFunction = $this->getMock('OldSound\\RabbitMqBundle\\RabbitMq\\ConsumerInterface');
+        $callbackFunction
+            ->expects($this->any())
+            ->method('execute')
+            ->withAnyParameters()
+            ->will($this->returnValue($processFlag));
         $consumer->setCallback($callbackFunction);
 
         // Create a default message
