@@ -158,7 +158,9 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_consumer', $key), $definition);
+            $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
+            $this->container->setDefinition($name, $definition);
+            $this->addDequeuerAwareCall($consumer['callback'], $name);
         }
     }
 
@@ -166,6 +168,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['multiple_consumers'] as $key => $consumer) {
             $queues = array();
+            $callbacks = array();
 
             if (empty($consumer['queues']) && empty($consumer['queues_provider'])) {
                 throw new InvalidConfigurationException(
@@ -177,6 +180,7 @@ class OldSoundRabbitMqExtension extends Extension
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
                 $queues[$queueOptions['name']]  = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
+                $callbacks[] = new Reference($queueOptions['callback']);
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
@@ -213,7 +217,14 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_multiple', $key), $definition);
+            $name = sprintf('old_sound_rabbit_mq.%s_multiple', $key);
+            $this->container->setDefinition($name, $definition);
+            if ($consumer['queues_provider']) {
+                $this->addDequeuerAwareCall($consumer['queues_provider'], $name);
+            }
+            foreach ($callbacks as $callback) {
+                $this->addDequeuerAwareCall($callback, $name);
+            }
         }
     }
 
@@ -231,7 +242,9 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);
             }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_anon', $key), $definition);
+            $name = sprintf('old_sound_rabbit_mq.%s_anon', $key);
+            $this->container->setDefinition($name, $definition);
+            $this->addDequeuerAwareCall($anon['callback'], $name);
         }
     }
 
@@ -354,5 +367,24 @@ class OldSoundRabbitMqExtension extends Extension
     public function getAlias()
     {
         return 'old_sound_rabbit_mq';
+    }
+
+    /**
+     * Add proper dequeuer aware call
+     *
+     * @param string $callback
+     * @param string $name
+     */
+    protected function addDequeuerAwareCall($callback, $name)
+    {
+        if (! $this->container->has($callback)) {
+            return;
+        }
+
+        $callbackDefinition = $this->container->findDefinition($callback);
+        $refClass           = new \ReflectionClass($callbackDefinition->getClass());
+        if ($refClass->implementsInterface('OldSound\RabbitMqBundle\RabbitMq\DequeuerAwareInterface')) {
+            $callbackDefinition->addMethodCall('setDequeuer', array(new Reference($name)));
+        }
     }
 }
