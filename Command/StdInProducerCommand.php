@@ -9,7 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class StdInProducerCommand extends BaseRabbitMqCommand
 {
-
+    const FORMAT_PHP = 'php';
+    const FORMAT_RAW = 'raw';
+    
     protected function configure()
     {
         parent::configure();
@@ -17,6 +19,8 @@ class StdInProducerCommand extends BaseRabbitMqCommand
         $this
             ->setName('rabbitmq:stdin-producer')
             ->addArgument('name', InputArgument::REQUIRED, 'Producer Name')
+            ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
+            ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, 'Payload Format', self::FORMAT_PHP)
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
         ;
     }
@@ -39,7 +43,21 @@ class StdInProducerCommand extends BaseRabbitMqCommand
         while (!feof(STDIN)) {
             $data .= fread(STDIN, 8192);
         }
+        
+        $route = $input->getOption('route');
+        $format = $input->getOption('format');
 
-        $producer->publish(serialize($data));
+        switch ($format) {
+            case self::FORMAT_RAW:
+                break; // data as is
+            case self::FORMAT_PHP:
+                $data = serialize($data);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid payload format "%s", expecting one of: %s.',
+                    $format, implode(', ', [self::FORMAT_PHP, self::FORMAT_RAW])));
+        }
+
+        $producer->publish($data, $route);
     }
 }
