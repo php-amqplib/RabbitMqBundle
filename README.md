@@ -25,7 +25,7 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 ## Installation ##
 
-### For Symfony >= 2.1.* ###
+### For Symfony Framework >= 2.3 ###
 
 Require the bundle in your composer.json file:
 
@@ -58,40 +58,31 @@ $ composer update oldsound/rabbitmq-bundle
 
 Enjoy !
 
-### For Symfony 2.0.* ###
+### For a console application that uses Symfony Console, Dependency Injection and Config components ###
 
-The following instructions have been tested on a project created with the [Symfony2 Standard 2.0.6](http://symfony.com/download?v=Symfony_Standard_2.0.6.tgz)
+If you have a console application used to run RabbitMQ consumers, you do not need Symfony HttpKernel and FrameworkBundle.
+From version 1.6, you can use the Dependency Injection component to load this bundle configuration and services, and then use the consumer command.
 
-Put the RabbitMqBundle and the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library into the deps file:
+Require the bundle in your composer.json file:
 
-```ini
-[RabbitMqBundle]
-git=http://github.com/videlalvaro/RabbitMqBundle.git
-target=/bundles/OldSound/RabbitMqBundle
-
-[php-amqplib]
-git=http://github.com/videlalvaro/php-amqplib.git
-target=videlalvaro/php-amqplib
-```
-
-Register the bundle and library namespaces in the `app/autoload.php` file:
-
-```php
-$loader->registerNamespaces(array(
-    'OldSound'         => __DIR__.'/../vendor/bundles',
-    'PhpAmqpLib'       => __DIR__.'/../vendor/videlalvaro/php-amqplib',
-));
-```
-
-Add the RabbitMqBundle to your application's kernel:
-
-```php
-public function registerBundles()
+````
 {
-    $bundles = array(
-        new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-    );
+    "require": {
+        "oldsound/rabbitmq-bundle": "~1.6",
+    }
 }
+```
+
+Register the extension and the compiler pass:
+
+```php
+use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
+use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
+
+// ...
+
+$containerBuilder->registerExtension(new OldSoundRabbitMqExtension());
+$containerBuilder->addCompilerPass(new RegisterPartsPass());
 ```
 
 ### Warning - BC Breaking Changes ###
@@ -520,7 +511,7 @@ Be aware that all queues are under the same exchange, it's up to you to set the 
 The `queues_provider` is a optional service that dynamically provides queues.
 It must implement `QueuesProviderInterface`.
 
-Be aware that queues providers are responsible for the proper calls to `setDequeuer` and that callbacks are callables 
+Be aware that queues providers are responsible for the proper calls to `setDequeuer` and that callbacks are callables
 (not `ConsumerInterface`). In case service providing queues implements `DequeuerAwareInterface`, a call to
 `setDequeuer` is added to the definition of the service with a `DequeuerInterface` currently being a `MultipleConsumer`.
 

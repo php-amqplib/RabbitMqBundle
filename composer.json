@@ -9,11 +9,11 @@
     }],
     "require": {
         "php"                          : ">=5.3.0",
-        "symfony/dependency-injection" : "~2.1",
-        "symfony/event-dispatcher"     : "~2.1",
-        "symfony/config"               : "~2.1",
-        "symfony/yaml"                 : "~2.1",
-        "symfony/console"              : "~2.1",
+        "symfony/dependency-injection" : "~2.3",
+        "symfony/event-dispatcher"     : "~2.3",
+        "symfony/config"               : "~2.3",
+        "symfony/yaml"                 : "~2.3",
+        "symfony/console"              : "~2.3",
         "videlalvaro/php-amqplib"      : "~2.4.0"
     },
     "suggest": {
@@ -22,7 +22,7 @@
     "require-dev": {
         "symfony/serializer": "~2.3",
         "symfony/debug"     : "~2.3",
-        "phpunit/phpunit"   : ">=3.7.20"
+        "phpunit/phpunit" : ">=3.7.0"
     },
     "extra": {
         "branch-alias": {
