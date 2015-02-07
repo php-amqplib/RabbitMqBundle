@@ -13,6 +13,7 @@ class RpcClient extends BaseAmqp
     protected $timeout = 0;
 
     private $queueName;
+    private $unserializer = 'unserialize';
 
     public function initClient($expectSerializedResponse = true)
     {
@@ -60,7 +61,7 @@ class RpcClient extends BaseAmqp
     {
         $messageBody = $msg->body;
         if ($this->expectSerializedResponse) {
-            $messageBody = unserialize($messageBody);
+            $messageBody = call_user_func($this->unserializer, $messageBody);
         }
 
         $this->replies[$msg->get('correlation_id')] = $messageBody;
@@ -73,5 +74,10 @@ class RpcClient extends BaseAmqp
         }
 
         return $this->queueName;
+    }
+
+    public function setUnserializer($unserializer)
+    {
+        $this->unserializer = $unserializer;
     }
 }

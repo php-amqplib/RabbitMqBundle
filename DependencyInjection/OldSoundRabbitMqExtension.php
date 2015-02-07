@@ -312,6 +312,9 @@ class OldSoundRabbitMqExtension extends Extension
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $client['connection']);
             }
+            if (array_key_exists('unserializer', $client)) {
+                $definition->addMethodCall('setUnserializer', array($client['unserializer']));
+            }
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
         }
@@ -339,6 +342,9 @@ class OldSoundRabbitMqExtension extends Extension
             }
             if (array_key_exists('queue_options', $server)) {
                 $definition->addMethodCall('setQueueOptions', array($server['queue_options']));
+            }
+            if (array_key_exists('serializer', $server)) {
+                $definition->addMethodCall('setSerializer', array($server['serializer']));
             }
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
         }
