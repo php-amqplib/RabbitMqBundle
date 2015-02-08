@@ -380,12 +380,14 @@ Let's add a RPC client and server into the configuration:
 rpc_clients:
     integer_store:
         connection: default
+        unserializer: json_decode
 rpc_servers:
     random_int:
         connection: default
         callback:   random_int_server
         qos_options: {prefetch_size: 0, prefetch_count: 1, global: false}
         queue_options: {name: random_int_queue, durable: false, auto_delete: true}
+        serializer: json_encode
 ```
 
 *For a full configuration reference please use the `php app/console config:dump-reference old_sound_rabbit_mq` command.*
