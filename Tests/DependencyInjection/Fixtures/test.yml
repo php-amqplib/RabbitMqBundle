@@ -147,6 +147,7 @@ old_sound_rabbit_mq:
     rpc_clients:
         foo_client:
             connection:      foo_connection
+            unserializer:    json_decode
 
         default_client:
 
@@ -154,6 +155,7 @@ old_sound_rabbit_mq:
         foo_server:
             connection:      foo_connection
             callback:        foo_server.callback
+            serializer:      json_encode
 
         default_server:
             callback:        default_server.callback

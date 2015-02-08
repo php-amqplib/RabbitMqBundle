@@ -473,7 +473,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_client');
         $this->assertEquals(
-            array(array('initClient', array(true))),
+            array(
+                array('initClient', array(true)),
+                array('setUnserializer', array('json_decode'))
+            ),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
@@ -488,7 +491,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_client');
         $this->assertEquals(
-            array(array('initClient', array(true))),
+            array(
+                array('initClient', array(true)),
+                array('setUnserializer', array('unserialize'))
+            ),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
@@ -505,6 +511,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
                 array('initServer', array('foo_server')),
                 array('setCallback', array(array(new Reference('foo_server.callback'), 'execute'))),
+                array('setSerializer', array('json_encode')),
             ),
             $definition->getMethodCalls()
         );
@@ -522,6 +529,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
                 array('initServer', array('default_server')),
                 array('setCallback', array(array(new Reference('default_server.callback'), 'execute'))),
+                array('setSerializer', array('serialize')),
             ),
             $definition->getMethodCalls()
         );
@@ -550,6 +558,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'ticket'       => null,
                     'routing_keys' => array(),
                 ))),
+                array('setSerializer', array('serialize')),
             ),
             $definition->getMethodCalls()
         );
