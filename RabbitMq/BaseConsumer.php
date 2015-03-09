@@ -97,4 +97,13 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     {
         return $this->idleTimeout;
     }
+
+    /**
+     * Resets the consumed property.
+     * Use when you want to call start() or consume() multiple times.
+     */
+    public function resetConsumed()
+    {
+        $this->consumed = 0;
+    }
 }
