@@ -11,7 +11,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
 {
     const FORMAT_PHP = 'php';
     const FORMAT_RAW = 'raw';
-    
+
     protected function configure()
     {
         parent::configure();
@@ -43,7 +43,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
         while (!feof(STDIN)) {
             $data .= fread(STDIN, 8192);
         }
-        
+
         $route = $input->getOption('route');
         $format = $input->getOption('format');
 
@@ -55,7 +55,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid payload format "%s", expecting one of: %s.',
-                    $format, implode(', ', [self::FORMAT_PHP, self::FORMAT_RAW])));
+                    $format, implode(', ', array(self::FORMAT_PHP, self::FORMAT_RAW))));
         }
 
         $producer->publish($data, $route);
