@@ -62,4 +62,4 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
             array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
         );
     }
-} 
+}
