@@ -28,12 +28,12 @@ install:
   - mkdir -p vendor/bin
   - wget -O vendor/bin/composer-nette https://raw.githubusercontent.com/Kdyby/TesterExtras/master/bin/composer-nette.php
   - php vendor/bin/composer-nette
-  - composer install --no-interaction --prefer-source --dev
+  - composer install --no-interaction --prefer-source
 
 before_script:
-  - composer create-project --prefer-source --dev --no-interaction jakub-onderka/php-parallel-lint vendor/php-parallel-lint ~0.8
+  - composer create-project --prefer-source --no-interaction jakub-onderka/php-parallel-lint vendor/php-parallel-lint ~0.8
   - php vendor/php-parallel-lint/parallel-lint.php -e php,phpt --exclude vendor .
-  - composer create-project --prefer-source --dev --no-interaction nette/code-checker vendor/code-checker ~2.2
+  - composer create-project --prefer-source --no-interaction nette/code-checker vendor/code-checker ~2.2
   - php vendor/code-checker/src/code-checker.php -d src
   - php vendor/code-checker/src/code-checker.php -d tests
 
