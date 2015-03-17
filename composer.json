@@ -23,9 +23,8 @@
         }
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "OldSound\\RabbitMqBundle\\": ""
         }
-    },
-    "target-dir" : "OldSound/RabbitMqBundle"
+    }
 }
