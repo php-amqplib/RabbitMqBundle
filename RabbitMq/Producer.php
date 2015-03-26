@@ -8,7 +8,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 /**
  * Prodcuer, that publishes AMQP Messages
  */
-class Producer extends BaseAmqp
+class Producer extends BaseAmqp implements ProducerInterface
 {
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
