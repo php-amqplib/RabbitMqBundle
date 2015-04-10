@@ -32,3 +32,10 @@ class QueueNotFoundException extends \RuntimeException implements Exception
 {
 
 }
+
+
+
+class TerminateAndRequeueException extends \RuntimeException implements Exception
+{
+
+}
