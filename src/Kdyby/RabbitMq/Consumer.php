@@ -125,6 +125,9 @@ class Consumer extends BaseConsumer
 
 			$this->onError($this, $e);
 			throw $e;
+
+		} catch (TerminateAndRequeueException $e) {
+			$this->stopConsuming();
 		}
 	}
 
@@ -146,6 +149,10 @@ class Consumer extends BaseConsumer
 		try {
 			$processFlag = call_user_func($this->callback, $msg);
 			$this->handleProcessMessage($msg, $processFlag);
+
+		} catch (TerminateAndRequeueException $e) {
+			$this->handleProcessMessage($msg, IConsumer::MSG_REJECT_REQUEUE);
+			throw $e;
 
 		} catch (\Exception $e) {
 			$this->onReject($this, $msg, IConsumer::MSG_REJECT_REQUEUE);
