@@ -35,7 +35,32 @@ class QueueNotFoundException extends \RuntimeException implements Exception
 
 
 
-class TerminateAndRequeueException extends \RuntimeException implements Exception
+class TerminateException extends \RuntimeException implements Exception
 {
+
+	private $response = IConsumer::MSG_REJECT_REQUEUE;
+
+
+
+	/**
+	 * @param int $response
+	 * @return TerminateException
+	 */
+	public static function withResponse($response)
+	{
+		$e = new self();
+		$e->response = $response;
+		return $e;
+	}
+
+
+
+	/**
+	 * @return int
+	 */
+	public function getResponse()
+	{
+		return $this->response;
+	}
 
 }
