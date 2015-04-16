@@ -141,9 +141,9 @@ class OldSoundRabbitMqExtension extends Extension
                 $consumer['exchange_options']['declare'] = false;
             }
             $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])));
-            //this consumer doesn't define a queue
+            //this consumer doesn't define a queue, create a temporary queue
             if (!isset($consumer['queue_options'])) {
-                $consumer['queue_options']['name'] = null;
+                $consumer['queue_options']['name'] = '';
             }
             $definition->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])));
             $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
