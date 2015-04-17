@@ -19,7 +19,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.foo_connection');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.foo_connection'));
         $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.foo_connection');
-        $this->assertEquals('old_sound_rabbit_mq.connection_factory.foo_connection', $definition->getFactoryService());
+        $this->assertEquals(array('old_sound_rabbit_mq.connection_factory.foo_connection', 'createConnection'), $definition->getFactory());
         $this->assertEquals(array(
             'host' => 'foo_host',
             'port' => 123,
@@ -44,7 +44,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.ssl_connection');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.ssl_connection'));
         $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.ssl_connection');
-        $this->assertEquals('old_sound_rabbit_mq.connection_factory.ssl_connection', $definition->getFactoryService());
+        $this->assertEquals(array('old_sound_rabbit_mq.connection_factory.ssl_connection', 'createConnection'), $definition->getFactory());
         $this->assertEquals(array(
             'host' => 'ssl_host',
             'port' => 123,
@@ -71,7 +71,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_connection');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.lazy_connection'));
         $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.lazy_connection');
-        $this->assertEquals('old_sound_rabbit_mq.connection_factory.lazy_connection', $definition->getFactoryService());
+        $this->assertEquals(array('old_sound_rabbit_mq.connection_factory.lazy_connection', 'createConnection'), $definition->getFactory());
         $this->assertEquals(array(
             'host' => 'lazy_host',
             'port' => 456,
@@ -96,7 +96,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.default');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.default'));
         $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.default');
-        $this->assertEquals('old_sound_rabbit_mq.connection_factory.default', $definition->getFactoryService());
+        $this->assertEquals(array('old_sound_rabbit_mq.connection_factory.default', 'createConnection'), $definition->getFactory());
         $this->assertEquals(array(
             'host' => 'localhost',
             'port' => 5672,
