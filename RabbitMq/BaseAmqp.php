@@ -28,7 +28,7 @@ abstract class BaseAmqp
     );
 
     protected $queueOptions = array(
-        'name' => '',
+        'name' => null,
         'passive' => false,
         'durable' => true,
         'exclusive' => false,
