@@ -41,6 +41,9 @@ class ConsumerCommandTest extends BaseCommandTest
 
         $this->assertTrue($this->command->getDefinition()->hasOption('route'));
         $this->assertTrue($this->command->getDefinition()->getOption('route')->isValueOptional()); // It should accept value
+        
+        $this->assertTrue($this->command->getDefinition()->hasOption('queue-name'));
+        $this->assertTrue($this->command->getDefinition()->getOption('queue-name')->isValueRequired()); // It should accept a non empty value
 
         $this->assertTrue($this->command->getDefinition()->hasOption('without-signals'));
         $this->assertFalse($this->command->getDefinition()->getOption('without-signals')->acceptValue()); // It shouldn't accept value because it is a true/false input
