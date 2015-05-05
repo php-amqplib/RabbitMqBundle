@@ -346,6 +346,9 @@ class OldSoundRabbitMqExtension extends Extension
                     $server['qos_options']['global']
                 ));
             }
+            if (array_key_exists('exchange_options', $server)) {
+                $definition->addMethodCall('setExchangeOptions', array($server['exchange_options']));
+            }
             if (array_key_exists('queue_options', $server)) {
                 $definition->addMethodCall('setQueueOptions', array($server['queue_options']));
             }

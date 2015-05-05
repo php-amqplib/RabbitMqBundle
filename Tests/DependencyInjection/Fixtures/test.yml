@@ -164,3 +164,9 @@ old_sound_rabbit_mq:
             callback:        server_with_queue_options.callback
             queue_options:
                 name: "server_with_queue_options-queue"
+
+        server_with_exchange_options:
+            callback:        server_with_exchange_options.callback
+            exchange_options:
+                name: exchange
+                type: topic
