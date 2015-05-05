@@ -45,6 +45,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
+            ->addOption('queue-name', 'Q', InputOption::VALUE_REQUIRED, 'Queue Name')
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
@@ -95,6 +96,11 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }
         $this->consumer->setRoutingKey($input->getOption('route'));
+        
+        $queueName = $input->getOption('queue-name');
+        if (!empty($queueName)){
+            $this->consumer->setQueueOptions(array('name' => $queueName));
+        }
         $this->consumer->consume($this->amount);
     }
 }
