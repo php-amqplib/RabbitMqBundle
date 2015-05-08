@@ -7,7 +7,26 @@ use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 class ConsumerTest extends \PHPUnit_Framework_TestCase
-{
+{   
+    protected function getConsumer($amqpConnection, $amqpChannel)
+    {
+        return new Consumer($amqpConnection, $amqpChannel);
+    }
+
+    protected function prepareAMQPConnection()
+    {
+        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    }
+
+    protected function prepareAMQPChannel()
+    {
+        return $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    }
+
     /**
      * Check if the message is requeued or not correctly.
      *
@@ -15,15 +34,9 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = null)
     {
-        $amqpConnection = $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $amqpChannel = $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $consumer = new Consumer($amqpConnection, $amqpChannel);
+        $amqpConnection = $this->prepareAMQPConnection();
+        $amqpChannel = $this->prepareAMQPChannel();
+        $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
 
         $callbackFunction = function() use ($processFlag) { return $processFlag; }; // Create a callback function with a return value set by the data provider.
         $consumer->setCallback($callbackFunction);

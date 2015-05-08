@@ -391,6 +391,49 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
     }
+    
+    public function testDynamicConsumerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_dyn_consumer_dynamic'));
+        $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
+        
+        $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
+        $this->assertEquals(array(
+                array(
+                    'setExchangeOptions',
+                        array(
+                            array(
+                                'name' => 'foo_dynamic_exchange',
+                                'type' => 'direct',
+                                'passive' => false,
+                                'durable' => true,
+                                'auto_delete' => false,
+                                'internal' => false,
+                                'nowait' => false,
+                                'declare' => true,
+                                'arguments' => NULL,
+                                'ticket' => NULL,
+                            )
+                        )
+                ),
+                array(
+                    'setCallback',
+                        array(
+                            array(new Reference('foo.dynamic.callback'), 'execute')
+                        )
+                ),
+                array(
+                    'setQueueOptionsProvider',
+                        array(
+                            new Reference('foo.dynamic.provider')
+                        )
+                )
+            ),
+            $definition->getMethodCalls()
+        );
+    }
 
     public function testFooAnonConsumerDefinition()
     {

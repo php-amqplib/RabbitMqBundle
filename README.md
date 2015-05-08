@@ -515,6 +515,32 @@ Be aware that queues providers are responsible for the proper calls to `setDeque
 (not `ConsumerInterface`). In case service providing queues implements `DequeuerAwareInterface`, a call to
 `setDequeuer` is added to the definition of the service with a `DequeuerInterface` currently being a `MultipleConsumer`.
 
+### Dynamic Consumers ###
+
+Sometimes you have to change the consumer's configuration on the fly.
+Dynamic consumers allow you to define the consumers queue options programatically, based on the context.
+
+e.g. In a scenario when the defined consumer must be responsible for a dynamic number of topics and you do not want (or can't) change it's configuration every time.
+
+Define a service `queue_provider` that implements the `QueueOptionsProviderInterface` which provides the queue options, and add it to your `dynamic_consumers` configuration.
+
+```yaml
+dynamic_consumers:
+    proc_logs:
+        connection: default
+        exchange_options: {name: 'logs', type: topic}
+        callback: parse_logs_service
+        queue_provider: queue_options_provider_service
+```
+
+Example Usage:
+
+```bash
+$ ./app/console rabbitmq:dynamic-consumer proc_logs server1
+```
+
+In this case the `proc_logs` consumer runs for `server1` and it can decide over the queue options it uses.
+
 ### Anonymous Consumers ###
 
 Now, why will we ever need anonymous consumers? This sounds like some internet threat or something… Keep reading.
