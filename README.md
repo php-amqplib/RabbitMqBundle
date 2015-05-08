@@ -377,6 +377,7 @@ rpc_servers:
         connection: default
         callback:   random_int_server
         qos_options: {prefetch_size: 0, prefetch_count: 1, global: false}
+        exchange_options: {name: exchange, type: topic}
         queue_options: {name: random_int_queue, durable: false, auto_delete: true}
         serializer: json_encode
 ```
