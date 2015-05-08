@@ -522,7 +522,7 @@ Dynamic consumers allow you to define the consumers queue options programaticall
 
 e.g. In a scenario when the defined consumer must be responsible for a dynamic number of topics and you do not want (or can't) change it's configuration every time.
 
-Define a service `queue_provider` that implements the `QueueOptionsProviderInterface` which provides the queue options, and add it to your `dynamic_consumers` configuration.
+Define a service `queue_options_provider` that implements the `QueueOptionsProviderInterface`, and add it to your `dynamic_consumers` configuration.
 
 ```yaml
 dynamic_consumers:
@@ -530,7 +530,7 @@ dynamic_consumers:
         connection: default
         exchange_options: {name: 'logs', type: topic}
         callback: parse_logs_service
-        queue_provider: queue_options_provider_service
+        queue_options_provider: queue_options_provider_service
 ```
 
 Example Usage:
