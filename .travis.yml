@@ -14,12 +14,10 @@ php:
   - 5.5
   - 5.6
   - hhvm
-  - hhvm-nightly
 
 matrix:
   allow_failures:
     - php: hhvm
-    - php: hhvm-nightly
 
 before_install:
   - composer self-update
