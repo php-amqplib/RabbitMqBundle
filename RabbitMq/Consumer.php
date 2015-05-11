@@ -56,6 +56,14 @@ class Consumer extends BaseConsumer
     {
         $this->getChannel()->queue_purge($this->queueOptions['name'], true);
     }
+    
+    /**
+     * Delete the queue
+     */
+    public function delete()
+    {
+        $this->getChannel()->queue_delete($this->queueOptions['name'], true);
+    }
 
     public function processMessage(AMQPMessage $msg)
     {
