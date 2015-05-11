@@ -271,7 +271,7 @@ If you want to remove all the messages awaiting in a queue, you can execute this
 $ ./app/console rabbitmq:purge --no-confirmation upload_picture
 ```
 
-For deleting the consumer's queue completely use this command:
+For deleting the consumer's queue, use this command:
 
 ```bash
 $ ./app/console rabbitmq:delete --no-confirmation upload_picture
