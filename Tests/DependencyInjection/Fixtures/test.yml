@@ -122,7 +122,23 @@ old_sound_rabbit_mq:
                       - 'iphone.upload'
                     callback:        foo.multiple_test2.callback
             queues_provider: foo.queues_provider
-
+            
+    dynamic_consumers:
+        foo_dyn_consumer:
+            connection: foo_default
+            exchange_options:
+                name:           foo_dynamic_exchange
+                type:           direct
+            callback: foo.dynamic.callback
+            queue_options_provider: foo.dynamic.provider
+        bar_dyn_consumer:
+            connection: bar_default
+            exchange_options:
+                name:           bar_dynamic_exchange
+                type:           direct
+            callback: bar.dynamic.callback
+            queue_options_provider: bar.dynamic.provider
+            
     anon_consumers:
         foo_anon_consumer:
             connection:      foo_connection

@@ -31,6 +31,7 @@ class Configuration implements ConfigurationInterface
         $this->addProducers($rootNode);
         $this->addConsumers($rootNode);
         $this->addMultipleConsumers($rootNode);
+        $this->addDynamicConsumers($rootNode);
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
@@ -147,6 +148,37 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('queues_provider')->defaultNull()->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+    
+    protected function addDynamicConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->fixXmlConfig('dynamic_consumer')
+            ->children()
+                ->arrayNode('dynamic_consumers')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->append($this->getExchangeConfiguration())
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('callback')->isRequired()->end()
+                            ->scalarNode('idle_timeout')->end()
+                            ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                            ->arrayNode('qos_options')
+                                ->canBeUnset()
+                                ->children()
+                                    ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                    ->scalarNode('prefetch_count')->defaultValue(0)->end()
+                                    ->booleanNode('global')->defaultFalse()->end()
+                                ->end()
+                            ->end()
+                            ->scalarNode('queue_options_provider')->isRequired()->end()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
