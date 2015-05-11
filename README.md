@@ -271,6 +271,12 @@ If you want to remove all the messages awaiting in a queue, you can execute this
 $ ./app/console rabbitmq:purge --no-confirmation upload_picture
 ```
 
+For deleting the consumer's queue completely use this command:
+
+```bash
+$ ./app/console rabbitmq:delete --no-confirmation upload_picture
+```
+
 #### Idle timeout ####
 
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
