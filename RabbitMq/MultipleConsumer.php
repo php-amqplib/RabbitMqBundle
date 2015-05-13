@@ -70,7 +70,7 @@ class MultipleConsumer extends Consumer
                 foreach ($options['routing_keys'] as $routingKey) {
                     $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
-            } else {
+            } elseif ('' != $this->exchangeOptions['name']) {
                 $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
         }

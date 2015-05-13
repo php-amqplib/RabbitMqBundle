@@ -138,12 +138,25 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
-            $definition
-                ->addTag('old_sound_rabbit_mq.base_amqp')
-                ->addTag('old_sound_rabbit_mq.consumer')
-                ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
-                ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+            $definition->addTag('old_sound_rabbit_mq.base_amqp');
+            $definition->addTag('old_sound_rabbit_mq.consumer');
+            //this consumer doesn't define an exchange -> using AMQP Default
+            if (!isset($consumer['exchange_options'])) {
+                $consumer['exchange_options']['name'] = '';
+                $consumer['exchange_options']['type'] = 'direct';
+                $consumer['exchange_options']['passive'] = true;
+                $consumer['exchange_options']['declare'] = false;
+            }
+            $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])));
+            //this consumer doesn't define a queue, create a temporary queue
+            if (!isset($consumer['queue_options'])) {
+                $consumer['queue_options']['name'] = '';
+                $consumer['queue_options']['durable'] = false;
+                $consumer['queue_options']['exclusive'] = true;
+                $consumer['queue_options']['auto_delete'] = true;
+            }
+            $definition->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])));
+            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
