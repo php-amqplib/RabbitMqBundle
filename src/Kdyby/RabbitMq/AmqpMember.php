@@ -257,7 +257,9 @@ abstract class AmqpMember extends Nette\Object
 		);
 
 		if (empty($options['routing_keys'])) {
-			$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+			if (!empty($this->exchangeOptions['name'])) {
+				$this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+			}
 
 		} else {
 			foreach ($options['routing_keys'] as $routingKey) {
