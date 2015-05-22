@@ -18,6 +18,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  * @method onReject(Consumer $self, AMQPMessage $msg, $processFlag)
  * @method onAck(Consumer $self, AMQPMessage $msg)
  * @method onError(Consumer $self, AMQPExceptionInterface $e)
+ * @method onTimeout(Consumer $self)
  */
 class Consumer extends BaseConsumer
 {
@@ -46,6 +47,11 @@ class Consumer extends BaseConsumer
 	 * @var array
 	 */
 	public $onStop = array();
+
+	/**
+	 * @var array
+	 */
+	public $onTimeout = array();
 
 	/**
 	 * @var array
@@ -105,7 +111,9 @@ class Consumer extends BaseConsumer
 				try {
 					$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
 				} catch (AMQPTimeoutException $e) {
+					$this->onTimeout($this);
 					// nothing bad happened, right?
+					// intentionally not throwing the exception
 				}
 			}
 
