@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 class AMQPConnectionFactory
 {
     /** @var \ReflectionClass */
@@ -9,6 +11,7 @@ class AMQPConnectionFactory
 
     /** @var array */
     private $parameters = array(
+        'url'                => '',
         'host'               => 'localhost',
         'port'               => 5672,
         'user'               => 'guest',
@@ -31,6 +34,7 @@ class AMQPConnectionFactory
     {
         $this->class = $class;
         $this->parameters = array_merge($this->parameters, $parameters);
+        $this->parameters = $this->parseUrl($this->parameters);
         if (is_array($this->parameters['ssl_context'])) {
             $this->parameters['ssl_context'] = ! empty($this->parameters['ssl_context'])
                 ? stream_context_create(array('ssl' => $this->parameters['ssl_context']))
@@ -56,5 +60,44 @@ class AMQPConnectionFactory
             $this->parameters['keepalive'],
             $this->parameters['heartbeat']
         );
+    }
+
+    private function parseUrl($parameters)
+    {
+        if (!$parameters['url']) {
+            return $parameters;
+        }
+
+        $url = parse_url($parameters['url']);
+
+        if ($url === false || !isset($url['scheme']) || $url['scheme'] !== 'amqp') {
+            throw new InvalidConfigurationException('Malformed parameter "url".');
+        }
+
+        if (isset($url['host'])) {
+            $parameters['host'] = $url['host'];
+        }
+        if (isset($url['port'])) {
+            $parameters['port'] = $url['port'];
+        }
+        if (isset($url['user'])) {
+            $parameters['user'] = $url['user'];
+        }
+        if (isset($url['pass'])) {
+            $parameters['password'] = $url['pass'];
+        }
+        if (isset($url['path'])) {
+            $parameters['vhost'] = $url['path'];
+        }
+
+        if (isset($url['query'])) {
+            $query = array();
+            parse_str($url['query'], $query);
+            $parameters = array_merge($parameters, $query);
+        }
+
+        unset($parameters['url']);
+
+        return $parameters;
     }
 }
