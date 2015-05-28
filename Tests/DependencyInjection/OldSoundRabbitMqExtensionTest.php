@@ -143,7 +143,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'setQueueOptions',
                     array(
                         array(
-                            'name'        => null,
+                            'name'        => '',
+                            'declare'     => false,
                         )
                     )
                 )
@@ -183,7 +184,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'setQueueOptions',
                     array(
                         array(
-                            'name'        => null,
+                            'name'        => '',
+                            'declare'     => false,
                         )
                     )
                 )
@@ -232,6 +234,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'arguments'    => null,
                             'ticket'       => null,
                             'routing_keys' => array('android.#.upload', 'iphone.upload'),
+                            'declare'      => true,
                         )
                     )
                 ),
@@ -284,6 +287,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'arguments'   => null,
                             'ticket'      => null,
                             'routing_keys' => array(),
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -361,7 +365,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                 'arguments'    => null,
                                 'ticket'       => null,
                                 'routing_keys' => array(),
-                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute')
+                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute'),
+                                'declare'      => true,
                             ),
                             'foo_bar_2' => array(
                                 'name'         => 'foo_bar_2',
@@ -376,7 +381,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                     'android.upload',
                                     'iphone.upload'
                                 ),
-                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute')
+                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute'),
+                                'declare'      => true,
                             )
                         )
                     )
@@ -557,6 +563,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'arguments'    => null,
                     'ticket'       => null,
                     'routing_keys' => array(),
+                    'declare'      => true,
                 ))),
                 array('setSerializer', array('serialize')),
             ),

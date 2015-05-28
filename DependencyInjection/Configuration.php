@@ -277,6 +277,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('exclusive')->defaultFalse()->end()
                 ->booleanNode('auto_delete')->defaultFalse()->end()
                 ->booleanNode('nowait')->defaultFalse()->end()
+                ->booleanNode('declare')->defaultTrue()->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
                 ->arrayNode('routing_keys')

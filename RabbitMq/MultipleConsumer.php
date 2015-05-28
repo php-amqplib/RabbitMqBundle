@@ -68,10 +68,10 @@ class MultipleConsumer extends Consumer
 
             if (isset($options['routing_keys']) && count($options['routing_keys']) > 0) {
                 foreach ($options['routing_keys'] as $routingKey) {
-                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
         }
 
