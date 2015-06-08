@@ -44,13 +44,13 @@ class RpcClient extends BaseAmqp
     public function getReplies()
     {
         $this->replies = array();
-        $this->getChannel()->basic_consume($this->getQueueName(), '', false, true, false, false, array($this, 'processMessage'));
+        $consumer_tag = $this->getChannel()->basic_consume($this->getQueueName(), '', false, true, false, false, array($this, 'processMessage'));
 
         while (count($this->replies) < $this->requests) {
             $this->getChannel()->wait(null, false, $this->timeout);
         }
 
-        $this->getChannel()->basic_cancel($this->getQueueName());
+        $this->getChannel()->basic_cancel($consumer_tag);
         $this->requests = 0;
         $this->timeout = 0;
 
@@ -70,7 +70,7 @@ class RpcClient extends BaseAmqp
     protected function getQueueName()
     {
         if (null === $this->queueName) {
-            list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, true);
+            list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, false);
         }
 
         return $this->queueName;
