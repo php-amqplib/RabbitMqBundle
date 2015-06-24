@@ -122,7 +122,7 @@ old_sound_rabbit_mq:
                       - 'iphone.upload'
                     callback:        foo.multiple_test2.callback
             queues_provider: foo.queues_provider
-            
+
     dynamic_consumers:
         foo_dyn_consumer:
             connection: foo_default
@@ -138,7 +138,7 @@ old_sound_rabbit_mq:
                 type:           direct
             callback: bar.dynamic.callback
             queue_options_provider: bar.dynamic.provider
-            
+
     anon_consumers:
         foo_anon_consumer:
             connection:      foo_connection
@@ -179,10 +179,16 @@ old_sound_rabbit_mq:
         server_with_queue_options:
             callback:        server_with_queue_options.callback
             queue_options:
-                name: "server_with_queue_options-queue"
+                name: "custom-queue"
 
         server_with_exchange_options:
             callback:        server_with_exchange_options.callback
             exchange_options:
-                name: exchange
+                name: "custom-exchange"
                 type: topic
+
+services:
+    server_with_queue_options.callback:
+        class: stdClass
+    server_with_exchange_options.callback:
+        class: stdClass
