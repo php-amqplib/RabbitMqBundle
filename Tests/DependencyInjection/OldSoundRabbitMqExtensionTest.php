@@ -391,14 +391,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
     }
-    
+
     public function testDynamicConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');
-        
+
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_dyn_consumer_dynamic'));
         $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
-        
+
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
         $this->assertEquals(array(
                 array(
@@ -583,6 +583,18 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getContainer('test.yml');
 
+        $queueOptions = array(
+            'name'         => 'custom-queue',
+            'passive'      => false,
+            'durable'      => true,
+            'exclusive'    => false,
+            'auto_delete'  => false,
+            'nowait'       => false,
+            'arguments'    => null,
+            'ticket'       => null,
+            'routing_keys' => array(),
+        );
+
         $this->assertTrue($container->has('old_sound_rabbit_mq.server_with_queue_options_server'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_queue_options_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
@@ -590,52 +602,56 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
                 array('initServer', array('server_with_queue_options')),
                 array('setCallback', array(array(new Reference('server_with_queue_options.callback'), 'execute'))),
-                array('setQueueOptions', array(array(
-                    'name'         => 'server_with_queue_options-queue',
-                    'passive'      => false,
-                    'durable'      => true,
-                    'exclusive'    => false,
-                    'auto_delete'  => false,
-                    'nowait'       => false,
-                    'arguments'    => null,
-                    'ticket'       => null,
-                    'routing_keys' => array(),
-                ))),
+                array('setQueueOptions', array($queueOptions)),
                 array('setSerializer', array('serialize')),
             ),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
+
+        $rpcServer = $container->get('old_sound_rabbit_mq.server_with_queue_options_server');
+        $refl = new \ReflectionProperty($rpcServer, 'queueOptions');
+        $refl->setAccessible(true);
+
+        $this->assertEquals($queueOptions, $refl->getValue($rpcServer));
     }
 
     public function testRpcServerWithExchangeOptionsDefinition()
     {
         $container = $this->getContainer('test.yml');
 
-        $this->assertTrue($container->has('old_sound_rabbit_mq.server_with_exchange_options_server'));
+        $exchangeOptions = array(
+            'name'         => 'custom-exchange',
+            'type'         => 'topic',
+            'passive'      => false,
+            'durable'      => true,
+            'auto_delete'  => false,
+            'internal'     => null,
+            'nowait'       => false,
+            'declare'      => true,
+            'arguments'    => null,
+            'ticket'       => null,
+        );
+
+            $this->assertTrue($container->has('old_sound_rabbit_mq.server_with_exchange_options_server'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_exchange_options_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.server_with_exchange_options');
         $this->assertEquals(array(
             array('initServer', array('server_with_exchange_options')),
             array('setCallback', array(array(new Reference('server_with_exchange_options.callback'), 'execute'))),
-            array('setExchangeOptions', array(array(
-                'name'         => 'exchange',
-                'type'         => 'topic',
-                'passive'      => false,
-                'durable'      => true,
-                'auto_delete'  => false,
-                'internal'     => null,
-                'nowait'       => false,
-                'declare'      => true,
-                'arguments'    => null,
-                'ticket'       => null,
-            ))),
+            array('setExchangeOptions', array($exchangeOptions)),
             array('setSerializer', array('serialize')),
         ),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.rpc_server.class%', $definition->getClass());
+
+        $rpcServer = $container->get('old_sound_rabbit_mq.server_with_queue_options_server');
+        $refl = new \ReflectionProperty($rpcServer, 'exchangeOptions');
+        $refl->setAccessible(true);
+
+        $this->assertEquals($exchangeOptions, $refl->getValue($rpcServer));
     }
 
     public function testHasCollectorWhenChannelsExist()
