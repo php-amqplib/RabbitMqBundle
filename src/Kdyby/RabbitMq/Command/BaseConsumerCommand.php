@@ -69,26 +69,9 @@ abstract class BaseConsumerCommand extends Command
 				throw new \BadFunctionCallException("Function 'pcntl_signal' is referenced in the php.ini 'disable_functions' and can't be called.");
 			}
 
-			pcntl_signal(SIGTERM, function () {
-				if ($this->consumer) {
-					pcntl_signal(SIGTERM, SIG_DFL);
-					$this->consumer->forceStopConsumer();
-				}
-			});
-			pcntl_signal(SIGINT, function () {
-				if ($this->consumer) {
-					pcntl_signal(SIGINT, SIG_DFL);
-					$this->consumer->forceStopConsumer();
-				}
-			});
-			pcntl_signal(SIGHUP, function () {
-				if ($this->consumer) {
-					pcntl_signal(SIGHUP, SIG_DFL);
-					$this->consumer->forceStopConsumer();
-				}
-
-				// TODO: Implement restarting of consumer
-			});
+			pcntl_signal(SIGTERM, [$this, 'signalTerm']);
+			pcntl_signal(SIGINT, [$this, 'signalInt']);
+			pcntl_signal(SIGHUP, [$this, 'signalHup']);
 		}
 
 		if (defined('AMQP_DEBUG') === false) {
@@ -121,6 +104,46 @@ abstract class BaseConsumerCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$this->consumer->consume($this->amount);
+	}
+
+
+
+	/**
+	 * @internal for pcntl only
+	 */
+	public function signalTerm()
+	{
+		if ($this->consumer) {
+			pcntl_signal(SIGTERM, SIG_DFL);
+			$this->consumer->forceStopConsumer();
+		}
+	}
+
+
+
+	/**
+	 * @internal for pcntl only
+	 */
+	public function signalInt()
+	{
+		if ($this->consumer) {
+			pcntl_signal(SIGINT, SIG_DFL);
+			$this->consumer->forceStopConsumer();
+		}
+	}
+
+
+
+	/**
+	 * @internal for pcntl only
+	 */
+	public function signalHup()
+	{
+		if ($this->consumer) {
+			pcntl_signal(SIGHUP, SIG_DFL);
+			$this->consumer->forceStopConsumer();
+		}
+		// TODO: Implement restarting of consumer
 	}
 
 }
