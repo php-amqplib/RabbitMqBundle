@@ -28,8 +28,11 @@ class SetupFabricCommand extends BaseRabbitMqCommand
 
         $partsHolder = $this->getContainer()->get('old_sound_rabbit_mq.parts_holder');
 
-        foreach ($partsHolder->getParts('old_sound_rabbit_mq.base_amqp') as $baseAmqp) {
-            $baseAmqp->setupFabric();
+        foreach (array('base_amqp', 'binding') as $key) {
+            foreach ($partsHolder->getParts('old_sound_rabbit_mq.' . $key) as $baseAmqp) {
+                $baseAmqp->setupFabric();
+            }
         }
+
     }
 }

@@ -106,11 +106,12 @@ class OldSoundRabbitMqExtension extends Extension
             ksort($binding);
             $definition = new Definition($binding['class']);
             $definition->addTag('old_sound_rabbit_mq.binding');
-            $definition->addMethodCall('setExchange', array($binding['exchange']));
+            $definition->addMethodCall('setArguments', array($binding['arguments']));
             $definition->addMethodCall('setDestination', array($binding['destination']));
-            $definition->addMethodCall('setRoutingKey', array($binding['routing_key']));
-            $definition->addMethodCall('isNowait', array($binding['nowait']));
             $definition->addMethodCall('setDestinationIsExchange', array($binding['destination_is_exchange']));
+            $definition->addMethodCall('setExchange', array($binding['exchange']));
+            $definition->addMethodCall('isNowait', array($binding['nowait']));
+            $definition->addMethodCall('setRoutingKey', array($binding['routing_key']));
             $this->injectConnection($definition, $binding['connection']);
             $key = md5(json_encode($binding));
             if ($this->collectorEnabled) {
