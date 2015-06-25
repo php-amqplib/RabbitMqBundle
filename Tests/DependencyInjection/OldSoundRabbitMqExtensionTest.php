@@ -113,6 +113,44 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
+    public function testFooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => null,
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default',
+            'exchange'                  => 'foo',
+            'destination'               => 'bar',
+            'destination_is_exchange'   => false,
+            'nowait'                    => false,
+            'routing_key'               => 'baz',
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.%s_binding', $key);
+        $this->assertTrue($container->has($name));
+    }
+
+    public function testMooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => array('moo' => 'cow'),
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default2',
+            'exchange'                  => 'moo',
+            'destination'               => 'cow',
+            'destination_is_exchange'   => true,
+            'nowait'                    => true,
+            'routing_key'               => null,
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.%s_binding', $key);
+        $this->assertTrue($container->has($name));
+    }
+
     public function testFooProducerDefinition()
     {
         $container = $this->getContainer('test.yml');
