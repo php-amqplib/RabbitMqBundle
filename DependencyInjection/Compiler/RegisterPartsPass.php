@@ -18,6 +18,7 @@ class RegisterPartsPass implements CompilerPassInterface
 
         $tags = array(
             'old_sound_rabbit_mq.base_amqp',
+            'old_sound_rabbit_mq.binding',
             'old_sound_rabbit_mq.producer',
             'old_sound_rabbit_mq.consumer',
             'old_sound_rabbit_mq.multi_consumer',

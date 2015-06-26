@@ -129,7 +129,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         );
         ksort($binding);
         $key = md5(json_encode($binding));
-        $name = sprintf('old_sound_rabbit_mq.%s_binding', $key);
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
         $this->assertTrue($container->has($name));
         $definition = $container->getDefinition($name);
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
@@ -151,7 +151,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         );
         ksort($binding);
         $key = md5(json_encode($binding));
-        $name = sprintf('old_sound_rabbit_mq.%s_binding', $key);
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
         $this->assertTrue($container->has($name));
         $definition = $container->getDefinition($name);
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default2');

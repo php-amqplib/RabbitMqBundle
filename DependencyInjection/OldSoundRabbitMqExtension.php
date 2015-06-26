@@ -118,7 +118,7 @@ class OldSoundRabbitMqExtension extends Extension
                 // in the context of a binding, I don't thing logged channels are needed?
                 $this->injectLoggedChannel($definition, $key, $binding['connection']);
             }
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_binding', $key), $definition);
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.binding.%s', $key), $definition);
         }
     }
 
