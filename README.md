@@ -522,6 +522,21 @@ Be aware that queues providers are responsible for the proper calls to `setDeque
 (not `ConsumerInterface`). In case service providing queues implements `DequeuerAwareInterface`, a call to
 `setDequeuer` is added to the definition of the service with a `DequeuerInterface` currently being a `MultipleConsumer`.
 
+### Arbitrary Bindings ###
+
+You may find that your application has a complex workflow and you you need to have arbitrary binding. Arbitrary
+binding scenarios might include exchange to exchange bindings via `destination_is_exchange` property.
+
+```yaml
+bindings:
+    - {exchange: foo, destination: bar, routing_key: 'baz.*' }
+    - {exchange: foo1, destination: foo, routing_key: 'baz.*' destination_is_exchange: true}
+```
+
+The rabbitmq:setup-fabric command will declare exchanges and queues as defined in your producer, consumer
+and multi consumer configurations before it creates your arbitrary bindings. However, the rabbitmq:setup-fabric will
+*NOT* declare addition queues and exchanges defined in the bindings. It's up to you to make sure exchanges/queues are declared.
+
 ### Dynamic Consumers ###
 
 Sometimes you have to change the consumer's configuration on the fly.
