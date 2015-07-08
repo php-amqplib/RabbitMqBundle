@@ -15,6 +15,7 @@ class PurgeConsumerCommand extends ConsumerCommand
     protected function configure()
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
+             ->setDescription('Purge a consumer\'s queue')
              ->addOption('no-confirmation', null, InputOption::VALUE_NONE, 'Whether it must be confirmed before purging');
 
         $this->setName('rabbitmq:purge');

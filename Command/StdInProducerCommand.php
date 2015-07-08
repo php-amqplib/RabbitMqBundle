@@ -19,6 +19,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
         $this
             ->setName('rabbitmq:stdin-producer')
             ->addArgument('name', InputArgument::REQUIRED, 'Producer Name')
+            ->setDescription('Executes a consumer that reads data from STDIN')
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, 'Payload Format', self::FORMAT_PHP)
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Enable Debugging', false)
