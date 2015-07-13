@@ -86,7 +86,17 @@ class MultipleConsumer extends Consumer
 		}
 
 		$this->onConsume($this, $msg);
-		$processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
-		$this->handleProcessMessage($msg, $processFlag);
+		try {
+			$processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
+			$this->handleProcessMessage($msg, $processFlag);
+
+		} catch (TerminateException $e) {
+			$this->handleProcessMessage($msg, $e->getResponse());
+			throw $e;
+
+		} catch (\Exception $e) {
+			$this->onReject($this, $msg, IConsumer::MSG_REJECT_REQUEUE);
+			throw $e;
+		}
 	}
 }
