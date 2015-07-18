@@ -435,7 +435,7 @@ public function indexAction($name)
 {
     $expiration = 5; // seconds
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
-    $client->addRequest($body, $server, $requestId, $expiration);
+    $client->addRequest($body, $server, $requestId, $routingKey, $expiration);
     try {
         $replies = $client->getReplies();
         // process $replies['request_id'];
