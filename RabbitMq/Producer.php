@@ -6,7 +6,7 @@ use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use PhpAmqpLib\Message\AMQPMessage;
 
 /**
- * Prodcuer, that publishes AMQP Messages
+ * Producer, that publishes AMQP Messages
  */
 class Producer extends BaseAmqp implements ProducerInterface
 {
