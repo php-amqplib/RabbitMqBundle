@@ -39,7 +39,7 @@ before_script:
   - php vendor/code-checker/src/code-checker.php -d src
   - php vendor/code-checker/src/code-checker.php -d tests
 
-script: vendor/bin/tester -p php -c ./tests/php.ini-unix ./tests/KdybyTests/
+script: vendor/bin/tester -s -p php -c ./tests/php.ini-unix ./tests/KdybyTests/
 
 after_failure:
   - 'for i in $(find ./tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done'
