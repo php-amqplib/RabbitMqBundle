@@ -1,5 +1,7 @@
 language: php
 
+sudo: false
+
 env:
   - NETTE=nette-2.3-dev
   - NETTE=nette-2.3
