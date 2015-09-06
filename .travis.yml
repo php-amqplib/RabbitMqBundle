@@ -3,9 +3,10 @@ language: php
 sudo: false
 
 env:
-  - NETTE=nette-2.3-dev
-  - NETTE=nette-2.3
-  - NETTE=nette-2.2
+  matrix:
+    - NETTE=nette-2.3-dev COMPOSER_EXTRA_ARGS=""
+    - NETTE=nette-2.3 COMPOSER_EXTRA_ARGS=""
+    - NETTE=nette-2.3 COMPOSER_EXTRA_ARGS="--prefer-lowest"
 
 services:
   - rabbitmq
@@ -29,7 +30,7 @@ install:
   - mkdir -p vendor/bin
   - wget -O vendor/bin/composer-nette https://raw.githubusercontent.com/Kdyby/TesterExtras/master/bin/composer-nette.php
   - php vendor/bin/composer-nette
-  - composer install --no-interaction --prefer-source
+  - composer update --no-interaction --prefer-source $COMPOSER_EXTRA_ARGS
 
 before_script:
   - composer create-project --prefer-source --no-interaction jakub-onderka/php-parallel-lint vendor/php-parallel-lint ~0.8
