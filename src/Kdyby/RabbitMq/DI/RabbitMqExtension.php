@@ -238,7 +238,6 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 
 			$connection = $builder->addDefinition($serviceName = $this->prefix($name . '.connection'))
 				->setClass('Kdyby\RabbitMq\Connection')
-				->setInject(FALSE)
 				->setArguments(array(
 					$config['host'],
 					$config['port'],
