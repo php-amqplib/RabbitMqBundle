@@ -2,8 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 abstract class BaseAmqp
 {
@@ -39,11 +39,11 @@ abstract class BaseAmqp
     );
 
     /**
-     * @param AMQPConnection   $conn
-     * @param AMQPChannel|null $ch
-     * @param null             $consumerTag
+     * @param AMQPStreamConnection $conn
+     * @param AMQPChannel|null     $ch
+     * @param null                 $consumerTag
      */
-    public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
+    public function __construct(AMQPStreamConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         $this->conn = $conn;
         $this->ch = $ch;
