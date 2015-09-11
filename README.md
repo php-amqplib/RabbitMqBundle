@@ -23,7 +23,7 @@ Installation
 The best way to install Kdyby/RabbitMq is using  [Composer](http://getcomposer.org/):
 
 ```sh
-$ composer require kdyby/rabbitmq:@dev
+$ composer require kdyby/rabbitmq
 ```
 
 
