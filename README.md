@@ -11,7 +11,7 @@ This is a fork of [videlalvaro/RabbitMqBundle](https://github.com/videlalvaro/Ra
 Requirements
 ------------
 
-Kdyby/RabbitMq requires PHP 5.4 or higher with cUrl extension enabled.
+Kdyby/RabbitMq requires PHP 5.4 or higher.
 
 - [Nette Framework](https://github.com/nette/nette)
 - [php-amqplib](https://github.com/videlalvaro/php-amqplib)
