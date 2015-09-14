@@ -48,6 +48,16 @@ class MultipleConsumer extends Consumer
 
 
 
+	/**
+	 * @return \array[]|\callable[][]
+	 */
+	public function getQueues()
+	{
+		return $this->queues;
+	}
+
+
+
 	protected function setupConsumer()
 	{
 		if ($this->autoSetupFabric) {
