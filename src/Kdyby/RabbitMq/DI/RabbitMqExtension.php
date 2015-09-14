@@ -215,8 +215,13 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 
 		$this->loadConsole();
+	}
 
-		unset($builder->parameters[$this->name]);
+
+
+	public function beforeCompile()
+	{
+		unset($this->getContainerBuilder()->parameters[$this->name]);
 	}
 
 
