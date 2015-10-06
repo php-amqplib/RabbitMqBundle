@@ -4,12 +4,11 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class BaseAmqpTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \PhpAmqpLib\Exception\AMQPRuntimeException
+     * @expectedException \ErrorException
      */
     public function testLazyConnection()
     {
