@@ -27,14 +27,10 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 ### For Symfony Framework >= 2.3 ###
 
-Require the bundle in your composer.json file:
+Require the bundle and its dependencies with composer:
 
-````
-{
-    "require": {
-        "oldsound/rabbitmq-bundle": "1.*",
-    }
-}
+```bash
+$ composer require oldsound/rabbitmq-bundle
 ```
 
 Register the bundle:
@@ -48,12 +44,6 @@ public function registerBundles()
         new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
     );
 }
-```
-
-Install the bundle:
-
-```
-$ composer update oldsound/rabbitmq-bundle
 ```
 
 Enjoy !
