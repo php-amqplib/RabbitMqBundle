@@ -22,5 +22,4 @@ env:
 
 before_script:
     - composer self-update
-    - composer require --no-update symfony/framework-bundle:${SYMFONY_VERSION}
     - composer install --prefer-source
