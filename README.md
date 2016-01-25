@@ -1,3 +1,7 @@
+# Looking for New Maintainer #
+
+See issue: https://github.com/videlalvaro/RabbitMqBundle/issues/327
+
 # RabbitMqBundle #
 
 ## About ##
