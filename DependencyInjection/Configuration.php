@@ -218,6 +218,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->booleanNode('expect_serialized_response')->defaultTrue()->end()
                             ->scalarNode('unserializer')->defaultValue('unserialize')->end()
+                            ->booleanNode('direct_reply_to')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()

@@ -164,6 +164,7 @@ old_sound_rabbit_mq:
         foo_client:
             connection:      foo_connection
             unserializer:    json_decode
+            direct_reply_to: true
 
         default_client:
 

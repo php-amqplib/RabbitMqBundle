@@ -373,6 +373,9 @@ class OldSoundRabbitMqExtension extends Extension
             if (array_key_exists('unserializer', $client)) {
                 $definition->addMethodCall('setUnserializer', array($client['unserializer']));
             }
+            if (array_key_exists('direct_reply_to', $client)) {
+                $definition->addMethodCall('setDirectReplyTo', array($client['direct_reply_to']));
+            }
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
         }

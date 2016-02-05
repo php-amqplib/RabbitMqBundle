@@ -376,6 +376,7 @@ rpc_clients:
     integer_store:
         connection: default
         unserializer: json_decode
+        direct_reply_to: false
 rpc_servers:
     random_int:
         connection: default
@@ -475,6 +476,12 @@ public function indexAction($name)
 ```
 
 Is very similar to the previous example, we just have an extra `addRequest` call. Also we provide meaningful request identifiers so later will be easier for us to find the reply we want in the __$replies__ array.
+
+### Direct Reply-To clients ###
+
+To enable [direct reply-to clients](https://www.rabbitmq.com/direct-reply-to.html) you just have to enable option __direct_reply_to__ on the __rpc_clients__ configuration for the client.
+
+This option will use pseudo-queue __amq.rabbitmq.reply-to__ when doing RPC calls. On the RPC server there is no modification needed.
 
 ### Multiple Consumers ###
 
