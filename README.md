@@ -58,7 +58,7 @@ Require the bundle in your composer.json file:
 ````
 {
     "require": {
-        "oldsound/rabbitmq-bundle": "~1.6",
+        "php-amqplib/rabbitmq-bundle": "~1.6",
     }
 }
 ```
