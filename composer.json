@@ -1,6 +1,9 @@
 {
-    "name": "oldsound/rabbitmq-bundle",
-    "description": "Integrates php-amqplib with Symfony2 and RabbitMq",
+    "name": "php-amqplib/rabbitmq-bundle",
+    "replace": {
+        "oldsound/rabbitmq-bundle": "self.version"
+    },
+    "description": "Formerly oldsound/rabbitmq-bundle. Integrates php-amqplib with Symfony2 and RabbitMq",
     "keywords": ["symfony2", "rabbitmq", "message", "queue", "amqp"],
     "type": "symfony-bundle",
     "license": "MIT",

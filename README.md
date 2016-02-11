@@ -1,12 +1,8 @@
-# Looking for New Maintainer #
-
-See issue: https://github.com/videlalvaro/RabbitMqBundle/issues/327
-
 # RabbitMqBundle #
 
 ## About ##
 
-The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/videlalvaro/php-amqplib) library.
+The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/php-amqplib/php-amqplib) library.
 
 The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/videlalvaro/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
 
@@ -25,7 +21,7 @@ All the examples expect a running RabbitMQ server.
 
 This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference. See the slides [here](http://www.slideshare.net/old_sound/theres-a-rabbit-on-my-symfony).
 
-[![Build Status](https://secure.travis-ci.org/videlalvaro/RabbitMqBundle.png?branch=master)](http://travis-ci.org/videlalvaro/RabbitMqBundle)
+[![Build Status](https://secure.travis-ci.org/php-amqplib/RabbitMqBundle.png?branch=master)](http://travis-ci.org/php-amqplib/RabbitMqBundle)
 
 ## Installation ##
 
@@ -34,7 +30,7 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 Require the bundle and its dependencies with composer:
 
 ```bash
-$ composer require oldsound/rabbitmq-bundle
+$ composer require php-amqplib/rabbitmq-bundle
 ```
 
 Register the bundle:
@@ -352,7 +348,7 @@ As you can see, this is as simple as implementing one method: __ConsumerInterfac
 
 Keep in mind that your callbacks _need to be registered_ as normal Symfony2 services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
-See [https://github.com/videlalvaro/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/videlalvaro/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
+See [https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
 ### Recap ###
 
