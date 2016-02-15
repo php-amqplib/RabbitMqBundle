@@ -17,7 +17,7 @@
         "symfony/config"               : "~2.3 || ~3.0",
         "symfony/yaml"                 : "~2.3 || ~3.0",
         "symfony/console"              : "~2.3 || ~3.0",
-        "videlalvaro/php-amqplib"      : "~2.6"
+        "php-amqplib/php-amqplib"      : "~2.6"
     },
     "suggest": {
         "symfony/framework-bundle" : "To use this lib as a full Symfony Bundle and to use the profiler data collector"
