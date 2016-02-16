@@ -25,33 +25,13 @@ matrix:
       env: SYMFONY_VERSION=2.8.*
 
     - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.3.*
-        - PHPUNIT_VERSION=4.8.*
+      env: SYMFONY_VERSION=2.3.*
     - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.4.*
-        - PHPUNIT_VERSION=4.8.*
+      env: SYMFONY_VERSION=2.7.*
     - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.5.*
-        - PHPUNIT_VERSION=4.8.*
+      env: SYMFONY_VERSION=2.8.*
     - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.6.*
-        - PHPUNIT_VERSION=4.8.*
-    - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.7.*
-        - PHPUNIT_VERSION=4.8.*
-    - php: 5.5
-      env:
-        - SYMFONY_VERSION=2.8.*
-        - PHPUNIT_VERSION=4.8.*
-    - php: 5.5
-      env:
-        - SYMFONY_VERSION=3.0.*
-        - PHPUNIT_VERSION=4.8.*
+      env: SYMFONY_VERSION=3.0.*
 
     - php: 5.6
       env: SYMFONY_VERSION=2.3.*
@@ -73,12 +53,10 @@ matrix:
 
 env:
   global:
-    - PHPUNIT_VERSION=""
     - SYMFONY_VERSION=""
 
 before_install:
   - if [ "$SYMFONY_VERSION" != "" ]; then composer require --no-update symfony/framework-bundle "$SYMFONY_VERSION"; fi
-  - if [ "$PHPUNIT_VERSION" != "" ]; then composer require --dev --no-update phpunit/phpunit "$PHPUNIT_VERSION"; fi
 
 install:
   - composer install --prefer-source
