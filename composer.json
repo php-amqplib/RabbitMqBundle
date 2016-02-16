@@ -1,35 +1,36 @@
 {
     "name": "php-amqplib/rabbitmq-bundle",
-    "replace": {
-        "oldsound/rabbitmq-bundle": "self.version"
-    },
-    "description": "Formerly oldsound/rabbitmq-bundle. Integrates php-amqplib with Symfony2 and RabbitMq",
-    "keywords": ["symfony2", "rabbitmq", "message", "queue", "amqp"],
     "type": "symfony-bundle",
+    "description": "Integrates php-amqplib with Symfony2 and RabbitMq. Formerly oldsound/rabbitmq-bundle.",
+    "keywords": ["symfony2", "rabbitmq", "message", "queue", "amqp"],
     "license": "MIT",
     "authors": [{
         "name" : "Alvaro Videla"
     }],
     "require": {
-        "php"                          : ">=5.3.0",
-        "symfony/dependency-injection" : "~2.3 || ~3.0",
-        "symfony/event-dispatcher"     : "~2.3 || ~3.0",
-        "symfony/config"               : "~2.3 || ~3.0",
-        "symfony/yaml"                 : "~2.3 || ~3.0",
-        "symfony/console"              : "~2.3 || ~3.0",
-        "php-amqplib/php-amqplib"      : "~2.6"
-    },
-    "suggest": {
-        "symfony/framework-bundle" : "To use this lib as a full Symfony Bundle and to use the profiler data collector"
+        "php":                          ">=5.3.0",
+
+        "symfony/dependency-injection": "~2.3 || ~3.0",
+        "symfony/event-dispatcher":     "~2.3 || ~3.0",
+        "symfony/config":               "~2.3 || ~3.0",
+        "symfony/yaml":                 "~2.3 || ~3.0",
+        "symfony/console":              "~2.3 || ~3.0",
+        "php-amqplib/php-amqplib":      "~2.6"
     },
     "require-dev": {
-        "symfony/serializer": "~2.3 || ~3.0",
-        "symfony/debug"     : "~2.3 || ~3.0",
-        "phpunit/phpunit" : ">=3.7.0"
+        "symfony/serializer":           "~2.3 || ~3.0",
+        "symfony/debug":                "~2.3 || ~3.0",
+        "phpunit/phpunit":              "~4.8 || ~5.0"
+    },
+    "replace": {
+        "oldsound/rabbitmq-bundle": "self.version"
+    },
+    "suggest": {
+        "symfony/framework-bundle": "To use this lib as a full Symfony Bundle and to use the profiler data collector"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.6.x-dev"
+            "dev-master": "1.9.x-dev"
         }
     },
     "autoload": {
