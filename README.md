@@ -1,5 +1,7 @@
 # RabbitMqBundle #
 
+[![Join the chat at https://gitter.im/php-amqplib/RabbitMqBundle](https://badges.gitter.im/php-amqplib/RabbitMqBundle.svg)](https://gitter.im/php-amqplib/RabbitMqBundle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## About ##
 
 The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/php-amqplib/php-amqplib) library.
