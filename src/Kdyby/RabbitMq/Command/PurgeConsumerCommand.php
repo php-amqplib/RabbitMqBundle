@@ -58,7 +58,7 @@ class PurgeConsumerCommand extends Command
 
 		/** @var Consumer $consumer */
 		$consumer = $this->connection->getConsumer($input->getArgument('name'));
-		$consumer->purge($input->getArgument('name'));
+		$consumer->purge();
 
 		return 0;
 	}
