@@ -13,8 +13,6 @@ namespace Kdyby\RabbitMq\Diagnostics;
 use Kdyby\RabbitMq\Connection;
 use Nette;
 use Nette\Utils\Html;
-use Tracy\Bar;
-use Tracy\BlueScreen;
 use Tracy\Debugger;
 use Tracy\IBarPanel;
 

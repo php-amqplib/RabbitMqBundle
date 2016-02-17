@@ -4,7 +4,6 @@ namespace Kdyby\RabbitMq;
 
 use Nette;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 
 
