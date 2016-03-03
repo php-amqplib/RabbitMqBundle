@@ -45,7 +45,10 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
-    public function processMessage(AMQPMessage $msg) {}
+    public function processMessage(AMQPMessage $msg)
+    {
+        //To be implemented by descendant classes
+    }
 
     protected function maybeStopConsumer()
     {
@@ -83,8 +86,8 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
      * Sets the qos settings for the current channel
      * Consider that prefetchSize and global do not work with rabbitMQ version <= 8.0
      *
-     * @param int  $prefetchSize
-     * @param int  $prefetchCount
+     * @param int $prefetchSize
+     * @param int $prefetchCount
      * @param bool $global
      */
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
