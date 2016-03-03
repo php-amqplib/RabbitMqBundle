@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use PhpAmqpLib\Message\AMQPMessage;
+
 abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
     protected $target;
@@ -42,6 +44,8 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         }
         $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
+
+    public function processMessage(AMQPMessage $msg) {}
 
     protected function maybeStopConsumer()
     {
