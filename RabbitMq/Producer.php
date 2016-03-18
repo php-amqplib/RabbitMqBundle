@@ -49,8 +49,10 @@ class Producer extends BaseAmqp implements ProducerInterface
 
         $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
-        $headersTable = new AMQPTable($headers);
-        $msg->set('application_headers', $headersTable);
+        if(!empty($headers)){
+            $headersTable = new AMQPTable($headers);
+            $msg->set('application_headers', $headersTable);
+        }
 
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
     }
