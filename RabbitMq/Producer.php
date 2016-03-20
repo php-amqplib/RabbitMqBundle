@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 
 /**
  * Producer, that publishes AMQP Messages
@@ -38,14 +39,21 @@ class Producer extends BaseAmqp implements ProducerInterface
      * @param string $msgBody
      * @param string $routingKey
      * @param array $additionalProperties
+     * @param array $headers
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array())
+    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null)
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
 
         $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+
+        if(!empty($headers)){
+            $headersTable = new AMQPTable($headers);
+            $msg->set('application_headers', $headersTable);
+        }
+
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string) $routingKey);
     }
 }
