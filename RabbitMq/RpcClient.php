@@ -91,7 +91,7 @@ class RpcClient extends BaseAmqp
         if (is_callable($callback)) {
             $this->notifyCallback = $callback;
         } else {
-            throw new AMQPInvalidArgumentException('Firs parameter expects to be callable');
+            throw new AMQPInvalidArgumentException('First parameter expects to be callable');
         }
     }
 }
