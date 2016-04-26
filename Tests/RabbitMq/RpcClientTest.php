@@ -22,4 +22,38 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
         });
         $client->processMessage($message);
     }
+    
+    public function testProcessMessageWithNotifyMethod()
+    {
+        /** @var RpcClient $client */
+        $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
+            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->disableOriginalConstructor()
+            ->getMock();
+        $expectedNotify = 'message';
+        $message = $this->getMock('\PhpAmqpLib\Message\AMQPMessage', array('get'), array($expectedNotify));
+        $notified = false;
+        $client->notify(function ($message) use (&$notified) {
+            $notified = $message;
+        });
+
+        $client->initClient(false);
+        $client->processMessage($message);
+
+        $this->assertSame($expectedNotify, $notified);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidParameterOnNotify()
+    {
+        /** @var RpcClient $client */
+        $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
+            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $client->notify('not a callable');
+    }
 }
