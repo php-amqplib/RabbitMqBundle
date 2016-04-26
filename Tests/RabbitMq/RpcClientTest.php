@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
-use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +39,21 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
 
         $client->initClient(false);
         $client->processMessage($message);
-        
+
         $this->assertSame($expectedNotify, $notified);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidParameterOnNotify()
+    {
+        /** @var RpcClient $client */
+        $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
+            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $client->notify('not a callable');
     }
 }

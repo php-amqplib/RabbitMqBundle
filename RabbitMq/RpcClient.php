@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
-use PhpAmqpLib\Exception\AMQPInvalidArgumentException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClient extends BaseAmqp
@@ -91,7 +90,7 @@ class RpcClient extends BaseAmqp
         if (is_callable($callback)) {
             $this->notifyCallback = $callback;
         } else {
-            throw new AMQPInvalidArgumentException('First parameter expects to be callable');
+            throw new \InvalidArgumentException('First parameter expects to be callable');
         }
     }
 }
