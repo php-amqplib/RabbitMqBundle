@@ -361,6 +361,23 @@ This seems to be quite a lot of work for just sending messages, let's recap to h
 
 And that's it!
 
+### Audit / Logging ###
+
+This was a requirement to have a traceability of messages received/published.
+In order to enable this you'll need to add "audit" config to consumers or publishers.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:       default
+        exchange_options: {name: 'upload-picture', type: direct}
+        queue_options:    {name: 'upload-picture'}
+        callback:         upload_picture_service
+        audit: true
+```
+
+If you would like you can also treat logging from queues with different handlers in monolog, by referencing channel "phpamqplib"
+
 ### RPC or Reply/Response ###
 
 So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony2.

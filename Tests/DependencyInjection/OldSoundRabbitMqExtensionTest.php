@@ -805,6 +805,15 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $options[0]['passive']);
     }
 
+    public function testProducersWithLogger()
+    {
+        $container = $this->getContainer('config_with_audit.yml');
+        $this->assertTrue(
+            $container->getDefinition('old_sound_rabbit_mq.default_consumer_consumer')->hasTag('monolog.logger'),
+            'service should be marked for logger'
+        );
+    }
+
     private function getContainer($file, $debug = false)
     {
         $container = new ContainerBuilder(new ParameterBag(array('kernel.debug' => $debug)));

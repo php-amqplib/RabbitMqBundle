@@ -4,6 +4,8 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 abstract class BaseAmqp
 {
@@ -16,6 +18,11 @@ abstract class BaseAmqp
     protected $autoSetupFabric = true;
     protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+    
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
@@ -53,6 +60,8 @@ abstract class BaseAmqp
         }
 
         $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
+
+        $this->logger = new NullLogger();
     }
 
     public function __destruct()
@@ -186,5 +195,13 @@ abstract class BaseAmqp
      */
     public function disableAutoSetupFabric() {
         $this->autoSetupFabric = false;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 }

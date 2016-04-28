@@ -150,6 +150,10 @@ class OldSoundRabbitMqExtension extends Extension
                     $definition->addMethodCall('disableAutoSetupFabric');
                 }
 
+                if ($producer['audit']) {
+                    $this->injectLogger($definition);
+                }
+
                 $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
             }
         } else {
@@ -189,6 +193,10 @@ class OldSoundRabbitMqExtension extends Extension
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['audit']) {
+                $this->injectLogger($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
@@ -250,6 +258,10 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
+            if ($consumer['audit']) {
+                $this->injectLogger($definition);
+            }
+
             $name = sprintf('old_sound_rabbit_mq.%s_multiple', $key);
             $this->container->setDefinition($name, $definition);
             if ($consumer['queues_provider']) {
@@ -303,6 +315,10 @@ class OldSoundRabbitMqExtension extends Extension
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['audit']) {
+                $this->injectLogger($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_dynamic', $key);
@@ -480,5 +496,12 @@ class OldSoundRabbitMqExtension extends Extension
         if ($refClass->implementsInterface('OldSound\RabbitMqBundle\RabbitMq\DequeuerAwareInterface')) {
             $callbackDefinition->addMethodCall('setDequeuer', array(new Reference($name)));
         }
+    }
+
+    private function injectLogger(Definition $definition)
+    {
+        $definition->addTag('monolog.logger', [
+            'channel' => 'phpamqplib'
+        ]);
     }
 }

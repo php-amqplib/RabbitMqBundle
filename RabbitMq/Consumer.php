@@ -67,9 +67,36 @@ class Consumer extends BaseConsumer
 
     public function processMessage(AMQPMessage $msg)
     {
-        $processFlag = call_user_func($this->callback, $msg);
+        try {
+            $processFlag = call_user_func($this->callback, $msg);
+            $this->handleProcessMessage($msg, $processFlag);
+            $this->logger->debug('Queue message processed', array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'return_code' => $processFlag
+                )
+            ));
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        } catch (\Error $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        }
 
-        $this->handleProcessMessage($msg, $processFlag);
     }
 
     protected function handleProcessMessage(AMQPMessage $msg, $processFlag)
