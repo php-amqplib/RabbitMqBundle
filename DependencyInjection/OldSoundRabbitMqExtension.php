@@ -500,8 +500,8 @@ class OldSoundRabbitMqExtension extends Extension
 
     private function injectLogger(Definition $definition)
     {
-        $definition->addTag('monolog.logger', [
+        $definition->addTag('monolog.logger', array(
             'channel' => 'phpamqplib'
-        ]);
+        ));
     }
 }
