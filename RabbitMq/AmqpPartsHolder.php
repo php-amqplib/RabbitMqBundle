@@ -18,6 +18,7 @@ class AmqpPartsHolder
 
 	public function getParts($type)
 	{
-		return $this->parts[(string) $type];
+        $type = (string) $type;
+		return isset($this->parts[$type]) ? $this->parts[$type] : array();
 	}
 }

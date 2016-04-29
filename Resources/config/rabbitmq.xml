@@ -7,6 +7,7 @@
         <parameter key="old_sound_rabbit_mq.connection.class">PhpAmqpLib\Connection\AMQPConnection</parameter>
         <parameter key="old_sound_rabbit_mq.lazy.connection.class">PhpAmqpLib\Connection\AMQPLazyConnection</parameter>
         <parameter key="old_sound_rabbit_mq.connection_factory.class">OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory</parameter>
+        <parameter key="old_sound_rabbit_mq.binding.class">OldSound\RabbitMqBundle\RabbitMq\Binding</parameter>
         <parameter key="old_sound_rabbit_mq.producer.class">OldSound\RabbitMqBundle\RabbitMq\Producer</parameter>
         <parameter key="old_sound_rabbit_mq.consumer.class">OldSound\RabbitMqBundle\RabbitMq\Consumer</parameter>
         <parameter key="old_sound_rabbit_mq.multi_consumer.class">OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer</parameter>
