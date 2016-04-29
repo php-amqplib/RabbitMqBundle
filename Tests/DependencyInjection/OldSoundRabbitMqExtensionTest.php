@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -113,6 +114,93 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
+    public function testFooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => null,
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default',
+            'exchange'                  => 'foo',
+            'destination'               => 'bar',
+            'destination_is_exchange'   => false,
+            'nowait'                    => false,
+            'routing_key'               => 'baz',
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
+        $this->assertTrue($container->has($name));
+        $definition = $container->getDefinition($name);
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertBindingMethodCalls($definition, $binding);
+    }
+
+    public function testMooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => array('moo' => 'cow'),
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default2',
+            'exchange'                  => 'moo',
+            'destination'               => 'cow',
+            'destination_is_exchange'   => true,
+            'nowait'                    => true,
+            'routing_key'               => null,
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
+        $this->assertTrue($container->has($name));
+        $definition = $container->getDefinition($name);
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default2');
+        $this->assertBindingMethodCalls($definition, $binding);
+    }
+
+    protected function assertBindingMethodCalls(Definition $definition, $binding)
+    {
+        $this->assertEquals(array(
+            array(
+                'setArguments',
+                array(
+                    $binding['arguments']
+                )
+            ),
+            array(
+                'setDestination',
+                array(
+                    $binding['destination']
+                )
+            ),
+            array(
+                'setDestinationIsExchange',
+                array(
+                    $binding['destination_is_exchange']
+                )
+            ),
+            array(
+                'setExchange',
+                array(
+                    $binding['exchange']
+                )
+            ),
+            array(
+                'isNowait',
+                array(
+                    $binding['nowait']
+                )
+            ),
+            array(
+                'setRoutingKey',
+                array(
+                    $binding['routing_key']
+                )
+            ),
+        ),
+            $definition->getMethodCalls()
+        );
+    }
     public function testFooProducerDefinition()
     {
         $container = $this->getContainer('test.yml');

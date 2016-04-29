@@ -46,6 +46,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->collectorEnabled = $this->config['enable_collector'];
 
         $this->loadConnections();
+        $this->loadBindings();
         $this->loadProducers();
         $this->loadConsumers();
         $this->loadMultipleConsumers();
@@ -93,6 +94,31 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
+        }
+    }
+
+    protected function loadBindings()
+    {
+        if ($this->config['sandbox']) {
+            return;
+        }
+        foreach ($this->config['bindings'] as $binding) {
+            ksort($binding);
+            $definition = new Definition($binding['class']);
+            $definition->addTag('old_sound_rabbit_mq.binding');
+            $definition->addMethodCall('setArguments', array($binding['arguments']));
+            $definition->addMethodCall('setDestination', array($binding['destination']));
+            $definition->addMethodCall('setDestinationIsExchange', array($binding['destination_is_exchange']));
+            $definition->addMethodCall('setExchange', array($binding['exchange']));
+            $definition->addMethodCall('isNowait', array($binding['nowait']));
+            $definition->addMethodCall('setRoutingKey', array($binding['routing_key']));
+            $this->injectConnection($definition, $binding['connection']);
+            $key = md5(json_encode($binding));
+            if ($this->collectorEnabled) {
+                // in the context of a binding, I don't thing logged channels are needed?
+                $this->injectLoggedChannel($definition, $key, $binding['connection']);
+            }
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.binding.%s', $key), $definition);
         }
     }
 

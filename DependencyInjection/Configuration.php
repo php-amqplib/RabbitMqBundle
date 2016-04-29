@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
         ;
 
         $this->addConnections($rootNode);
+        $this->addBindings($rootNode);
         $this->addProducers($rootNode);
         $this->addConsumers($rootNode);
         $this->addMultipleConsumers($rootNode);
@@ -71,6 +72,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+
     protected function addProducers(ArrayNodeDefinition $node)
     {
         $node
@@ -86,6 +88,30 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.producer.class%')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addBindings(ArrayNodeDefinition $node)
+    {
+        $node
+            ->fixXmlConfig('binding')
+            ->children()
+                ->arrayNode('bindings')
+                    ->canBeUnset()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('exchange')->defaultNull()->end()
+                            ->scalarNode('destination')->defaultNull()->end()
+                            ->scalarNode('routing_key')->defaultNull()->end()
+                            ->booleanNode('nowait')->defaultFalse()->end()
+                            ->booleanNode('destination_is_exchange')->defaultFalse()->end()
+                            ->variableNode('arguments')->defaultNull()->end()
+                            ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.binding.class%')->end()
                         ->end()
                     ->end()
                 ->end()
