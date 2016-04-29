@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: brandon
- * Date: 6/24/15
- * Time: 3:49 PM
- */
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
-
 
 class Binding extends BaseAmqp
 {
