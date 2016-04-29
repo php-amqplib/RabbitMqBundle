@@ -150,7 +150,7 @@ class OldSoundRabbitMqExtension extends Extension
                     $definition->addMethodCall('disableAutoSetupFabric');
                 }
 
-                if ($producer['audit']) {
+                if ($producer['enable_logger']) {
                     $this->injectLogger($definition);
                 }
 
@@ -183,7 +183,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
-            if(isset($consumer['idle_timeout'])) {
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
             if (!$consumer['auto_setup_fabric']) {
@@ -195,7 +195,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
-            if ($consumer['audit']) {
+            if ($consumer['enable_logger']) {
                 $this->injectLogger($definition);
             }
 
@@ -219,7 +219,7 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
-                $queues[$queueOptions['name']]  = $queueOptions;
+                $queues[$queueOptions['name']] = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
                 $callbacks[] = new Reference($queueOptions['callback']);
             }
@@ -246,7 +246,7 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
-            if(isset($consumer['idle_timeout'])) {
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
             if (!$consumer['auto_setup_fabric']) {
@@ -258,7 +258,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
-            if ($consumer['audit']) {
+            if ($consumer['enable_logger']) {
                 $this->injectLogger($definition);
             }
 
@@ -272,18 +272,18 @@ class OldSoundRabbitMqExtension extends Extension
             }
         }
     }
-    
+
     protected function loadDynamicConsumers()
-    {   
+    {
         foreach ($this->config['dynamic_consumers'] as $key => $consumer) {
-            
+
             if (empty($consumer['queue_options_provider'])) {
                 throw new InvalidConfigurationException(
                     "Error on loading $key dynamic consumer. " .
                     "'queue_provider' parameter should be defined."
                 );
             }
-            
+
             $definition = new Definition('%old_sound_rabbit_mq.dynamic_consumer.class%');
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
@@ -299,13 +299,13 @@ class OldSoundRabbitMqExtension extends Extension
                     $consumer['qos_options']['global']
                 ));
             }
-            
+
             $definition->addMethodCall(
-                    'setQueueOptionsProvider',
-                    array(new Reference($consumer['queue_options_provider']))
-                );
-            
-            if(isset($consumer['idle_timeout'])) {
+                'setQueueOptionsProvider',
+                array(new Reference($consumer['queue_options_provider']))
+            );
+
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
             if (!$consumer['auto_setup_fabric']) {
@@ -317,7 +317,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
             }
 
-            if ($consumer['audit']) {
+            if ($consumer['enable_logger']) {
                 $this->injectLogger($definition);
             }
 
@@ -456,7 +456,7 @@ class OldSoundRabbitMqExtension extends Extension
 
     protected function injectLoggedChannel(Definition $definition, $name, $connectionName)
     {
-        $id      = sprintf('old_sound_rabbit_mq.channel.%s', $name);
+        $id = sprintf('old_sound_rabbit_mq.channel.%s', $name);
         $channel = new Definition('%old_sound_rabbit_mq.logged.channel.class%');
         $channel
             ->setPublic(false)
@@ -487,12 +487,12 @@ class OldSoundRabbitMqExtension extends Extension
      */
     protected function addDequeuerAwareCall($callback, $name)
     {
-        if (! $this->container->has($callback)) {
+        if (!$this->container->has($callback)) {
             return;
         }
 
         $callbackDefinition = $this->container->findDefinition($callback);
-        $refClass           = new \ReflectionClass($callbackDefinition->getClass());
+        $refClass = new \ReflectionClass($callbackDefinition->getClass());
         if ($refClass->implementsInterface('OldSound\RabbitMqBundle\RabbitMq\DequeuerAwareInterface')) {
             $callbackDefinition->addMethodCall('setDequeuer', array(new Reference($name)));
         }
@@ -503,5 +503,8 @@ class OldSoundRabbitMqExtension extends Extension
         $definition->addTag('monolog.logger', array(
             'channel' => 'phpamqplib'
         ));
+        if ($this->container->has('logger')) {
+            $definition->addMethodCall('setLogger', array(new Reference('logger')));
+        }
     }
 }

@@ -19,4 +19,7 @@ old_sound_rabbit_mq:
             queue_options:
                 name:       default_queue
             callback:       default.callback
-            audit:      true
+            enable_logger:      true
+services:
+    logger:
+        class: \stdClass
