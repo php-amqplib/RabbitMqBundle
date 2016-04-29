@@ -597,7 +597,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFooRpcClientDefinition()
     {
-        $container = $this->getContainer('test.yml');
+        $container = $this->getContainer('rpc-clients.yml');
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_client_rpc'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_client_rpc');
@@ -615,7 +615,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultRpcClientDefinition()
     {
-        $container = $this->getContainer('test.yml');
+        $container = $this->getContainer('rpc-clients.yml');
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.default_client_rpc'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_client_rpc');
@@ -628,6 +628,26 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             $definition->getMethodCalls()
         );
+        $this->assertFalse($definition->isLazy());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
+    }
+
+    public function testLazyRpcClientDefinition()
+    {
+        $container = $this->getContainer('rpc-clients.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.lazy_client_rpc'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.lazy_client_rpc');
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.lazy_client');
+        $this->assertEquals(
+            array(
+                array('initClient', array(true)),
+                array('setUnserializer', array('unserialize'))
+            ),
+            $definition->getMethodCalls()
+        );
+        $this->assertTrue($definition->isLazy());
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
     }
 

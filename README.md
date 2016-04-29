@@ -370,8 +370,9 @@ Let's add a RPC client and server into the configuration:
 ```yaml
 rpc_clients:
     integer_store:
-        connection: default
-        unserializer: json_decode
+        connection: default #default: default
+        unserializer: json_decode #default: unserialize
+        lazy: true #default: false
 rpc_servers:
     random_int:
         connection: default
