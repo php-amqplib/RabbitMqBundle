@@ -23,16 +23,21 @@ class BindingTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    protected function prepareAMQPChannel()
+    protected function prepareAMQPChannel($channelId = null)
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+        $channelMock = $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $channelMock->expects($this->any())
+            ->method('getChannelId')
+            ->willReturn($channelId);
+        return $channelMock;
     }
 
     public function testQueueBind()
     {
-        $ch = $this->prepareAMQPChannel();
+        $ch = $this->prepareAMQPChannel('channel_id');
         $con = $this->prepareAMQPConnection();
 
         $source = 'example_source';
@@ -57,7 +62,7 @@ class BindingTest extends \PHPUnit_Framework_TestCase
 
     public function testExhangeBind()
     {
-        $ch = $this->prepareAMQPChannel();
+        $ch = $this->prepareAMQPChannel('channel_id');
         $con = $this->prepareAMQPConnection();
 
         $source = 'example_source';
