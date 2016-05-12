@@ -17,12 +17,12 @@ class MultipleConsumer extends Consumer
 	/**
 	 * @var array
 	 */
-	public $onConsume = array();
+	public $onConsume = [];
 
 	/**
 	 * @var array[]|callable[][]
 	 */
-	protected $queues = array();
+	protected $queues = [];
 
 
 
@@ -35,7 +35,7 @@ class MultipleConsumer extends Consumer
 
 	public function setQueues(array $queues)
 	{
-		$this->queues = array();
+		$this->queues = [];
 		foreach ($queues as $name => $queue) {
 			if (!isset($queue['callback'])) {
 				throw new InvalidArgumentException("The queue '$name' is missing a callback.");

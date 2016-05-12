@@ -26,37 +26,37 @@ class Consumer extends BaseConsumer
 	/**
 	 * @var array
 	 */
-	public $onConsume = array();
+	public $onConsume = [];
 
 	/**
 	 * @var array
 	 */
-	public $onReject = array();
+	public $onReject = [];
 
 	/**
 	 * @var array
 	 */
-	public $onAck = array();
+	public $onAck = [];
 
 	/**
 	 * @var array
 	 */
-	public $onStart = array();
+	public $onStart = [];
 
 	/**
 	 * @var array
 	 */
-	public $onStop = array();
+	public $onStop = [];
 
 	/**
 	 * @var array
 	 */
-	public $onTimeout = array();
+	public $onTimeout = [];
 
 	/**
 	 * @var array
 	 */
-	public $onError = array();
+	public $onError = [];
 
 	/**
 	 * @var int $memoryLimit

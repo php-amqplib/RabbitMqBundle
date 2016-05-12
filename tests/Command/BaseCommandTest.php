@@ -24,6 +24,6 @@ abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
 			->will($this->returnValue($this->definition));
 		$this->definition->expects($this->any())
 			->method('getArguments')
-			->will($this->returnValue(array()));
+			->will($this->returnValue([]));
 	}
 }

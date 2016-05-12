@@ -21,7 +21,7 @@ class RpcClient extends AmqpMember
 	/**
 	 * @var array
 	 */
-	protected $replies = array();
+	protected $replies = [];
 
 	/**
 	 * @var string
@@ -61,13 +61,13 @@ class RpcClient extends AmqpMember
 			throw new \InvalidArgumentException('You must provide a $requestId');
 		}
 
-		$msg = new AMQPMessage($msgBody, array(
+		$msg = new AMQPMessage($msgBody, [
 			'content_type' => 'text/plain',
 			'reply_to' => $this->queueName,
 			'delivery_mode' => 1, // non durable
 			'expiration' => $expiration * 1000,
 			'correlation_id' => $requestId
-		));
+		]);
 
 		$this->getChannel()->basic_publish($msg, $server, $routingKey);
 
@@ -82,8 +82,8 @@ class RpcClient extends AmqpMember
 
 	public function getReplies()
 	{
-		$this->replies = array();
-		$this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, array($this, 'processMessage'));
+		$this->replies = [];
+		$this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, [$this, 'processMessage']);
 
 		while (count($this->replies) < $this->requests) {
 			$this->getChannel()->wait(null, false, $this->timeout);

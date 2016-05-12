@@ -33,11 +33,11 @@ class ConsumerTest extends TestCase
 	public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = null)
 	{
 		/** @var Kdyby\RabbitMq\Connection|Mock $amqpConnection */
-		$amqpConnection = $this->getMockery('Kdyby\RabbitMq\Connection', array('127.0.0.1', 5672, 'guest', 'guest'))
+		$amqpConnection = $this->getMockery('Kdyby\RabbitMq\Connection', ['127.0.0.1', 5672, 'guest', 'guest'])
 			->makePartial();
 
 		/** @var Kdyby\RabbitMq\Channel|Mock $amqpChannel */
-		$amqpChannel = $this->getMockery('Kdyby\RabbitMq\Channel', array($amqpConnection))
+		$amqpChannel = $this->getMockery('Kdyby\RabbitMq\Channel', [$amqpConnection])
 			->makePartial();
 
 		$consumer = new Consumer($amqpConnection);
@@ -69,14 +69,14 @@ class ConsumerTest extends TestCase
 
 	public function processMessageProvider()
 	{
-		return array(
-			array(null, 'basic_ack'), // Remove message from queue only if callback return not false
-			array(true, 'basic_ack'), // Remove message from queue only if callback return not false
-			array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-			array(IConsumer::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-			array(IConsumer::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-			array(IConsumer::MSG_REJECT, 'basic_reject', false), // Reject and drop
-		);
+		return [
+			[null, 'basic_ack'], // Remove message from queue only if callback return not false
+			[true, 'basic_ack'], // Remove message from queue only if callback return not false
+			[false, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+			[IConsumer::MSG_ACK, 'basic_ack'], // Remove message from queue only if callback return not false
+			[IConsumer::MSG_REJECT_REQUEUE, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+			[IConsumer::MSG_REJECT, 'basic_reject', false], // Reject and drop
+		];
 	}
 
 }

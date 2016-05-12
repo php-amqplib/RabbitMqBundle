@@ -13,9 +13,9 @@ use Nette;
 interface IProducer
 {
 
-	function setExchangeOptions(array $options = array());
+	function setExchangeOptions(array $options = []);
 
-	function setQueueOptions(array $options = array());
+	function setQueueOptions(array $options = []);
 
 	function setRoutingKey($routingKey);
 
@@ -23,6 +23,6 @@ interface IProducer
 
 	function setDeliveryMode($deliveryMode);
 
-	function publish($msgBody, $routingKey = '', $additionalProperties = array());
+	function publish($msgBody, $routingKey = '', $additionalProperties = []);
 
 }

@@ -18,7 +18,7 @@ abstract class BaseConsumer extends AmqpMember
 	/**
 	 * @var array
 	 */
-	public $onStop = array();
+	public $onStop = [];
 
 	/**
 	 * @var int
@@ -48,11 +48,11 @@ abstract class BaseConsumer extends AmqpMember
 	/**
 	 * @var array
 	 */
-	protected $qosOptions = array(
+	protected $qosOptions = [
 		'prefetchSize' => 0,
 		'prefetchCount' => 0,
 		'global' => FALSE
-	);
+	];
 
 	/**
 	 * @var bool
@@ -94,7 +94,7 @@ abstract class BaseConsumer extends AmqpMember
 			$noAck = false,
 			$exclusive = false,
 			$nowait = false,
-			array($this, 'processMessage')
+			[$this, 'processMessage']
 		);
 	}
 
@@ -151,11 +151,11 @@ abstract class BaseConsumer extends AmqpMember
 	 */
 	public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = FALSE)
 	{
-		$this->qosOptions = array(
+		$this->qosOptions = [
 			'prefetchSize' => $prefetchSize,
 			'prefetchCount' => $prefetchCount,
 			'global' => $global,
-		);
+		];
 	}
 
 

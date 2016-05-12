@@ -31,21 +31,21 @@ class Panel extends Nette\Object implements IBarPanel
 	/**
 	 * @var array
 	 */
-	private $messages = array();
+	private $messages = [];
 
 	/**
 	 * @var array
 	 */
-	private $serviceMap = array();
+	private $serviceMap = [];
 
 
 
 	public function injectServiceMap(array $consumers, array $rpcServers)
 	{
-		$this->serviceMap = array(
+		$this->serviceMap = [
 			'consumer' => $consumers,
 			'rpcServer' => $rpcServers,
-		);
+		];
 	}
 
 
@@ -55,12 +55,12 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	public function getTab()
 	{
-		$img = Html::el('img', array(
+		$img = Html::el('img', [
 			'height' => '16px',
 			'src' => 'data:image/png;base64,' . base64_encode(file_get_contents(__DIR__ . '/logo.png'))
-		));
+		]);
 
-		$tab = Html::el('span', array('title' => 'RabbitMq'))->add($img);
+		$tab = Html::el('span', ['title' => 'RabbitMq'])->add($img);
 		$title = Html::el()->setText('RabbitMq');
 
 		if ($this->messages) {
@@ -101,7 +101,7 @@ class Panel extends Nette\Object implements IBarPanel
 			return $instances;
 		};
 
-		$workers = array();
+		$workers = [];
 		$runningWorkers = $configuredWorkers = 0;
 		foreach ($this->serviceMap as $type => $services) {
 			foreach ($services as $name => $serviceId) {
@@ -113,11 +113,11 @@ class Panel extends Nette\Object implements IBarPanel
 
 		ob_start();
 		$esc = class_exists('Nette\Templating\Helpers')
-			? array('Nette\Templating\Helpers', 'escapeHtml')
-			: array('Latte\Runtime\Filters', 'escapeHtml');
+			? ['Nette\Templating\Helpers', 'escapeHtml']
+			: ['Latte\Runtime\Filters', 'escapeHtml'];
 		$click = class_exists('\Tracy\Dumper')
-			? function ($o, $c = FALSE) { return \Tracy\Dumper::toHtml($o, array('collapse' => $c)); }
-			: array('Tracy\Helpers', 'clickableDump');
+			? function ($o, $c = FALSE) { return \Tracy\Dumper::toHtml($o, ['collapse' => $c]); }
+			: ['Tracy\Helpers', 'clickableDump'];
 
 		require __DIR__ . '/panel.phtml';
 		return ob_get_clean();

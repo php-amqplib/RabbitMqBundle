@@ -44,12 +44,12 @@ class SetupFabricCommand extends Command
 
 		$output->writeln('Setting up the Rabbit MQ fabric');
 
-		foreach (array(
+		foreach ([
 			RabbitMqExtension::TAG_PRODUCER,
 			RabbitMqExtension::TAG_CONSUMER,
 			RabbitMqExtension::TAG_RPC_CLIENT,
 			RabbitMqExtension::TAG_RPC_SERVER
-		) as $tag) {
+		] as $tag) {
 			foreach ($this->container->findByTag($tag) as $serviceId => $meta) {
 				/** @var AmqpMember $service */
 				$service = $this->container->getService($serviceId);
