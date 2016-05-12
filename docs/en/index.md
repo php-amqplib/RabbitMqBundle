@@ -34,12 +34,12 @@ rabbitmq:
 		user: 'guest'
 		password: 'guest'
 		vhost: '/'
-	
+
 	producers:
 		uploadPicture:
 			connection: default
 			exchange: {name: 'upload-picture', type: direct}
-	
+
 	consumers:
 		uploadPicture:
 			connection: default
@@ -65,7 +65,7 @@ rabbitmq:
 			port: 5672
 			user: 'bar'
 			password: 'secret'
-		
+
 		default:
 			user: 'guest'
 			password: 'secret'
@@ -274,7 +274,7 @@ If you need to set a timeout when there are no messages from your queue during a
 From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
 
 Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)).
-But implementing it allows you to scale horizontally dynamically as the queue is increasing. 
+But implementing it allows you to scale horizontally dynamically as the queue is increasing.
 You should evaluate, as the blog post recommend, the right value of prefetchSize accordingly with the time taken to process each message and your network performance.
 
 With RabbitMqBundle, you can configure that qos per consumer like that:
@@ -351,7 +351,7 @@ Let's add a RPC client and server into the configuration:
 	rpcClients:
 		integerStore:
 			connection: default
-	
+
 	rpcServers:
 		randomInt:
 			connection: default
@@ -443,12 +443,12 @@ With Kdyby/RabbitMq we can do such parallel calls with ease. Let's define a para
 	rpcClients:
 		parallel:
 			connection: default
-	
+
 	rpcServers:
 		charCount:
 			connection: default
 			callback: [@MyApp\CharacterCounter, count]
-	
+
 		randomInt:
 			connection: default
 			callback: [@Random\Integer, next]
@@ -493,13 +493,13 @@ Here is how you can set a consumer with multiple queues:
 					callback: [@MyApp\MediaStorage, uploadPicture]
 					routingKeys:
 						- picture
-	
+
 				upload-video:
 					name: upload_video
 					callback: [@MyApp\MediaStorage, uploadVideo]
 					routingKeys:
 						- video
-	
+
 				upload-stats:
 					name: upload_stats
 					callback: [@MyApp\MediaStorage, uploadStats]
