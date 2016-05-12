@@ -2,14 +2,9 @@ language: php
 
 sudo: false
 
-env:
-  matrix:
-    - NETTE=nette-2.3-dev COMPOSER_EXTRA_ARGS=""
-    - NETTE=nette-2.3 COMPOSER_EXTRA_ARGS=""
-    - NETTE=nette-2.3 COMPOSER_EXTRA_ARGS="--prefer-lowest"
-
-services:
-  - rabbitmq
+cache:
+    directories:
+        - $HOME/.composer/cache
 
 php:
   - 5.4
@@ -18,27 +13,35 @@ php:
   - 7.0
   - hhvm
 
+services:
+  - rabbitmq
+
+env:
+  matrix:
+    - NETTE=nette-2.3-dev
+    - NETTE=nette-2.3
+
 matrix:
+  include:
+    - php: 5.6
+      env: NETTE=nette-2.3 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
   allow_failures:
     - php: hhvm
 
 before_install:
-  - composer self-update
+  - travis_retry composer self-update
+  - wget -O /tmp/composer-nette https://raw.githubusercontent.com/Kdyby/TesterExtras/master/bin/composer-nette.php
+  - php /tmp/composer-nette
 
 install:
-  - mkdir -p vendor/bin
-  - wget -O vendor/bin/composer-nette https://raw.githubusercontent.com/Kdyby/TesterExtras/master/bin/composer-nette.php
-  - php vendor/bin/composer-nette
-  - composer update --no-interaction --prefer-source $COMPOSER_EXTRA_ARGS
+  - travis_retry composer update --no-interaction --prefer-dist $COMPOSER_EXTRA_ARGS
+  - travis_retry composer create-project --no-interaction jakub-onderka/php-parallel-lint /tmp/php-parallel-lint
+  - travis_retry composer create-project --no-interaction nette/code-checker /tmp/code-checker ~2.5
 
-before_script:
-  - composer create-project --prefer-source --no-interaction jakub-onderka/php-parallel-lint vendor/php-parallel-lint ~0.8
-  - php vendor/php-parallel-lint/parallel-lint.php -e php,phpt --exclude vendor .
-  - composer create-project --prefer-source --no-interaction nette/code-checker vendor/code-checker ~2.2
-  - php vendor/code-checker/src/code-checker.php -d src
-  - php vendor/code-checker/src/code-checker.php -d tests
-
-script: vendor/bin/tester -s -p php -c ./tests/php.ini-unix ./tests/KdybyTests/
+script:
+  - vendor/bin/tester -s -p php -c ./tests/php.ini-unix ./tests/KdybyTests/
+  - php /tmp/php-parallel-lint/parallel-lint.php -e php,phpt --exclude vendor .
+  - php /tmp/code-checker/src/code-checker.php --short-arrays
 
 after_failure:
   - 'for i in $(find ./tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done'
