@@ -181,7 +181,7 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 
 
 
-	public function basic_cancel($consumer_tag, $nowait = FALSE)
+	public function basic_cancel($consumer_tag, $nowait = FALSE, $noreturn = false)
 	{
 		$this->calls[] = array(__FUNCTION__) + get_defined_vars();
 

@@ -35,8 +35,9 @@ class ExtensionTest extends TestCase
 		$config = new Nette\Configurator();
 		$config->setTempDirectory(TEMP_DIR);
 		Kdyby\RabbitMq\DI\RabbitMqExtension::register($config);
-		$config->addConfig(__DIR__ . '/../nette-reset.neon', !isset($config->defaultExtensions['nette']) ? 'v23' : 'v22');
-		$config->addConfig(__DIR__ . '/files/default.neon', $config::NONE);
+		$configVersion = !isset($config->defaultExtensions['nette']) ? 'v23' : 'v22';
+		$config->addConfig(__DIR__ . '/../nette-reset.' . $configVersion . '.neon');
+		$config->addConfig(__DIR__ . '/files/default.neon');
 
 		return $config->createContainer();
 	}
