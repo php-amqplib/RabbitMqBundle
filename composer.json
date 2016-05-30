@@ -27,5 +27,8 @@
             "OldSound\\RabbitMqBundle\\": ""
         }
     },
-    "target-dir" : "OldSound/RabbitMqBundle"
+    "target-dir" : "OldSound/RabbitMqBundle",
+    "replace": {
+        "oldsound/rabbitmq-bundle": "self.version"
+    }
 }
