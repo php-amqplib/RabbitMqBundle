@@ -18,8 +18,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2.x-dev",
-            "dev-reconnect-fix": "1.6.x-dev"
+            "dev-master": "1.2.x-dev"
         }
     },
     "autoload": {
@@ -27,8 +26,5 @@
             "OldSound\\RabbitMqBundle\\": ""
         }
     },
-    "target-dir" : "OldSound/RabbitMqBundle",
-    "replace": {
-        "oldsound/rabbitmq-bundle": "self.version"
-    }
+    "target-dir" : "OldSound/RabbitMqBundle"
 }
