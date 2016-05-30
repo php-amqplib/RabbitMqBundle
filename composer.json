@@ -18,7 +18,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2.x-dev"
+            "dev-master": "1.2.x-dev",
+            "dev-reconnect-fix": "1.2.x-dev"
         }
     },
     "autoload": {
