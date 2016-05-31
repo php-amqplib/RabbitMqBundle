@@ -42,7 +42,8 @@ abstract class BaseAmqp
         'auto_delete' => false,
         'nowait' => false,
         'arguments' => null,
-        'ticket' => null
+        'ticket' => null,
+        'declare' => true,
     );
 
     /**
@@ -141,6 +142,9 @@ abstract class BaseAmqp
         $this->routingKey = $routingKey;
     }
 
+    /**
+     * Declares exchange
+     */
     protected function exchangeDeclare()
     {
         if ($this->exchangeOptions['declare']) {
@@ -159,9 +163,12 @@ abstract class BaseAmqp
         }
     }
 
+    /**
+     * Declares queue, creates if needed
+     */
     protected function queueDeclare()
     {
-        if (null !== $this->queueOptions['name']) {
+        if ($this->queueOptions['declare']) {
             list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
                 $this->queueOptions['durable'], $this->queueOptions['exclusive'],
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
@@ -169,13 +176,28 @@ abstract class BaseAmqp
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
 
             $this->queueDeclared = true;
+        }
+    }
+
+    /**
+     * Binds queue to an exchange
+     *
+     * @param string $queue
+     * @param string $exchange
+     * @param string $routing_key
+     */
+    protected function queueBind($queue, $exchange, $routing_key)
+    {
+        // queue binding is not permitted on the default exchange
+        if ('' !== $exchange) {
+            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
         }
     }
 
