@@ -131,15 +131,12 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 //this producer doesn't define an exchange -> using AMQP Default
                 if (!isset($producer['exchange_options'])) {
-                    $producer['exchange_options']['name'] = '';
-                    $producer['exchange_options']['type'] = 'direct';
-                    $producer['exchange_options']['passive'] = true;
-                    $producer['exchange_options']['declare'] = false;
+                    $producer['exchange_options'] = $this->getDefaultExchangeOptions();
                 }
                 $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($producer['exchange_options'])));
-                //this producer doesn't define a queue
+                //this producer doesn't define a queue -> using AMQP Default
                 if (!isset($producer['queue_options'])) {
-                    $producer['queue_options']['name'] = null;
+                    $producer['queue_options'] = $this->getDefaultQueueOptions();
                 }
                 $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
                 $this->injectConnection($definition, $producer['connection']);
@@ -168,12 +165,19 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
-            $definition
-                ->addTag('old_sound_rabbit_mq.base_amqp')
-                ->addTag('old_sound_rabbit_mq.consumer')
-                ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
-                ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+            $definition->addTag('old_sound_rabbit_mq.base_amqp');
+            $definition->addTag('old_sound_rabbit_mq.consumer');
+            //this consumer doesn't define an exchange -> using AMQP Default
+            if (!isset($consumer['exchange_options'])) {
+                $consumer['exchange_options'] = $this->getDefaultExchangeOptions();
+            }
+            $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])));
+            //this consumer doesn't define a queue -> using AMQP Default
+            if (!isset($consumer['queue_options'])) {
+                $consumer['queue_options'] = $this->getDefaultQueueOptions();
+            }
+            $definition->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])));
+            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
@@ -509,5 +513,33 @@ class OldSoundRabbitMqExtension extends Extension
         if ($this->container->has('logger')) {
             $definition->addMethodCall('setLogger', array(new Reference('logger')));
         }
+    }
+    
+    /**
+     * Get default AMQP exchange options
+     *
+     * @return array
+     */
+    protected function getDefaultExchangeOptions()
+    {
+        return array(
+            'name' => '',
+            'type' => 'direct',
+            'passive' => true,
+            'declare' => false
+        );
+    }
+
+    /**
+     * Get default AMQP queue options
+     *
+     * @return array
+     */
+    protected function getDefaultQueueOptions()
+    {
+        return array(
+            'name' => '',
+            'declare' => false
+        );
     }
 }
