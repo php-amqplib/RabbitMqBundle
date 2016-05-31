@@ -12,6 +12,7 @@ old_sound_rabbit_mq:
         foo_client:
             connection:      foo_connection
             unserializer:    json_decode
+            direct_reply_to: true
         lazy_client:
             connection:      default
             lazy: true
