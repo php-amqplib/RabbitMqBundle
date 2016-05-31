@@ -606,7 +606,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 array('initClient', array(true)),
-                array('setUnserializer', array('json_decode'))
+                array('setUnserializer', array('json_decode')),
+                array('setDirectReplyTo', array(true)),
             ),
             $definition->getMethodCalls()
         );
@@ -624,7 +625,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 array('initClient', array(true)),
-                array('setUnserializer', array('unserialize'))
+                array('setUnserializer', array('unserialize')),
+                array('setDirectReplyTo', array(false)),
             ),
             $definition->getMethodCalls()
         );
