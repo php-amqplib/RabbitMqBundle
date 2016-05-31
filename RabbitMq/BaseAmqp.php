@@ -8,12 +8,18 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 abstract class BaseAmqp
-{
+{   
+    /**
+     * Queue name auto generated.
+     */
+    const QUEUE_NAME_AUTOGENERATE = '';
+
     protected $conn;
     protected $ch;
     protected $consumerTag;
     protected $exchangeDeclared = false;
     protected $queueDeclared = false;
+    protected $queueConfigured = false;
     protected $routingKey = '';
     protected $autoSetupFabric = true;
     protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
@@ -35,7 +41,7 @@ abstract class BaseAmqp
     );
 
     protected $queueOptions = array(
-        'name' => '',
+        'name' => self::QUEUE_NAME_AUTOGENERATE,
         'passive' => false,
         'durable' => true,
         'exclusive' => false,
@@ -130,6 +136,7 @@ abstract class BaseAmqp
     public function setQueueOptions(array $options = array())
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
+        $this->queueConfigured = true;
     }
 
     /**
@@ -161,7 +168,7 @@ abstract class BaseAmqp
 
     protected function queueDeclare()
     {
-        if (null !== $this->queueOptions['name']) {
+        if (self::QUEUE_NAME_AUTOGENERATE !== $this->queueOptions['name'] || $this->queueConfigured) {
             list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
                 $this->queueOptions['durable'], $this->queueOptions['exclusive'],
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
