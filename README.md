@@ -4,7 +4,7 @@
 
 The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/php-amqplib/php-amqplib) library.
 
-The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/php-amqplib/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
+The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/php-amqplib/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony controller is as easy as:
 
 ```php
 $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
@@ -346,7 +346,7 @@ class UploadPictureConsumer implements ConsumerInterface
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
-Keep in mind that your callbacks _need to be registered_ as normal Symfony2 services. There you can inject the service container, the database service, the Symfony logger, and so on.
+Keep in mind that your callbacks _need to be registered_ as normal Symfony services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
 See [https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
@@ -380,7 +380,7 @@ If you would like you can also treat logging from queues with different handlers
 
 ### RPC or Reply/Response ###
 
-So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony2.
+So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony.
 
 Let's add a RPC client and server into the configuration:
 
