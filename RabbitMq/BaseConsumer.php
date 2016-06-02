@@ -45,10 +45,12 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
 
-    public function processMessage(AMQPMessage $msg)
-    {
-        //To be implemented by descendant classes
-    }
+    /**
+     * Process an AMQP Message.
+     *
+     * @param AMQPMessage $msg
+     */
+    abstract public function processMessage(AMQPMessage $msg);
 
     protected function maybeStopConsumer()
     {
