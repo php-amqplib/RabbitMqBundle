@@ -296,7 +296,7 @@ consumers:
 From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
 
 Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing.
-You should evaluate, as the blogpost reccommand, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
+You should evaluate, as the blogpost recommends, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
 
 With RabbitMqBundle, you can configure that qos_options per consumer like that:
 
@@ -559,7 +559,7 @@ and multi consumer configurations before it creates your arbitrary bindings. How
 ### Dynamic Consumers ###
 
 Sometimes you have to change the consumer's configuration on the fly.
-Dynamic consumers allow you to define the consumers queue options programatically, based on the context.
+Dynamic consumers allow you to define the consumers queue options programmatically, based on the context.
 
 e.g. In a scenario when the defined consumer must be responsible for a dynamic number of topics and you do not want (or can't) change it's configuration every time.
 
