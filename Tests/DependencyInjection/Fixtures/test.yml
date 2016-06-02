@@ -27,6 +27,24 @@ old_sound_rabbit_mq:
             vhost:    /lazy
             lazy:     true
 
+        socket_connection:
+            host:       bar_host
+            port:       789
+            user:       socket_user
+            password:   socket_password
+            vhost:      /socket
+            lazy:       false
+            use_socket: true
+
+        lazy_socket:
+            host:       joe_host
+            port:       987
+            user:       lazy_socket_user
+            password:   lazy_socket_password
+            vhost:      /lazy_socket
+            lazy:       true
+            use_socket: true
+
         default:
 
     producers:

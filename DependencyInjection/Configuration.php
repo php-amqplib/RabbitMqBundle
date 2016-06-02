@@ -58,6 +58,7 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('lazy')->defaultFalse()->end()
                             ->scalarNode('connection_timeout')->defaultValue(3)->end()
                             ->scalarNode('read_write_timeout')->defaultValue(3)->end()
+                            ->booleanNode('use_socket')->defaultValue(false)->end()
                             ->arrayNode('ssl_context')
                                 ->useAttributeAsKey('key')
                                 ->canBeUnset()

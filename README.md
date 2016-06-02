@@ -110,6 +110,9 @@ old_sound_rabbit_mq:
 
             # requires php-amqplib v2.4.1+
             heartbeat: 0
+
+            #requires php_sockets.dll
+            use_socket: true # default false
     producers:
         upload_picture:
             connection:       default
