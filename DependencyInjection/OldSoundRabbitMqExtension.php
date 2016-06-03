@@ -71,10 +71,11 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadConnections()
     {
         foreach ($this->config['connections'] as $key => $connection) {
+            $connectionSuffix = $connection['use_socket'] ? 'socket_connection.class' : 'connection.class';
             $classParam =
                 $connection['lazy']
-                    ? '%old_sound_rabbit_mq.lazy.connection.class%'
-                    : '%old_sound_rabbit_mq.connection.class%';
+                    ? '%old_sound_rabbit_mq.lazy.'.$connectionSuffix.'%'
+                    : '%old_sound_rabbit_mq.'.$connectionSuffix.'%';
 
             $definition = new Definition('%old_sound_rabbit_mq.connection_factory.class%', array(
                 $classParam, $connection,
