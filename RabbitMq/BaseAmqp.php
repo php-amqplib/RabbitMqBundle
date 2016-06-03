@@ -68,11 +68,19 @@ abstract class BaseAmqp
     public function __destruct()
     {
         if ($this->ch) {
-            $this->ch->close();
+            try {
+                $this->ch->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
-        
+
         if ($this->conn && $this->conn->isConnected()) {
-            $this->conn->close();
+            try {
+                $this->conn->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
     }
 
