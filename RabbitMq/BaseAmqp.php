@@ -1,7 +1,11 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+<<<<<<< 5818690e0890fb32c1d873645f59b33c73e3598c
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
+=======
+
+>>>>>>> add shutdown method. When called kernel shutdown, we must close opened connection
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -19,35 +23,35 @@ abstract class BaseAmqp
     protected $queueDeclared = false;
     protected $routingKey = '';
     protected $autoSetupFabric = true;
-    protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+    protected $basicProperties = ['content_type' => 'text/plain', 'delivery_mode' => 2];
 
     /**
      * @var LoggerInterface
      */
     protected $logger;
 
-    protected $exchangeOptions = array(
-        'passive' => false,
-        'durable' => true,
+    protected $exchangeOptions = [
+        'passive'     => false,
+        'durable'     => true,
         'auto_delete' => false,
-        'internal' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null,
-        'declare' => true,
-    );
+        'internal'    => false,
+        'nowait'      => false,
+        'arguments'   => null,
+        'ticket'      => null,
+        'declare'     => true,
+    ];
 
-    protected $queueOptions = array(
-        'name' => '',
-        'passive' => false,
-        'durable' => true,
-        'exclusive' => false,
+    protected $queueOptions = [
+        'name'        => '',
+        'passive'     => false,
+        'durable'     => true,
+        'exclusive'   => false,
         'auto_delete' => false,
-        'nowait' => false,
-        'arguments' => null,
-        'ticket' => null,
-        'declare' => true,
-    );
+        'nowait'      => false,
+        'arguments'   => null,
+        'ticket'      => null,
+        'declare'     => true,
+    ];
 
     /**
      * @var EventDispatcherInterface
@@ -68,12 +72,21 @@ abstract class BaseAmqp
             $this->getChannel();
         }
 
-        $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
+        $this->consumerTag = empty($consumerTag) ? sprintf(
+            "PHPPROCESS_%s_%s",
+            gethostname(),
+            getmypid()
+        ) : $consumerTag;
 
         $this->logger = new NullLogger();
     }
 
     public function __destruct()
+    {
+        $this->close();
+    }
+
+    public function close()
     {
         if ($this->ch) {
             try {
@@ -115,6 +128,7 @@ abstract class BaseAmqp
 
     /**
      * @param  AMQPChannel $ch
+     *
      * @return void
      */
     public function setChannel(AMQPChannel $ch)
@@ -124,10 +138,12 @@ abstract class BaseAmqp
 
     /**
      * @throws \InvalidArgumentException
-     * @param  array                     $options
+     *
+     * @param  array $options
+     *
      * @return void
      */
-    public function setExchangeOptions(array $options = array())
+    public function setExchangeOptions(array $options = [])
     {
         if (!isset($options['name'])) {
             throw new \InvalidArgumentException('You must provide an exchange name');
@@ -142,20 +158,49 @@ abstract class BaseAmqp
 
     /**
      * @param  array $options
+     *
      * @return void
      */
-    public function setQueueOptions(array $options = array())
+    public function setQueueOptions(array $options = [])
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
     }
 
     /**
      * @param  string $routingKey
+     *
      * @return void
      */
     public function setRoutingKey($routingKey)
     {
         $this->routingKey = $routingKey;
+    }
+
+    public function setupFabric()
+    {
+        if (!$this->exchangeDeclared) {
+            $this->exchangeDeclare();
+        }
+
+        if (!$this->queueDeclared) {
+            $this->queueDeclare();
+        }
+    }
+
+    /**
+     * disables the automatic SetupFabric when using a consumer or producer
+     */
+    public function disableAutoSetupFabric()
+    {
+        $this->autoSetupFabric = false;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -173,7 +218,8 @@ abstract class BaseAmqp
                 $this->exchangeOptions['internal'],
                 $this->exchangeOptions['nowait'],
                 $this->exchangeOptions['arguments'],
-                $this->exchangeOptions['ticket']);
+                $this->exchangeOptions['ticket']
+            );
 
             $this->exchangeDeclared = true;
         }
@@ -185,10 +231,16 @@ abstract class BaseAmqp
     protected function queueDeclare()
     {
         if ($this->queueOptions['declare']) {
-            list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
-                $this->queueOptions['durable'], $this->queueOptions['exclusive'],
-                $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-                $this->queueOptions['arguments'], $this->queueOptions['ticket']);
+            list($queueName, ,) = $this->getChannel()->queue_declare(
+                $this->queueOptions['name'],
+                $this->queueOptions['passive'],
+                $this->queueOptions['durable'],
+                $this->queueOptions['exclusive'],
+                $this->queueOptions['auto_delete'],
+                $this->queueOptions['nowait'],
+                $this->queueOptions['arguments'],
+                $this->queueOptions['ticket']
+            );
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
