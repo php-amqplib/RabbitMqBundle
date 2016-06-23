@@ -6,6 +6,8 @@ use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class BaseAmqp
 {
@@ -22,7 +24,7 @@ abstract class BaseAmqp
      * @var LoggerInterface
      */
     protected $logger;
-    
+
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
@@ -45,6 +47,11 @@ abstract class BaseAmqp
         'ticket' => null,
         'declare' => true,
     );
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param AbstractConnection   $conn
@@ -233,5 +240,31 @@ abstract class BaseAmqp
     public function setLogger($logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     *
+     * @return BaseAmqp
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
+    /**
+     * @param string $eventName
+     * @param Event  $event
+     */
+    protected function dispatchEvent($eventName, Event $event)
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(
+                $eventName,
+                $event
+            );
+        }
     }
 }

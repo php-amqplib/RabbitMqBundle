@@ -204,6 +204,10 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLogger($definition);
             }
 
+            if ($consumer['enable_events']) {
+                $this->injectEventDispatcher($definition);
+            }
+
             $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($consumer['callback'], $name);
@@ -267,6 +271,10 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLogger($definition);
             }
 
+            if ($consumer['enable_events']) {
+                $this->injectEventDispatcher($definition);
+            }
+
             $name = sprintf('old_sound_rabbit_mq.%s_multiple', $key);
             $this->container->setDefinition($name, $definition);
             if ($consumer['queues_provider']) {
@@ -324,6 +332,10 @@ class OldSoundRabbitMqExtension extends Extension
 
             if ($consumer['enable_logger']) {
                 $this->injectLogger($definition);
+            }
+
+            if ($consumer['enable_events']) {
+                $this->injectEventDispatcher($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_dynamic', $key);
@@ -542,5 +554,15 @@ class OldSoundRabbitMqExtension extends Extension
             'name' => '',
             'declare' => false
         );
+    }
+
+    /**
+     * @param Definition $definition
+     */
+    private function injectEventDispatcher(Definition $definition)
+    {
+        if ($this->container->has('event_dispatcher')) {
+            $definition->addMethodCall('setEventDispatcher', [new Reference('event_dispatcher')]);
+        }
     }
 }

@@ -2,6 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
+use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
+use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -44,6 +47,7 @@ class Consumer extends BaseConsumer
         $this->setupConsumer();
 
         while (count($this->getChannel()->callbacks)) {
+            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent());
             $this->maybeStopConsumer();
             $this->getChannel()->wait(null, false, $this->getIdleTimeout());
         }
@@ -67,9 +71,16 @@ class Consumer extends BaseConsumer
 
     public function processMessage(AMQPMessage $msg)
     {
+        $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
+            new BeforeProcessingMessageEvent($msg)
+        );
         try {
             $processFlag = call_user_func($this->callback, $msg);
             $this->handleProcessMessage($msg, $processFlag);
+            $this->dispatchEvent(
+                AfterProcessingMessageEvent::NAME,
+                new AfterProcessingMessageEvent($msg)
+            );
             $this->logger->debug('Queue message processed', array(
                 'amqp' => array(
                     'queue' => $this->queueOptions['name'],
