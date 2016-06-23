@@ -4,7 +4,6 @@ namespace OldSound\RabbitMqBundle;
 
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\InjectEventDispatcherPass;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
