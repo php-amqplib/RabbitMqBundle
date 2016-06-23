@@ -146,7 +146,6 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('enable_logger')->defaultFalse()->end()
-                            ->scalarNode('enable_events')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()
