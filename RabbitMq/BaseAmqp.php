@@ -1,6 +1,7 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -256,15 +257,23 @@ abstract class BaseAmqp
 
     /**
      * @param string $eventName
-     * @param Event  $event
+     * @param AMQPEvent  $event
      */
-    protected function dispatchEvent($eventName, Event $event)
+    protected function dispatchEvent($eventName, AMQPEvent $event)
     {
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(
+        if ($this->getEventDispatcher()) {
+            $this->getEventDispatcher()->dispatch(
                 $eventName,
                 $event
             );
         }
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
     }
 }

@@ -9,6 +9,7 @@ use Symfony\Component\EventDispatcher\Event;
  * Class AMQPEvent
  *
  * @package OldSound\RabbitMqBundle\Event
+ * @codeCoverageIgnore
  */
 class AMQPEvent extends Event
 {
@@ -20,7 +21,7 @@ class AMQPEvent extends Event
      * @var AMQPMessage
      */
     protected $AMQPMessage;
-    
+
     /**
      * @return AMQPMessage
      */
