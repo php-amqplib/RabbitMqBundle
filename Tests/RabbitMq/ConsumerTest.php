@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
+use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -67,8 +68,8 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->withConsecutive(
-                array(BeforeProcessingMessageEvent::NAME, new BeforeProcessingMessageEvent($amqpMessage)),
-                array(AfterProcessingMessageEvent::NAME, new AfterProcessingMessageEvent($amqpMessage))
+                array(BeforeProcessingMessageEvent::NAME, new BeforeProcessingMessageEvent($consumer, $amqpMessage)),
+                array(AfterProcessingMessageEvent::NAME, new AfterProcessingMessageEvent($consumer, $amqpMessage))
             )
             ->willReturn(true);
         $consumer->processMessage($amqpMessage);
@@ -163,7 +164,8 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
             ->method('dispatch')
-            ->willReturn($eventDispatcher);
+            ->with(OnConsumeEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'))
+            ->willReturn(true);
 
         $consumer->setEventDispatcher($eventDispatcher);
         $consumer->consume(1);

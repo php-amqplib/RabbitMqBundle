@@ -283,6 +283,16 @@ There are 3 AMQPEvents:
 class OnConsumeEvent extends AMQPEvent
 {
     const NAME = AMQPEvent::ON_CONSUME;
+
+    /**
+     * OnConsumeEvent constructor.
+     *
+     * @param Consumer $consumer
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+    }
 }
 ```
 
@@ -301,9 +311,10 @@ class BeforeProcessingMessageEvent extends AMQPEvent
      *
      * @param AMQPMessage $AMQPMessage
      */
-    public function __construct(AMQPMessage $AMQPMessage)
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
     {
-        $this->AMQPMessage = $AMQPMessage;
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
     }
 }
 ``` 
@@ -321,9 +332,10 @@ class AfterProcessingMessageEvent extends AMQPEvent
      *
      * @param AMQPMessage $AMQPMessage
      */
-    public function __construct(AMQPMessage $AMQPMessage)
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
     {
-        $this->AMQPMessage = $AMQPMessage;
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
     }
 }
 ``` 

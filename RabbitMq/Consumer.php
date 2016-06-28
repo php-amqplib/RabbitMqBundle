@@ -47,7 +47,7 @@ class Consumer extends BaseConsumer
         $this->setupConsumer();
 
         while (count($this->getChannel()->callbacks)) {
-            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent());
+            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
             $this->getChannel()->wait(null, false, $this->getIdleTimeout());
         }
@@ -72,14 +72,14 @@ class Consumer extends BaseConsumer
     public function processMessage(AMQPMessage $msg)
     {
         $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
-            new BeforeProcessingMessageEvent($msg)
+            new BeforeProcessingMessageEvent($this, $msg)
         );
         try {
             $processFlag = call_user_func($this->callback, $msg);
             $this->handleProcessMessage($msg, $processFlag);
             $this->dispatchEvent(
                 AfterProcessingMessageEvent::NAME,
-                new AfterProcessingMessageEvent($msg)
+                new AfterProcessingMessageEvent($this, $msg)
             );
             $this->logger->debug('Queue message processed', array(
                 'amqp' => array(
