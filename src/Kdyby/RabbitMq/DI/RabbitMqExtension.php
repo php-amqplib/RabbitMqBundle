@@ -65,6 +65,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'queue' => [],
 		'contentType' => 'text/plain',
 		'deliveryMode' => 2,
+		'routingKey' => '',
 		'autoSetupFabric' => NULL, // inherits from `rabbitmq: autoSetupFabric:`
 	];
 
@@ -284,6 +285,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				->setClass('Kdyby\RabbitMq\IProducer')
 				->addSetup('setContentType', [$config['contentType']])
 				->addSetup('setDeliveryMode', [$config['deliveryMode']])
+				->addSetup('setRoutingKey', [$config['routingKey']])
 				->addTag(self::TAG_PRODUCER);
 
 			if (!empty($config['exchange'])) {
