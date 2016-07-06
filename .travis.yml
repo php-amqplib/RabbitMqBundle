@@ -18,13 +18,23 @@ services:
 
 env:
   matrix:
-    - NETTE=nette-2.3-dev
-    - NETTE=nette-2.3
+  - NETTE=nette-2.4-dev
+  - NETTE=nette-2.4
+  - NETTE=nette-2.3
 
 matrix:
   include:
     - php: 5.6
       env: NETTE=nette-2.3 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
+  exclude:
+    - php: 5.4
+      env: NETTE=nette-2.4-dev
+    - php: 5.4
+      env: NETTE=nette-2.4
+    - php: 5.5
+      env: NETTE=nette-2.4-dev
+    - php: 5.5
+      env: NETTE=nette-2.4
   allow_failures:
     - php: hhvm
 
