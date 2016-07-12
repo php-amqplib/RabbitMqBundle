@@ -264,6 +264,17 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('My\Foo\Producer', $definition->getClass());
     }
 
+    /**
+     * @group alias
+     */
+    public function testAliasedFooProducerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_producer_producer'));
+        $this->assertTrue($container->has('foo_producer_alias'));
+    }
+
     public function testDefaultProducerDefinition()
     {
         $container = $this->getContainer('test.yml');

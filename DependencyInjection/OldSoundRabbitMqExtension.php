@@ -152,7 +152,12 @@ class OldSoundRabbitMqExtension extends Extension
                     $this->injectLogger($definition);
                 }
 
-                $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+                $producerServiceName = sprintf('old_sound_rabbit_mq.%s_producer', $key);
+
+                $this->container->setDefinition($producerServiceName, $definition);
+                if (null !== $producer['service_alias']) {
+                    $this->container->setAlias($producer['service_alias'], $producerServiceName);
+                }
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {
