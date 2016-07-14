@@ -28,7 +28,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
                 $this->consumer->stopConsuming();
             } catch (AMQPTimeoutException $e) {}
         }
-        exit();
     }
 
     public function restartConsumer()

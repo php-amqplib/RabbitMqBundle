@@ -45,7 +45,9 @@ class Consumer extends BaseConsumer
 
         while (count($this->getChannel()->callbacks)) {
             $this->maybeStopConsumer();
-            $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+            if (!$this->forceStop) {
+                $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+            }
         }
     }
 
