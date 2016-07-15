@@ -62,6 +62,21 @@ old_sound_rabbit_mq:
                 arguments:   null
                 ticket:      null
 
+        foo_producer_aliased:
+            class:           My\Foo\Producer
+            connection:      foo_connection
+            exchange_options:
+                name:        foo_exchange
+                type:        direct
+                passive:     true
+                durable:     false
+                auto_delete: true
+                internal:    true
+                nowait:      true
+                arguments:   null
+                ticket:      null
+            service_alias: foo_producer_alias
+
 
         default_producer:
             exchange_options:

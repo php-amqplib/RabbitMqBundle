@@ -90,6 +90,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.producer.class%')->end()
                             ->scalarNode('enable_logger')->defaultFalse()->end()
+                            ->scalarNode('service_alias')->defaultValue(null)->end()
                         ->end()
                     ->end()
                 ->end()
