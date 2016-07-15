@@ -275,6 +275,74 @@ For deleting the consumer's queue, use this command:
 $ ./app/console rabbitmq:delete --no-confirmation upload_picture
 ```
 
+#### Consumer Events ####
+
+This can be useful in many scenarios.
+There are 3 AMQPEvents:
+##### ON CONSUME #####
+```php
+class OnConsumeEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_CONSUME;
+
+    /**
+     * OnConsumeEvent constructor.
+     *
+     * @param Consumer $consumer
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+    }
+}
+```
+
+Let`s say you need to sleep / stop consumer/s on a new application deploy.
+You can listen for OnConsumeEvent (\OldSound\RabbitMqBundle\Event\OnConsumeEvent) and check for new application deploy.
+
+##### BEFORE PROCESSING MESSAGE #####
+
+```php
+class BeforeProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::BEFORE_PROCESSING_MESSAGE;
+
+    /**
+     * BeforeProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised before processing a AMQPMessage.
+
+##### AFTER PROCESSING MESSAGE #####
+
+```php
+class AfterProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::AFTER_PROCESSING_MESSAGE;
+
+    /**
+     * AfterProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised after processing a AMQPMessage.
+If the process message will throw an Exception the event will not raise.
+
 #### Idle timeout ####
 
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
