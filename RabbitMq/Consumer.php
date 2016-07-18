@@ -62,16 +62,23 @@ class Consumer extends BaseConsumer
                     $timeout = $this->getHeartbeatTimeout() ?: $this->getIdleTimeout();
                     $this->getChannel()->wait(null, false, $timeout);
                 } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $exception) {
+
                     if ($this->getHeartbeatTimeout() > 0) {
                         $consumeDuration += $this->getHeartbeatTimeout();
                         $isHeartBeating = true;
 
-                        if ($this->getHeartbeatCallback()[0] instanceof HeartbeatAwareConsumerInterface) {
-                            call_user_func($this->getHeartbeatCallback(), $consumeDuration);
+                        $heartbeatCallback = $this->getHeartbeatCallback();
+                        $heartbeatCallbackClass = $heartbeatCallback[0];
+
+                        if ($heartbeatCallbackClass instanceof HeartbeatAwareConsumerInterface) {
+                            call_user_func($heartbeatCallback, $consumeDuration);
                         }
                     }
 
-                    if ($this->getHeartbeatTimeout() <= 0 || ($this->getIdleTimeout() > 0 && $consumeDuration >= $this->getIdleTimeout())) {
+                    $consumeDurationExceeded = $this->getHeartbeatTimeout() <= 0 ||
+                        ($this->getIdleTimeout() > 0 && $consumeDuration >= $this->getIdleTimeout());
+
+                    if ($consumeDurationExceeded) {
                         throw $exception;
                     }
                 }
