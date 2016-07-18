@@ -12,13 +12,37 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     protected $callback;
 
+    protected $heartbeatCallback;
+
     protected $forceStop = false;
 
     protected $idleTimeout = 0;
 
+    protected $heartbeatTimeout = 0;
+
     public function setCallback($callback)
     {
         $this->callback = $callback;
+    }
+
+    public function setHeartbeatCallback($heartbeatCallback)
+    {
+        $this->heartbeatCallback = $heartbeatCallback;
+    }
+
+    public function getHeartbeatCallback()
+    {
+        return $this->heartbeatCallback;
+    }
+
+    public function setHeartbeatTimeout($heartbeatTimeout)
+    {
+        $this->heartbeatTimeout = $heartbeatTimeout;
+    }
+
+    public function getHeartbeatTimeout()
+    {
+        return $this->heartbeatTimeout;
     }
 
     public function start($msgAmount = 0)

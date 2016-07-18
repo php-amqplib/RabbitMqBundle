@@ -42,15 +42,39 @@ class Consumer extends BaseConsumer
      */
     public function consume($msgAmount)
     {
+        $isHeartBeating  = false;
+        $consumeDuration = 0;
+
         $this->target = $msgAmount;
 
         $this->setupConsumer();
 
-        while (count($this->getChannel()->callbacks)) {
-            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
-            $this->maybeStopConsumer();
+        while ($isHeartBeating || count($this->getChannel()->callbacks)) {
+            if (!$isHeartBeating) {
+                $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
+                $this->maybeStopConsumer();
+            } else {
+                $isHeartBeating = false;
+            }
+
             if (!$this->forceStop) {
-                $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+                try {
+                    $timeout = $this->getHeartbeatTimeout() ?: $this->getIdleTimeout();
+                    $this->getChannel()->wait(null, false, $timeout);
+                } catch (\PhpAmqpLib\Exception\AMQPTimeoutException $exception) {
+                    if ($this->getHeartbeatTimeout() > 0) {
+                        $consumeDuration += $this->getHeartbeatTimeout();
+                        $isHeartBeating = true;
+
+                        if ($this->getHeartbeatCallback()[0] instanceof HeartbeatAwareConsumerInterface) {
+                            call_user_func($this->getHeartbeatCallback(), $consumeDuration);
+                        }
+                    }
+
+                    if ($this->getHeartbeatTimeout() <= 0 || ($this->getIdleTimeout() > 0 && $consumeDuration >= $this->getIdleTimeout())) {
+                        throw $exception;
+                    }
+                }
             }
         }
     }

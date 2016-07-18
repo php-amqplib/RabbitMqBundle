@@ -193,6 +193,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
+            if (isset($consumer['heartbeat_timeout']) && $consumer['heartbeat_timeout'] > 0) {
+                $definition->addMethodCall('setHeartbeatTimeout', array($consumer['heartbeat_timeout']));
+                $definition->addMethodCall('setHeartbeatCallback', array(array(new Reference($consumer['callback']), 'heartbeat')));
+            }
+
             if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
@@ -256,6 +261,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
+            if (isset($consumer['heartbeat_timeout']) && $consumer['heartbeat_timeout'] > 0) {
+                $definition->addMethodCall('setHeartbeatTimeout', array($consumer['heartbeat_timeout']));
+                $definition->addMethodCall('setHeartbeatCallback', array(array(new Reference($consumer['callback']), 'heartbeat')));
+            }
+
             if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
@@ -314,6 +324,11 @@ class OldSoundRabbitMqExtension extends Extension
                 'setQueueOptionsProvider',
                 array(new Reference($consumer['queue_options_provider']))
             );
+            
+            if (isset($consumer['heartbeat_timeout']) && $consumer['heartbeat_timeout'] > 0) {
+                $definition->addMethodCall('setHeartbeatTimeout', array($consumer['heartbeat_timeout']));
+                $definition->addMethodCall('setHeartbeatCallback', array(array(new Reference($consumer['callback']), 'heartbeat')));
+            }
 
             if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
