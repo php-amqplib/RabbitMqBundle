@@ -1,6 +1,7 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
@@ -75,6 +76,11 @@ abstract class BaseAmqp
 
     public function __destruct()
     {
+        $this->close();
+    }
+
+    public function close()
+    {
         if ($this->ch) {
             try {
                 $this->ch->close();
@@ -115,6 +121,7 @@ abstract class BaseAmqp
 
     /**
      * @param  AMQPChannel $ch
+     *
      * @return void
      */
     public function setChannel(AMQPChannel $ch)
@@ -156,6 +163,33 @@ abstract class BaseAmqp
     public function setRoutingKey($routingKey)
     {
         $this->routingKey = $routingKey;
+    }
+
+    public function setupFabric()
+    {
+        if (!$this->exchangeDeclared) {
+            $this->exchangeDeclare();
+        }
+
+        if (!$this->queueDeclared) {
+            $this->queueDeclare();
+        }
+    }
+
+    /**
+     * disables the automatic SetupFabric when using a consumer or producer
+     */
+    public function disableAutoSetupFabric()
+    {
+        $this->autoSetupFabric = false;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -215,32 +249,6 @@ abstract class BaseAmqp
         if ('' !== $exchange) {
             $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
         }
-    }
-
-    public function setupFabric()
-    {
-        if (!$this->exchangeDeclared) {
-            $this->exchangeDeclare();
-        }
-
-        if (!$this->queueDeclared) {
-            $this->queueDeclare();
-        }
-    }
-
-    /**
-     * disables the automatic SetupFabric when using a consumer or producer
-     */
-    public function disableAutoSetupFabric() {
-        $this->autoSetupFabric = false;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger($logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
