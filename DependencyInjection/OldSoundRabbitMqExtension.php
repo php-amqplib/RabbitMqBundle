@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -516,9 +517,7 @@ class OldSoundRabbitMqExtension extends Extension
         $definition->addTag('monolog.logger', array(
             'channel' => 'phpamqplib'
         ));
-        if ($this->container->has('logger')) {
-            $definition->addMethodCall('setLogger', array(new Reference('logger')));
-        }
+        $definition->addMethodCall('setLogger', array(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
     }
     
     /**
