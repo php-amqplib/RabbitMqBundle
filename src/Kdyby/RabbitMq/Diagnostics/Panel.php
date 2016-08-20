@@ -60,14 +60,14 @@ class Panel extends Nette\Object implements IBarPanel
 			'src' => 'data:image/png;base64,' . base64_encode(file_get_contents(__DIR__ . '/logo.png'))
 		]);
 
-		$tab = Html::el('span', ['title' => 'RabbitMq'])->add($img);
+		$tab = Html::el('span', ['title' => 'RabbitMq'])->addHtml($img);
 		$title = Html::el()->setText('RabbitMq');
 
 		if ($this->messages) {
 			$title->setText(count($this->messages) . ' message' . (count($this->messages) > 1 ? 's' : ''));
 		}
 
-		return (string)$tab->add($title);
+		return (string)$tab->addHtml($title);
 	}
 
 
