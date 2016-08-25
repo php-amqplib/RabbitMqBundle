@@ -55,21 +55,15 @@ class Panel extends Nette\Object implements IBarPanel
 	 */
 	public function getTab()
 	{
-		$img = Html::el('img', [
-			'height' => '16px',
-			'width' => '16px',
-			'style' => 'padding-right: 2px;',
-			'src' => 'data:image/png;base64,' . base64_encode(file_get_contents(__DIR__ . '/logo.png'))
-		]);
-
-		$tab = Html::el('span', ['title' => 'RabbitMq'])->addHtml($img);
-		$title = Html::el()->setText('RabbitMq');
+		$img = Html::el('')->addHtml(file_get_contents(__DIR__ . '/rabbitmq-logo.svg'));
+		$tab = Html::el('span')->title('RabbitMq')->addHtml($img);
+		$title = Html::el('span')->class('tracy-label');
 
 		if ($this->messages) {
 			$title->setText(count($this->messages) . ' message' . (count($this->messages) > 1 ? 's' : ''));
 		}
 
-		return (string)$tab->addHtml($title);
+		return (string) $tab->addHtml($title);
 	}
 
 
