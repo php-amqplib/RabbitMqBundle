@@ -57,6 +57,8 @@ class Panel extends Nette\Object implements IBarPanel
 	{
 		$img = Html::el('img', [
 			'height' => '16px',
+			'width' => '16px',
+			'style' => 'padding-right: 2px;',
 			'src' => 'data:image/png;base64,' . base64_encode(file_get_contents(__DIR__ . '/logo.png'))
 		]);
 
