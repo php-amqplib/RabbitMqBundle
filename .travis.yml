@@ -39,8 +39,6 @@ matrix:
       env: NETTE=nette-2.4
   allow_failures:
     - php: hhvm
-    - php: 7.0
-      env: NETTE=nette-2.4 COVERAGE="--coverage ./coverage.xml --coverage-src ./src" TESTER_RUNTIME="phpdbg"
 
 before_install:
   - travis_retry composer self-update
