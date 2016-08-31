@@ -90,6 +90,15 @@ class Consumer extends BaseConsumer
                     'return_code' => $processFlag
                 )
             ));
+        } catch (Exception\StopConsumerException $e) {
+            $this->logger->info('Consumer requested restart', array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->stopConsuming();
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), array(
                 'amqp' => array(
