@@ -13,3 +13,4 @@ class StopConsumerException extends \RuntimeException
 {
 
 }
+
