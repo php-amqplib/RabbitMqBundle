@@ -23,10 +23,14 @@ class OldSoundRabbitMqBundle extends Bundle
     public function shutdown()
     {
         parent::shutdown();
-        $partHolder = $this->container->get('old_sound_rabbit_mq.parts_holder');
-        $connections = $partHolder->getParts("old_sound_rabbit_mq.base_amqp");
+        if (!$this->container->hasParameter('old_sound_rabbit_mq.base_amqp')) {
+            return;
+        }
+        $connections = $this->container->getParameter('old_sound_rabbit_mq.base_amqp');
         foreach ($connections as $connection) {
-            $connection->close();
+            if ($this->container->initialized($connection)) {
+                $this->container->get($connection)->close();
+            }
         }
     }
 }
