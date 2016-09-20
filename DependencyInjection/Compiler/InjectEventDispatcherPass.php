@@ -30,9 +30,9 @@ class InjectEventDispatcherPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
             $definition->addMethodCall(
                 'setEventDispatcher',
-                [
+                array(
                     new Reference(self::EVENT_DISPATCHER_SERVICE_ID, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
-                ]
+                )
             );
         }
 
