@@ -71,13 +71,13 @@ class Consumer extends BaseConsumer
         $this->getChannel()->queue_delete($this->queueOptions['name'], true);
     }
 
-    public function processMessage(AMQPMessage $msg)
+    protected function processMessageQueueCallback(AMQPMessage $msg, $queueName, $callback)
     {
         $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
             new BeforeProcessingMessageEvent($this, $msg)
         );
         try {
-            $processFlag = call_user_func($this->callback, $msg);
+            $processFlag = call_user_func($callback, $msg);
             $this->handleProcessMessage($msg, $processFlag);
             $this->dispatchEvent(
                 AfterProcessingMessageEvent::NAME,
@@ -85,7 +85,7 @@ class Consumer extends BaseConsumer
             );
             $this->logger->debug('Queue message processed', array(
                 'amqp' => array(
-                    'queue' => $this->queueOptions['name'],
+                    'queue' => $queueName,
                     'message' => $msg,
                     'return_code' => $processFlag
                 )
@@ -93,7 +93,7 @@ class Consumer extends BaseConsumer
         } catch (Exception\StopConsumerException $e) {
             $this->logger->info('Consumer requested restart', array(
                 'amqp' => array(
-                    'queue' => $this->queueOptions['name'],
+                    'queue' => $queueName,
                     'message' => $msg,
                     'stacktrace' => $e->getTraceAsString()
                 )
@@ -102,7 +102,7 @@ class Consumer extends BaseConsumer
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), array(
                 'amqp' => array(
-                    'queue' => $this->queueOptions['name'],
+                    'queue' => $queueName,
                     'message' => $msg,
                     'stacktrace' => $e->getTraceAsString()
                 )
@@ -111,14 +111,18 @@ class Consumer extends BaseConsumer
         } catch (\Error $e) {
             $this->logger->error($e->getMessage(), array(
                 'amqp' => array(
-                    'queue' => $this->queueOptions['name'],
+                    'queue' => $queueName,
                     'message' => $msg,
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
             throw $e;
         }
+    }
 
+    public function processMessage(AMQPMessage $msg)
+    {
+        $this->processMessageQueueCallback($msg, $this->queueOptions['name'], $this->callback);
     }
 
     protected function handleProcessMessage(AMQPMessage $msg, $processFlag)
