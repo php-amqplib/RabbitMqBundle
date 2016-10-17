@@ -50,6 +50,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->prototype('array')
                         ->children()
+                            ->scalarNode('url')->defaultValue('')->end()
                             ->scalarNode('host')->defaultValue('localhost')->end()
                             ->scalarNode('port')->defaultValue(5672)->end()
                             ->scalarNode('user')->defaultValue('guest')->end()

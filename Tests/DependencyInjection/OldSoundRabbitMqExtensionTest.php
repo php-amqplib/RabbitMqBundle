@@ -33,7 +33,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'ssl_context' => array(),
             'keepalive' => false,
             'heartbeat' => 0,
-            'use_socket' => false
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -61,7 +62,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             ),
             'keepalive' => false,
             'heartbeat' => 0,
-            'use_socket' => false
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -87,7 +89,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'ssl_context' => array(),
             'keepalive' => false,
             'heartbeat' => 0,
-            'use_socket' => false
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -113,7 +116,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'ssl_context' => array(),
             'keepalive' => false,
             'heartbeat' => 0,
-            'use_socket' => false
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -518,14 +522,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
     }
-    
+
     public function testDynamicConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');
-        
+
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_dyn_consumer_dynamic'));
         $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
-        
+
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
         $this->assertEquals(array(
                 array(

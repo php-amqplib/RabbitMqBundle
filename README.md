@@ -113,6 +113,11 @@ old_sound_rabbit_mq:
 
             #requires php_sockets.dll
             use_socket: true # default false
+        another:
+            # A different (unused) connection defined by an URL. One can omit all parts,
+            # except the scheme (amqp:). If both segment in the URL and a key value (see above)
+            # are given the value from the URL takes precedence.
+            url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
             connection:       default
