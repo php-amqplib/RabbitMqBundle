@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory;
 use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection;
 
@@ -147,5 +148,57 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             false,       // keepalive
             0,           // heartbeat
         ), $instance->constructParams);
+    }
+
+    public function testConnectionsParametersProvider()
+    {
+        $connectionParametersProvider = $this->prepareConnectionParametersProvider();
+        $connectionParametersProvider->expects($this->once())
+            ->method('getConnectionParameters')
+            ->will($this->returnValue(
+                array(
+                    'host' => '1.2.3.4',
+                    'port' => 5678,
+                    'user' => 'admin',
+                    'password' => 'admin',
+                    'vhost' => 'foo',
+                )
+            ));
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(),
+            $connectionParametersProvider
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(
+            '1.2.3.4',   // host
+            5678,        // port
+            'admin',     // user
+            'admin',     // password
+            'foo',       // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            3,           // connection timeout
+            3,           // read write timeout
+            null,        // context
+            false,       // keepalive
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    /**
+     * Preparing ConnectionParametersProviderInterface instance
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionParametersProviderInterface
+     */
+    private function prepareConnectionParametersProvider()
+    {
+        return $this->getMockBuilder('OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface')
+            ->getMock();
     }
 }
