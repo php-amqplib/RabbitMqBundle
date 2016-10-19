@@ -4,7 +4,6 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -81,6 +80,10 @@ class OldSoundRabbitMqExtension extends Extension
             $definition = new Definition('%old_sound_rabbit_mq.connection_factory.class%', array(
                 $classParam, $connection,
             ));
+            if (isset($connection['connection_parameters_provider'])) {
+                $definition->addArgument(new Reference($connection['connection_parameters_provider']));
+                unset($connection['connection_parameters_provider']);
+            }
             $definition->setPublic(false);
             $factoryName = sprintf('old_sound_rabbit_mq.connection_factory.%s', $key);
             $this->container->setDefinition($factoryName, $definition);
@@ -519,7 +522,7 @@ class OldSoundRabbitMqExtension extends Extension
         ));
         $definition->addMethodCall('setLogger', array(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
     }
-    
+
     /**
      * Get default AMQP exchange options
      *
