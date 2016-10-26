@@ -90,10 +90,10 @@ abstract class BaseConsumer extends AmqpMember
 		$this->getChannel()->basic_consume(
 			$this->queueOptions['name'],
 			$this->getConsumerTag(),
-			$noLocal = false,
-			$noAck = false,
-			$exclusive = false,
-			$nowait = false,
+			$this->queueOptions['noLocal'],
+			$this->queueOptions['noAck'],
+			$this->queueOptions['exclusive'],
+			$this->queueOptions['nowait'],
 			[$this, 'processMessage']
 		);
 	}
