@@ -121,6 +121,8 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		'name' => '',
 		'passive' => FALSE,
 		'durable' => TRUE,
+		'noLocal' => FALSE,
+		'noAck' => FALSE,
 		'exclusive' => FALSE,
 		'autoDelete' => FALSE,
 		'nowait' => FALSE,
