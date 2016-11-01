@@ -10,7 +10,6 @@
  */
 namespace OldSound\RabbitMqBundle\Command;
 
-use OldSound\RabbitMqBundle\Command\BaseConsumerCommand;
 use Symfony\Component\Console\Input\InputArgument;
 
 class DynamicConsumerCommand extends BaseConsumerCommand

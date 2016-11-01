@@ -17,7 +17,7 @@ abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
         $this->definition = $this->getMockBuilder('Symfony\\Component\\Console\\Input\\InputDefinition')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->helperSet = $this->getMock('Symfony\\Component\\Console\\Helper\\HelperSet');
+        $this->helperSet = $this->getMockBuilder('Symfony\\Component\\Console\\Helper\\HelperSet')->getMock();
 
         $this->application->expects($this->any())
             ->method('getDefinition')

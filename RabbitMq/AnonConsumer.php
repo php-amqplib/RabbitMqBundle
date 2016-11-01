@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Connection\AbstractConnection;
 
 class AnonConsumer extends Consumer

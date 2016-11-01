@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClient extends BaseAmqp
