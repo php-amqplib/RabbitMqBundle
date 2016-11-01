@@ -74,20 +74,21 @@ class AMQPConnectionFactory
             throw new InvalidConfigurationException('Malformed parameter "url".');
         }
 
+        // See https://www.rabbitmq.com/uri-spec.html
         if (isset($url['host'])) {
-            $parameters['host'] = $url['host'];
+            $parameters['host'] = urldecode($url['host']);
         }
         if (isset($url['port'])) {
-            $parameters['port'] = $url['port'];
+            $parameters['port'] = (int)$url['port'];
         }
         if (isset($url['user'])) {
-            $parameters['user'] = $url['user'];
+            $parameters['user'] = urldecode($url['user']);
         }
         if (isset($url['pass'])) {
-            $parameters['password'] = $url['pass'];
+            $parameters['password'] = urldecode($url['pass']);
         }
         if (isset($url['path'])) {
-            $parameters['vhost'] = $url['path'];
+            $parameters['vhost'] = urldecode(ltrim($url['path'], '/'));
         }
 
         if (isset($url['query'])) {

@@ -91,7 +91,7 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             321,         // port
             'bar_user',  // user
             'bar_password', // password
-            '/whost',    // vhost
+            'whost',     // vhost
             false,       // insist
             "AMQPLAIN",  // login method
             null,        // login response
@@ -99,8 +99,68 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             6,           // connection timeout
             6,           // read write timeout
             null,        // context
-            true,       // keepalive
+            true,        // keepalive
             0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    public function testSetConnectionParametersWithUrlEncoded()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(
+                'url' => 'amqp://user%61:%61pass@ho%61st:10000/v%2fhost?keepalive=1&connection_timeout=6&read_write_timeout=6',
+            )
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(
+            'hoast',     // host
+            10000,       // port
+            'usera',     // user
+            'apass',     // password
+            'v/host',    // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            6,           // connection timeout
+            6,           // read write timeout
+            null,        // context
+            true,        // keepalive
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    public function testSetConnectionParametersWithUrlWithoutVhost()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(
+                'url' => 'amqp://user:pass@host:321/?keepalive=1&connection_timeout=6&read_write_timeout=6',
+            )
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(
+            'host',     // host
+            321,        // port
+            'user',     // user
+            'pass',     // password
+            '',         // vhost
+            false,      // insist
+            "AMQPLAIN", // login method
+            null,       // login response
+            "en_US",    // locale
+            6,          // connection timeout
+            6,          // read write timeout
+            null,       // context
+            true,       // keepalive
+            0,          // heartbeat
         ), $instance->constructParams);
     }
 

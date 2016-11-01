@@ -117,6 +117,7 @@ old_sound_rabbit_mq:
             # A different (unused) connection defined by an URL. One can omit all parts,
             # except the scheme (amqp:). If both segment in the URL and a key value (see above)
             # are given the value from the URL takes precedence.
+            # See https://www.rabbitmq.com/uri-spec.html on how to encode values.
             url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
