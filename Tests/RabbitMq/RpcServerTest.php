@@ -14,15 +14,23 @@ class RpcServerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('sendReply', 'maybeStopConsumer'))
             ->disableOriginalConstructor()
             ->getMock();
-        $message = $this->getMock('\PhpAmqpLib\Message\AMQPMessage', array('get'));
+        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
+            ->setMethods( array('get'))
+            ->getMock();
         $message->delivery_info = array(
-            'channel' => $this->getMock('\PhpAmqpLib\Channel\AMQPChannel', array(), array(), '', false),
+            'channel' => $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+                ->setMethods(array())->setConstructorArgs(array())
+                ->setMockClassName('')
+                ->disableOriginalConstructor()
+                ->getMock(),
             'delivery_tag' => null
         );
         $server->setCallback(function() {
             return 'message';
         });
-        $serializer = $this->getMock('\Symfony\Component\Serializer\SerializerInterface', array('serialize', 'deserialize'));
+        $serializer = $this->getMockBuilder('\Symfony\Component\Serializer\SerializerInterface')
+            ->setMethods(array('serialize', 'deserialize'))
+            ->getMock();
         $serializer->expects($this->once())->method('serialize')->with('message', 'json');
         $server->setSerializer(function($data) use ($serializer) {
             $serializer->serialize($data, 'json');
@@ -30,3 +38,4 @@ class RpcServerTest extends \PHPUnit_Framework_TestCase
         $server->processMessage($message);
     }
 }
+

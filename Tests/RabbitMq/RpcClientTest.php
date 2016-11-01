@@ -13,8 +13,8 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('sendReply', 'maybeStopConsumer'))
             ->disableOriginalConstructor()
             ->getMock();
-        $message = $this->getMock('\PhpAmqpLib\Message\AMQPMessage', array('get'), array('message'));
-        $serializer = $this->getMock('\Symfony\Component\Serializer\SerializerInterface', array('serialize', 'deserialize'));
+        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')->setMethods(array('get'))->setConstructorArgs(array('message'))->getMock();
+        $serializer = $this->getMockBuilder('\Symfony\Component\Serializer\SerializerInterface')->setMethods(array('serialize', 'deserialize'))->getMock();
         $serializer->expects($this->once())->method('deserialize')->with('message', 'json', null);
         $client->initClient(true);
         $client->setUnserializer(function($data) use ($serializer) {
