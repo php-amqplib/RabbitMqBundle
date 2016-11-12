@@ -6,6 +6,7 @@ use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
@@ -169,5 +170,36 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer->setEventDispatcher($eventDispatcher);
         $consumer->consume(1);
+    }
+
+    public function testIdleTimeoutExitCode()
+    {
+        // set up amqp connection
+        $amqpConnection = $this->prepareAMQPConnection();
+        // set up amqp channel
+        $amqpChannel = $this->prepareAMQPChannel();
+        $amqpChannel->expects($this->atLeastOnce())
+            ->method('getChannelId')
+            ->with()
+            ->willReturn(true);
+        $amqpChannel->expects($this->once())
+            ->method('basic_consume')
+            ->withAnyParameters()
+            ->willReturn(true);
+
+        // set up consumer
+        $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
+        // disable autosetup fabric so we do not mock more objects
+        $consumer->disableAutoSetupFabric();
+        $consumer->setChannel($amqpChannel);
+        $consumer->setIdleTimeoutExitCode(2);
+        $amqpChannel->callbacks = array('idle_timeout_exit_code');
+
+        $amqpChannel->expects($this->exactly(1))
+            ->method('wait')
+            ->with(null, false, $consumer->getIdleTimeout())
+            ->willThrowException(new AMQPTimeoutException());
+
+        $this->assertTrue(2 == $consumer->consume(1));
     }
 }

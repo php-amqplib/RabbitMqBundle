@@ -16,6 +16,8 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     protected $idleTimeout = 0;
 
+    protected $idleTimeoutExitCode;
+
     public function setCallback($callback)
     {
         $this->callback = $callback;
@@ -100,9 +102,29 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         $this->idleTimeout = $idleTimeout;
     }
 
+    /**
+     * Set exit code to be returned when there is a timeout exception
+     *
+     * @param int|null $idleTimeoutExitCode
+     */
+    public function setIdleTimeoutExitCode($idleTimeoutExitCode)
+    {
+        $this->idleTimeoutExitCode = $idleTimeoutExitCode;
+    }
+
     public function getIdleTimeout()
     {
         return $this->idleTimeout;
+    }
+
+    /**
+     * Get exit code to be returned when there is a timeout exception
+     *
+     * @return int|null
+     */
+    public function getIdleTimeoutExitCode()
+    {
+        return $this->idleTimeoutExitCode;
     }
 
     /**
