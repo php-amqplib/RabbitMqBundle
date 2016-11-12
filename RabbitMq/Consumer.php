@@ -5,6 +5,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
@@ -49,7 +50,15 @@ class Consumer extends BaseConsumer
             $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
             if (!$this->forceStop) {
-                $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+                try {
+                    $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+                } catch (AMQPTimeoutException $e) {
+                    if (null !== $this->getIdleTimeoutExitCode()) {
+                        return $this->getIdleTimeoutExitCode();
+                    } else {
+                        throw $e;
+                    }
+                }
             }
         }
     }

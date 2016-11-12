@@ -351,16 +351,18 @@ If the process message will throw an Exception the event will not raise.
 
 #### Idle timeout ####
 
-If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
+If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds.
+The `idle_timeout_exit_code` specifies what exit code should be returned by the consumer when the idle timeout occurs. Without specifying it, the consumer will throw an **PhpAmqpLib\Exception\AMQPTimeoutException** exception.
 
 ```yaml
 consumers:
     upload_picture:
-        connection:       default
-        exchange_options: {name: 'upload-picture', type: direct}
-        queue_options:    {name: 'upload-picture'}
-        callback:         upload_picture_service
-        idle_timeout:     60
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+        idle_timeout:           60
+        idle_timeout_exit_code: 0
 ```
 
 #### Fair dispatching ####

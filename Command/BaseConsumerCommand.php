@@ -87,7 +87,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         }
         $this->initConsumer($input);
         
-        $this->consumer->consume($this->amount);   
+        return $this->consumer->consume($this->amount);
     }
     
     protected function initConsumer($input) {
