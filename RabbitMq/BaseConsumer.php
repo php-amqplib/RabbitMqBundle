@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Connection\AbstractConnection;
 
@@ -21,14 +22,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     protected $startDateTime = null;
 
-    /**
-     * BaseConsumer constructor.
-     *
-     * @param AbstractConnection                   $conn
-     * @param null|\PhpAmqpLib\Channel\AMQPChannel $ch
-     * @param null                                 $consumerTag
-     */
-    public function __construct(AbstractConnection $conn, $ch, $consumerTag)
+    public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         parent::__construct($conn, $ch, $consumerTag);
 
@@ -145,6 +139,10 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     protected function isTimeLimitExceeded()
     {
+        if( $this->timeLimit == 0 ){
+            return false;
+        }
+
         $now = new \DateTime();
 
         if ((int)$now->format('YmdHis') >= ((int)$this->startDateTime->format('YmdHis') + $this->timeLimit)) {
