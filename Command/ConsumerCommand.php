@@ -4,7 +4,6 @@ namespace OldSound\RabbitMqBundle\Command;
 
 class ConsumerCommand extends BaseConsumerCommand
 {
-
     protected function configure()
     {
         parent::configure();
