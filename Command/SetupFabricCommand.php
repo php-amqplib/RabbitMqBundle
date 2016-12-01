@@ -23,7 +23,6 @@ class SetupFabricCommand extends BaseRabbitMqCommand
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
-
         $output->writeln('Setting up the Rabbit MQ fabric');
 
         $partsHolder = $this->getContainer()->get('old_sound_rabbit_mq.parts_holder');

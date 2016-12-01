@@ -86,11 +86,12 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
         $this->initConsumer($input);
-        
+
         return $this->consumer->consume($this->amount);
     }
-    
-    protected function initConsumer($input) {
+
+    protected function initConsumer($input)
+    {
         $this->consumer = $this->getContainer()
                 ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
