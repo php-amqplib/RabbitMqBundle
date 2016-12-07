@@ -41,7 +41,7 @@ class OldSoundRabbitMqExtension extends Extension
         $loader = new XmlFileLoader($this->container, new FileLocator(array(__DIR__ . '/../Resources/config')));
         $loader->load('rabbitmq.xml');
 
-        $configuration = new Configuration();
+        $configuration = new Configuration($this->getAlias());
         $this->config = $this->processConfiguration($configuration, $configs);
 
         $this->collectorEnabled = $this->config['enable_collector'];
@@ -52,6 +52,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadConsumers();
         $this->loadMultipleConsumers();
         $this->loadDynamicConsumers();
+        $this->loadBatchConsumers();
         $this->loadAnonConsumers();
         $this->loadRpcClients();
         $this->loadRpcServers();
@@ -345,6 +346,47 @@ class OldSoundRabbitMqExtension extends Extension
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($consumer['callback'], $name);
             $this->addDequeuerAwareCall($consumer['queue_options_provider'], $name);
+        }
+    }
+
+    protected function loadBatchConsumers()
+    {
+        foreach ($this->config['batch_consumers'] as $key => $consumer) {
+            $definition = new Definition('%old_sound_rabbit_mq.batch_consumer.class%');
+            $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.consumer')
+                ->addTag('old_sound_rabbit_mq.batch_consumer')
+                ->addMethodCall('setTimeoutWait', array($consumer['timeout_wait']))
+                ->addMethodCall('setPrefetchCount', array($consumer['qos_options']['prefetch_count']))
+                ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
+                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')))
+                ->addMethodCall('setQosOptions', array(
+                    $consumer['qos_options']['prefetch_size'],
+                    $consumer['qos_options']['prefetch_count'],
+                    $consumer['qos_options']['global']
+                ))
+            ;
+
+            if (isset($consumer['idle_timeout'])) {
+                $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+
+            if (!$consumer['auto_setup_fabric']) {
+                $definition->addMethodCall('disableAutoSetupFabric');
+            }
+
+            $this->injectConnection($definition, $consumer['connection']);
+            if ($this->collectorEnabled) {
+                $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['enable_logger']) {
+                $this->injectLogger($definition);
+            }
+
+            $name = sprintf('old_sound_rabbit_mq.%s_batch', $key);
+            $this->container->setDefinition($name, $definition);
         }
     }
 
