@@ -134,7 +134,7 @@ class BatchConsumer extends Consumer
         $this->consumed++;
         $this->maybeStopConsumer();
         if (!$isRejectedOrReQueued) {
-            $this->addDeliveryTag($msg);
+            $this->addMessage($msg);
         }
 
         if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
@@ -150,12 +150,12 @@ class BatchConsumer extends Consumer
     private function resetBatch($hasExceptions = false)
     {
         if ($hasExceptions) {
-            array_map(function(AMQPMessage $msg) {
-                $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
+            array_map(function($message) {
+                $message['channel']->basic_reject($message['tag'], true);
             }, $this->messages);
         } else {
-            array_map(function(AMQPMessage $msg) {
-                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            array_map(function($message) {
+                $message['channel']->basic_ack($message['tag']);
             }, $this->messages);
         }
 
@@ -168,9 +168,12 @@ class BatchConsumer extends Consumer
      *
      * @return  void
      */
-    private function addDeliveryTag(AMQPMessage $message)
+    private function addMessage(AMQPMessage $message)
     {
-        $this->messages[$this->batchCounter++] = $message;
+        $this->messages[$this->batchCounter++] = array(
+            'channel' => $message->delivery_info['channel'],
+            'tag' => $message->delivery_info['delivery_tag'],
+        );
     }
 
     /**
