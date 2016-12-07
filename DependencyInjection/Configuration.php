@@ -250,6 +250,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('key')
                     ->prototype('array')
                         ->append($this->getExchangeConfiguration())
+                        ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('callback')->isRequired()->end()
