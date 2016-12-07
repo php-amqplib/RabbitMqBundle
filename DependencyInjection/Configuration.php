@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
         $this->addConsumers($rootNode);
         $this->addMultipleConsumers($rootNode);
         $this->addDynamicConsumers($rootNode);
+        $this->addBatchConsumers($rootNode);
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
@@ -212,6 +213,42 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('queue_options_provider')->isRequired()->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    /**
+     * @param   ArrayNodeDefinition     $node
+     *
+     * @return  void
+     */
+    protected function addBatchConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('batch_consumers')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->append($this->getExchangeConfiguration())
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('callback')->isRequired()->end()
+                            ->scalarNode('idle_timeout')->end()
+                            ->scalarNode('timeout_wait')->defaultValue(3)->end()
+                            ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                            ->arrayNode('qos_options')
+                                ->children()
+                                    ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                    ->scalarNode('prefetch_count')->defaultValue(2)->end()
+                                    ->booleanNode('global')->defaultFalse()->end()
+                                ->end()
+                            ->end()
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                         ->end()
                     ->end()
