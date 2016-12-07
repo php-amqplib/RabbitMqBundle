@@ -13,11 +13,26 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Configuration constructor.
+     *
+     * @param   string  $name
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
     public function getConfigTreeBuilder()
     {
         $tree = new TreeBuilder();
 
-        $rootNode = $tree->root('old_sound_rabbit_mq');
+        $rootNode = $tree->root($this->name);
 
         $rootNode
             ->children()
