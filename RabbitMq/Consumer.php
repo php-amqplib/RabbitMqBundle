@@ -38,7 +38,11 @@ class Consumer extends BaseConsumer
     /**
      * Consume the message
      *
-     * @param int $msgAmount
+     * @param   int     $msgAmount
+     *
+     * @return  int
+     *
+     * @throws  AMQPTimeoutException
      */
     public function consume($msgAmount)
     {
