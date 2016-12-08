@@ -34,9 +34,15 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         }
     }
 
+    /**
+     * Tell the server you are going to stop consuming.
+     *
+     * It will finish up the last message and not send you any more.
+     */
     public function stopConsuming()
     {
-        $this->getChannel()->basic_cancel($this->getConsumerTag());
+        // This gets stuck and will not exit without the last two parameters set.
+        $this->getChannel()->basic_cancel($this->getConsumerTag(), false, true);
     }
 
     protected function setupConsumer()
