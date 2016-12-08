@@ -64,7 +64,7 @@ abstract class BaseAmqp
         $this->conn = $conn;
         $this->ch = $ch;
 
-        if (!($conn instanceof AMQPLazyConnection)) {
+        if ($conn->connectOnConstruct()) {
             $this->getChannel();
         }
 
