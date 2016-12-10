@@ -363,10 +363,9 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.batch_consumer')
                 ->addMethodCall('setTimeoutWait', array($consumer['timeout_wait']))
                 ->addMethodCall('setPrefetchCount', array($consumer['qos_options']['prefetch_count']))
-                ->addMethodCall('setBatchCallback', array(array(new Reference($consumer['callback']), 'batchExecute')))
+                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'batchExecute')))
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')))
                 ->addMethodCall('setQosOptions', array(
                     $consumer['qos_options']['prefetch_size'],
                     $consumer['qos_options']['prefetch_count'],
