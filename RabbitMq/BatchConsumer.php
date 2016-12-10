@@ -2,12 +2,43 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class BatchConsumer extends Consumer
+class BatchConsumer extends BaseAmqp implements DequeuerInterface
 {
+    /**
+     * @var int
+     */
+    protected $consumed = 0;
+
+    /**
+     * @var \Closure|callable
+     */
+    protected $callback;
+
+    /**
+     * @var bool
+     */
+    protected $forceStop = false;
+
+    /**
+     * @var int
+     */
+    protected $idleTimeout = 0;
+
+    /**
+     * @var int
+     */
+    protected $idleTimeoutExitCode;
+
+    /**
+     * @var int
+     */
+    protected $memoryLimit = null;
+
     /**
      * @var int
      */
@@ -16,7 +47,7 @@ class BatchConsumer extends Consumer
     /**
      * @var int
      */
-    protected $timeoutWait;
+    protected $timeoutWait = 3;
 
     /**
      * @var array
@@ -29,27 +60,48 @@ class BatchConsumer extends Consumer
     protected $batchCounter = 0;
 
     /**
-     * @var \Closure
+     * @param   \Closure|callable    $callback
+     *
+     * @return  $this
      */
-    protected $batchCallback;
-
-    /**
-     * @inheritDoc
-     */
-    public function consume($msgAmount)
+    public function setCallback($callback)
     {
-        $this->target = $msgAmount;
+        $this->callback = $callback;
 
+        return $this;
+    }
+
+    public function start()
+    {
+        $this->setupConsumer();
+
+        while (count($this->getChannel()->callbacks)) {
+            $this->getChannel()->wait();
+        }
+    }
+
+    public function execute(AMQPMessage $msg)
+    {
+        $this->addMessage($msg);
+
+        $this->maybeStopConsumer();
+
+        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+            $this->stopConsuming();
+        }
+    }
+
+    public function consume()
+    {
         $this->setupConsumer();
 
         $isConsuming = false;
         $timeoutWanted = $this->getTimeoutWait();
         while (count($this->getChannel()->callbacks)) {
-            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
             if (!$this->forceStop) {
                 try {
-                    $this->consumeMessage($timeoutWanted);
+                    $this->getChannel()->wait(null, false, $timeoutWanted);
                     $isConsuming = true;
                 } catch (AMQPTimeoutException $e) {
                     $this->batchConsume();
@@ -61,6 +113,8 @@ class BatchConsumer extends Consumer
                         throw $e;
                     }
                 }
+            } else {
+                $this->batchConsume();
             }
 
             if ($this->isCompleteBatch($isConsuming)) {
@@ -71,23 +125,94 @@ class BatchConsumer extends Consumer
         }
     }
 
-    /**
-     * @return  void
-     *
-     * @throws  \Exception
-     */
-    protected function batchConsume()
+    public function batchConsume()
     {
         if ($this->batchCounter == 0) {
             return;
         }
 
-        try {
-            call_user_func($this->batchCallback);
+        try  {
+            $processFlags = call_user_func($this->callback, $this->messages);
+            $this->handleProcessMessages($processFlags);
+            $this->logger->debug('Queue message processed', array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'messages' => $this->messages,
+                    'return_codes' => $processFlags
+                )
+            ));
+        } catch (Exception\StopConsumerException $e) {
+            $this->logger->info('Consumer requested restart', array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $this->messages,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->stopConsuming();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $this->messages,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        } catch (\Error $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $this->messages,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        } finally {
             $this->resetBatch();
-        } catch (\Exception $exception) {
-            $this->resetBatch(true);
-            throw $exception;
+        }
+    }
+
+    /**
+     * @param   mixed   $processFlags
+     *
+     * @return  void
+     */
+    protected function handleProcessMessages($processFlags = null)
+    {
+        $processFlags = $this->analyzeProcessFlags($processFlags);
+        foreach ($processFlags as $deliveryTag => $processFlag) {
+            $this->handleProcessFlag($deliveryTag, $processFlag);
+        }
+
+        $this->consumed++;
+        $this->maybeStopConsumer();
+
+        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+            $this->stopConsuming();
+        }
+    }
+
+    /**
+     * @param   int     $deliveryTag
+     * @param   mixed   $processFlag
+     *
+     * @return  void
+     */
+    private function handleProcessFlag ($deliveryTag, $processFlag)
+    {
+        if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
+            // Reject and requeue message to RabbitMQ
+            $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, true);
+        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+            // NACK and requeue message to RabbitMQ
+            $this->getMessageChannel($deliveryTag)->basic_nack($deliveryTag, false, true);
+        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+            // Reject and drop
+            $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, false);
+        } else {
+            // Remove message from queue only if callback return not false
+            $this->getMessageChannel($deliveryTag)->basic_ack($deliveryTag);
         }
     }
 
@@ -98,67 +223,86 @@ class BatchConsumer extends Consumer
      */
     protected function isCompleteBatch($isConsuming)
     {
-        return $isConsuming && $this->batchCounter != 0 && $this->batchCounter%$this->prefetchCount == 0;
+        return $isConsuming && $this->batchCounter === $this->prefetchCount;
     }
 
     /**
-     * @inheritDoc
-     */
-    public function stopConsuming()
-    {
-        $this->batchConsume();
-
-        parent::stopConsuming();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function handleProcessMessage(AMQPMessage $msg, $processFlag)
-    {
-        $isRejectedOrReQueued = false;
-
-        if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
-            // Reject and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
-            $isRejectedOrReQueued = true;
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
-            // NACK and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], false, true);
-            $isRejectedOrReQueued = true;
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
-            // Reject and drop
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
-        }
-
-        $this->consumed++;
-        $this->maybeStopConsumer();
-        if (!$isRejectedOrReQueued) {
-            $this->addMessage($msg);
-        }
-
-        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
-            $this->stopConsuming();
-        }
-    }
-
-    /**
-     * @param   bool    $hasExceptions
+     * @param   AMQPMessage     $msg
      *
      * @return  void
+     *
+     * @throws  \Error
+     * @throws  \Exception
      */
-    private function resetBatch($hasExceptions = false)
+    public function processMessage(AMQPMessage $msg)
     {
-        if ($hasExceptions) {
-            array_map(function($message) {
-                $message['channel']->basic_reject($message['tag'], true);
-            }, $this->messages);
-        } else {
-            array_map(function($message) {
-                $message['channel']->basic_ack($message['tag']);
-            }, $this->messages);
+        try {
+            call_user_func(array($this, 'execute'), $msg);
+        } catch (Exception\StopConsumerException $e) {
+            $this->logger->info('Consumer requested restart', array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->stopConsuming();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->batchConsume();
+
+            throw $e;
+        } catch (\Error $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $this->queueOptions['name'],
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->batchConsume();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param   mixed   $processFlags
+     *
+     * @return  array
+     */
+    private function analyzeProcessFlags($processFlags = null)
+    {
+        if (is_array($processFlags)) {
+            if (count($processFlags) !== $this->batchCounter) {
+                throw new AMQPRuntimeException(
+                    'Method batchExecute() should return an array with elements equal with the number of messages processed'
+                );
+            }
+
+            return $processFlags;
         }
 
+        $response = array();
+        foreach ($this->messages as $deliveryTag => $message) {
+            $response[$deliveryTag] = $processFlags;
+        }
+
+        return $response;
+    }
+
+
+    /**
+     * @return  void
+     */
+    private function resetBatch()
+    {
         $this->messages = array();
         $this->batchCounter = 0;
     }
@@ -170,22 +314,203 @@ class BatchConsumer extends Consumer
      */
     private function addMessage(AMQPMessage $message)
     {
-        $this->messages[$this->batchCounter++] = array(
-            'channel' => $message->delivery_info['channel'],
-            'tag' => $message->delivery_info['delivery_tag'],
-        );
+        $this->batchCounter++;
+        $this->messages[(int)$message->delivery_info['delivery_tag']] = $message;
     }
 
     /**
-     * @param   \Closure    $callback
+     * @param   int     $deliveryTag
+     *
+     * @return  AMQPMessage
+     */
+    public function getMessage($deliveryTag)
+    {
+        return isset($this->messages[$deliveryTag])
+            ? $this->messages[$deliveryTag]
+            : null
+        ;
+    }
+
+    /**
+     * @param   int     $deliveryTag
+     *
+     * @return  AMQPChannel
+     *
+     * @throws  AMQPRuntimeException
+     */
+    public function getMessageChannel($deliveryTag)
+    {
+        $message = $this->getMessage($deliveryTag);
+        if (!$message) {
+            throw new AMQPRuntimeException(sprintf('Unknown delivery_tag %d!', $deliveryTag));
+        }
+
+        return $message->delivery_info['channel'];
+    }
+
+    /**
+     * @return  void
+     */
+    public function stopConsuming()
+    {
+        $this->batchConsume();
+
+        $this->getChannel()->basic_cancel($this->getConsumerTag());
+    }
+
+    /**
+     * @return  void
+     */
+    protected function setupConsumer()
+    {
+        if ($this->autoSetupFabric) {
+            $this->setupFabric();
+        }
+
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+    }
+
+    /**
+     * @return  void
+     *
+     * @throws \BadFunctionCallException
+     */
+    protected function maybeStopConsumer()
+    {
+        if (extension_loaded('pcntl') && (defined('AMQP_WITHOUT_SIGNALS') ? !AMQP_WITHOUT_SIGNALS : true)) {
+            if (!function_exists('pcntl_signal_dispatch')) {
+                throw new \BadFunctionCallException("Function 'pcntl_signal_dispatch' is referenced in the php.ini 'disable_functions' and can't be called.");
+            }
+
+            pcntl_signal_dispatch();
+        }
+
+        if ($this->forceStop) {
+            $this->stopConsuming();
+        } else {
+            return;
+        }
+    }
+
+    /**
+     * @param   string  $tag
      *
      * @return  $this
      */
-    public function setBatchCallback($callback)
+    public function setConsumerTag($tag)
     {
-        $this->batchCallback = $callback;
+        $this->consumerTag = $tag;
 
         return $this;
+    }
+
+    /**
+     * @return  string
+     */
+    public function getConsumerTag()
+    {
+        return $this->consumerTag;
+    }
+
+    /**
+     * @return  void
+     */
+    public function forceStopConsumer()
+    {
+        $this->forceStop = true;
+    }
+
+    /**
+     * Sets the qos settings for the current channel
+     * Consider that prefetchSize and global do not work with rabbitMQ version <= 8.0
+     *
+     * @param int $prefetchSize
+     * @param int $prefetchCount
+     * @param bool $global
+     */
+    public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
+    {
+        $this->prefetchCount = $prefetchCount;
+        $this->getChannel()->basic_qos($prefetchSize, $prefetchCount, $global);
+    }
+
+    /**
+     * @param   int     $idleTimeout
+     *
+     * @return  $this
+     */
+    public function setIdleTimeout($idleTimeout)
+    {
+        $this->idleTimeout = $idleTimeout;
+
+        return $this;
+    }
+
+    /**
+     * Set exit code to be returned when there is a timeout exception
+     *
+     * @param   int     $idleTimeoutExitCode
+     *
+     * @return  $this
+     */
+    public function setIdleTimeoutExitCode($idleTimeoutExitCode)
+    {
+        $this->idleTimeoutExitCode = $idleTimeoutExitCode;
+
+        return $this;
+    }
+
+    /**
+     * Purge the queue
+     */
+    public function purge()
+    {
+        $this->getChannel()->queue_purge($this->queueOptions['name'], true);
+    }
+
+    /**
+     * Delete the queue
+     */
+    public function delete()
+    {
+        $this->getChannel()->queue_delete($this->queueOptions['name'], true);
+    }
+
+    /**
+     * Checks if memory in use is greater or equal than memory allowed for this process
+     *
+     * @return boolean
+     */
+    protected function isRamAlmostOverloaded()
+    {
+        return (memory_get_usage(true) >= ($this->getMemoryLimit() * 1048576));
+    }
+
+    /**
+     * @return  int
+     */
+    public function getIdleTimeout()
+    {
+        return $this->idleTimeout;
+    }
+
+    /**
+     * Get exit code to be returned when there is a timeout exception
+     *
+     * @return  int|null
+     */
+    public function getIdleTimeoutExitCode()
+    {
+        return $this->idleTimeoutExitCode;
+    }
+
+    /**
+     * Resets the consumed property.
+     * Use when you want to call start() or consume() multiple times.
+     */
+    public function resetConsumed()
+    {
+        $this->consumed = 0;
     }
 
     /**
@@ -229,14 +554,22 @@ class BatchConsumer extends Consumer
     }
 
     /**
-     * @param   int     $timeout
+     * Set the memory limit
      *
-     * @return  void
-     *
-     * @throws  AMQPTimeoutException
+     * @param int $memoryLimit
      */
-    private function consumeMessage($timeout)
+    public function setMemoryLimit($memoryLimit)
     {
-        $this->getChannel()->wait(null, false, $timeout);
+        $this->memoryLimit = $memoryLimit;
+    }
+
+    /**
+     * Get the memory limit
+     *
+     * @return int
+     */
+    public function getMemoryLimit()
+    {
+        return $this->memoryLimit;
     }
 }
