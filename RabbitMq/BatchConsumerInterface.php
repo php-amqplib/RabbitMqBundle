@@ -2,7 +2,14 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-interface BatchConsumerInterface extends ConsumerInterface
+use PhpAmqpLib\Message\AMQPMessage;
+
+interface BatchConsumerInterface
 {
-    public function batchExecute();
+    /**
+     * @param   AMQPMessage[]   $messages
+     *
+     * @return  array|bool
+     */
+    public function batchExecute(array $messages);
 }
