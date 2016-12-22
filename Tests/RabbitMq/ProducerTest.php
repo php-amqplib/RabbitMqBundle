@@ -57,11 +57,8 @@ class ProducerTest extends \PHPUnit_Framework_TestCase
 
         $channel->close()->shouldBeCalled();
         $channel->confirm_select()->shouldBeCalled();
-        $channel->getChannelId()->shouldBeCalled();
+        $channel->getChannelId()->willReturn('channel_id');
         $channel->wait_for_pending_acks($producer->getWaitConfirmationTimeout())->shouldBeCalled();
-
-        $connection->channel()->willReturn($channel->reveal());
-        $connection->isConnected()->willReturn(false);
 
         $producer->setChannel($channel->reveal());
         $producer->enableConfirmation();
