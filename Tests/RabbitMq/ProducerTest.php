@@ -1,15 +1,6 @@
 <?php
-/*
- * This file is part of the OpCart software.
- *
- * (c) 2015, OpticsPlanet, Inc
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
-
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -61,12 +52,16 @@ class ProducerTest extends \PHPUnit_Framework_TestCase
     {
         $connection = $this->prophesize('\PhpAmqpLib\Connection\AMQPLazyConnection');
         $channel = $this->prophesize('\PhpAmqpLib\Channel\AMQPChannel');
-        
+
         $producer = new Producer($connection->reveal());
 
         $channel->close()->shouldBeCalled();
         $channel->confirm_select()->shouldBeCalled();
+        $channel->getChannelId()->shouldBeCalled();
         $channel->wait_for_pending_acks($producer->getWaitConfirmationTimeout())->shouldBeCalled();
+
+        $connection->channel()->willReturn($channel->reveal());
+        $connection->isConnected()->willReturn(false);
 
         $producer->setChannel($channel->reveal());
         $producer->enableConfirmation();

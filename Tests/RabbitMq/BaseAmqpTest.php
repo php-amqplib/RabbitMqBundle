@@ -30,13 +30,17 @@ class BaseAmqpTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')
             ->disableOriginalConstructor()
             ->getMock();
+        $channel = $this->getMockBuilder('PhpAmqpLib\Channel\AMQPChannel')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $connection
             ->method('connectOnConstruct')
             ->willReturn(true);
         $connection
             ->expects(static::once())
-            ->method('channel');
+            ->method('channel')
+            ->willReturn($channel);
 
         new Consumer($connection, null);
     }

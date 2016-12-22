@@ -31,8 +31,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.10.x-dev",
-            "dev-reconnect-fix-upstream": "1.13.x-dev"
+            "dev-master": "1.10.x-dev"
         }
     },
     "autoload": {
