@@ -18,7 +18,7 @@ class MemoryConsumptionCheckerTest extends \PHPUnit_Framework_TestCase
         $allowedConsumptionUntil = '2M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder(NativeMemoryUsageProvider::class)->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
@@ -32,7 +32,7 @@ class MemoryConsumptionCheckerTest extends \PHPUnit_Framework_TestCase
         $allowedConsumptionUntil = '2M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder(NativeMemoryUsageProvider::class)->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
