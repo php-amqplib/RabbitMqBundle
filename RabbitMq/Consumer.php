@@ -2,7 +2,10 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
+use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
+use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
+use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
@@ -44,8 +47,19 @@ class Consumer extends BaseConsumer
         $this->setupConsumer();
 
         while (count($this->getChannel()->callbacks)) {
+            $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
-            $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+            if (!$this->forceStop) {
+                try {
+                    $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+                } catch (AMQPTimeoutException $e) {
+                    if (null !== $this->getIdleTimeoutExitCode()) {
+                        return $this->getIdleTimeoutExitCode();
+                    } else {
+                        throw $e;
+                    }
+                }
+            }
         }
     }
 
@@ -56,12 +70,67 @@ class Consumer extends BaseConsumer
     {
         $this->getChannel()->queue_purge($this->queueOptions['name'], true);
     }
+    
+    /**
+     * Delete the queue
+     */
+    public function delete()
+    {
+        $this->getChannel()->queue_delete($this->queueOptions['name'], true);
+    }
+
+    protected function processMessageQueueCallback(AMQPMessage $msg, $queueName, $callback)
+    {
+        $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
+            new BeforeProcessingMessageEvent($this, $msg)
+        );
+        try {
+            $processFlag = call_user_func($callback, $msg);
+            $this->handleProcessMessage($msg, $processFlag);
+            $this->dispatchEvent(
+                AfterProcessingMessageEvent::NAME,
+                new AfterProcessingMessageEvent($this, $msg)
+            );
+            $this->logger->debug('Queue message processed', array(
+                'amqp' => array(
+                    'queue' => $queueName,
+                    'message' => $msg,
+                    'return_code' => $processFlag
+                )
+            ));
+        } catch (Exception\StopConsumerException $e) {
+            $this->logger->info('Consumer requested restart', array(
+                'amqp' => array(
+                    'queue' => $queueName,
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            $this->stopConsuming();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $queueName,
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        } catch (\Error $e) {
+            $this->logger->error($e->getMessage(), array(
+                'amqp' => array(
+                    'queue' => $queueName,
+                    'message' => $msg,
+                    'stacktrace' => $e->getTraceAsString()
+                )
+            ));
+            throw $e;
+        }
+    }
 
     public function processMessage(AMQPMessage $msg)
     {
-        $processFlag = call_user_func($this->callback, $msg);
-
-        $this->handleProcessMessage($msg, $processFlag);
+        $this->processMessageQueueCallback($msg, $this->queueOptions['name'], $this->callback);
     }
 
     protected function handleProcessMessage(AMQPMessage $msg, $processFlag)

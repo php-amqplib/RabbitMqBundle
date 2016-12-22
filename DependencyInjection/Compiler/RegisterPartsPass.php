@@ -10,6 +10,8 @@ class RegisterPartsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $services = $container->findTaggedServiceIds('old_sound_rabbit_mq.base_amqp');
+        $container->setParameter('old_sound_rabbit_mq.base_amqp', array_keys($services));
         if (!$container->hasDefinition('old_sound_rabbit_mq.parts_holder')) {
             return;
         }
@@ -18,6 +20,7 @@ class RegisterPartsPass implements CompilerPassInterface
 
         $tags = array(
             'old_sound_rabbit_mq.base_amqp',
+            'old_sound_rabbit_mq.binding',
             'old_sound_rabbit_mq.producer',
             'old_sound_rabbit_mq.consumer',
             'old_sound_rabbit_mq.multi_consumer',

@@ -2,9 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
+use PhpAmqpLib\Message\AMQPMessage;
 
-abstract class BaseConsumer extends BaseAmqp
+abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
     protected $target;
 
@@ -15,6 +15,8 @@ abstract class BaseConsumer extends BaseAmqp
     protected $forceStop = false;
 
     protected $idleTimeout = 0;
+
+    protected $idleTimeoutExitCode;
 
     public function setCallback($callback)
     {
@@ -32,9 +34,15 @@ abstract class BaseConsumer extends BaseAmqp
         }
     }
 
+    /**
+     * Tell the server you are going to stop consuming.
+     *
+     * It will finish up the last message and not send you any more.
+     */
     public function stopConsuming()
     {
-        $this->getChannel()->basic_cancel($this->getConsumerTag());
+        // This gets stuck and will not exit without the last two parameters set.
+        $this->getChannel()->basic_cancel($this->getConsumerTag(), false, true);
     }
 
     protected function setupConsumer()
@@ -43,6 +51,11 @@ abstract class BaseConsumer extends BaseAmqp
             $this->setupFabric();
         }
         $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+    }
+
+    public function processMessage(AMQPMessage $msg)
+    {
+        //To be implemented by descendant classes
     }
 
     protected function maybeStopConsumer()
@@ -81,8 +94,8 @@ abstract class BaseConsumer extends BaseAmqp
      * Sets the qos settings for the current channel
      * Consider that prefetchSize and global do not work with rabbitMQ version <= 8.0
      *
-     * @param int  $prefetchSize
-     * @param int  $prefetchCount
+     * @param int $prefetchSize
+     * @param int $prefetchCount
      * @param bool $global
      */
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
@@ -95,8 +108,37 @@ abstract class BaseConsumer extends BaseAmqp
         $this->idleTimeout = $idleTimeout;
     }
 
+    /**
+     * Set exit code to be returned when there is a timeout exception
+     *
+     * @param int|null $idleTimeoutExitCode
+     */
+    public function setIdleTimeoutExitCode($idleTimeoutExitCode)
+    {
+        $this->idleTimeoutExitCode = $idleTimeoutExitCode;
+    }
+
     public function getIdleTimeout()
     {
         return $this->idleTimeout;
+    }
+
+    /**
+     * Get exit code to be returned when there is a timeout exception
+     *
+     * @return int|null
+     */
+    public function getIdleTimeoutExitCode()
+    {
+        return $this->idleTimeoutExitCode;
+    }
+
+    /**
+     * Resets the consumed property.
+     * Use when you want to call start() or consume() multiple times.
+     */
+    public function resetConsumed()
+    {
+        $this->consumed = 0;
     }
 }

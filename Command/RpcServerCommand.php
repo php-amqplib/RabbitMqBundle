@@ -9,13 +9,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RpcServerCommand extends BaseRabbitMqCommand
 {
-
     protected function configure()
     {
         parent::configure();
 
         $this
             ->setName('rabbitmq:rpc-server')
+            ->setDescription('Start an RPC server')
             ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)

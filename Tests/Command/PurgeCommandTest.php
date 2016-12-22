@@ -2,8 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\Tests\Command;
 
-use OldSound\RabbitMqBundle\Command\ConsumerCommand;
-
 use OldSound\RabbitMqBundle\Command\PurgeConsumerCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -31,11 +29,12 @@ class PurgeCommandTest extends BaseCommandTest
     public function testInputsDefinitionCommand()
     {
         // check argument
-        $this->assertTrue($this->command->getDefinition()->hasArgument('name'));
-        $this->assertTrue($this->command->getDefinition()->getArgument('name')->isRequired()); // Name is required to find the service
+        $definition = $this->command->getDefinition();
+        $this->assertTrue($definition->hasArgument('name'));
+        $this->assertTrue($definition->getArgument('name')->isRequired()); // Name is required to find the service
 
         //check options
-        $this->assertTrue($this->command->getDefinition()->hasOption('no-confirmation'));
-        $this->assertFalse($this->command->getDefinition()->getOption('no-confirmation')->acceptValue()); // It shouldn't accept value because it is a true/false input
+        $this->assertTrue($definition->hasOption('no-confirmation'));
+        $this->assertFalse($definition->getOption('no-confirmation')->acceptValue()); // It shouldn't accept value because it is a true/false input
     }
 }
