@@ -252,7 +252,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer->setEventDispatcher($eventDispatcher);
 
-        $this->setExpectedException(AMQPTimeoutException::class);
+        $this->setExpectedException('PhpAmqpLib\Exception\AMQPTimeoutException');
         $consumer->consume(10);
     }
 }
