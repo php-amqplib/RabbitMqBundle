@@ -24,10 +24,31 @@ class OnIdleEventTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testEvent()
+    public function testShouldAllowGetConsumerSetInConstructor()
     {
         $consumer = $this->getConsumer();
         $event = new OnIdleEvent($consumer);
+
         $this->assertSame($consumer, $event->getConsumer());
+    }
+
+    public function testShouldSetForceStopToTrueInConstructor()
+    {
+        $consumer = $this->getConsumer();
+        $event = new OnIdleEvent($consumer);
+
+        $this->assertTrue($event->isForceStop());
+    }
+
+    public function testShouldReturnPreviouslySetForceStop()
+    {
+        $consumer = $this->getConsumer();
+        $event = new OnIdleEvent($consumer);
+
+        //guard
+        $this->assertTrue($event->isForceStop());
+
+        $event->setForceStop(false);
+        $this->assertFalse($event->isForceStop());
     }
 }
