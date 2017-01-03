@@ -351,6 +351,32 @@ class AfterProcessingMessageEvent extends AMQPEvent
 Event raised after processing a AMQPMessage.
 If the process message will throw an Exception the event will not raise.
 
+##### IDLE MESSAGE #####
+
+```php
+<?php
+class OnIdleEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_IDLE;
+
+    /**
+     * OnIdleEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+        
+        $this->forceStop = true;
+    }
+}
+```
+
+Event raised when `wait` method exit by timeout without receiving a message. 
+In order to make use of this event a consumer `idle_timeout` has to be [configured](#idle-timeout). 
+By default process exit on idle timeout, you can prevent it by setting `$event->setForceStop(false)` in a listener.
+
 #### Idle timeout ####
 
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds.
