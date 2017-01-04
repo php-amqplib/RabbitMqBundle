@@ -5,6 +5,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
+use OldSound\RabbitMqBundle\Event\OnIdleEvent;
 use OldSound\RabbitMqBundle\MemoryChecker\MemoryConsumptionChecker;
 use OldSound\RabbitMqBundle\MemoryChecker\NativeMemoryUsageProvider;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
@@ -55,10 +56,15 @@ class Consumer extends BaseConsumer
                 try {
                     $this->getChannel()->wait(null, false, $this->getIdleTimeout());
                 } catch (AMQPTimeoutException $e) {
-                    if (null !== $this->getIdleTimeoutExitCode()) {
-                        return $this->getIdleTimeoutExitCode();
-                    } else {
-                        throw $e;
+                    $idleEvent = new OnIdleEvent($this);
+                    $this->dispatchEvent(OnIdleEvent::NAME, $idleEvent);
+
+                    if ($idleEvent->isForceStop()) {
+                        if (null !== $this->getIdleTimeoutExitCode()) {
+                            return $this->getIdleTimeoutExitCode();
+                        } else {
+                            throw $e;
+                        }
                     }
                 }
             }
