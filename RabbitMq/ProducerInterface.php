@@ -10,6 +10,7 @@ interface ProducerInterface
      * @param string $msgBody
      * @param string $routingKey
      * @param array $additionalProperties
+     * @param array $headers
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array());
+    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null);
 }
