@@ -418,6 +418,43 @@ consumers:
         qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
 ```
 
+#### Usage without __exchanges__ and __producers__ for simple queue/worker implementation ####
+
+If you don't want to use more advanced features (e.g. __exchanges__ with type __fanout__), then you can publish messages
+to rabbitmq's queues with only one __producer__ and without any additional __exchanges__. To do so, you need to define
+a producer without `exchange_options`, which means it'll use rabbitmq's default `AMQP Exchange`. This way, you can
+publish new messages to desired queues by the queues' names (the second paramater to the `Producer::publish()` method).
+If you're interested why this works, then check out these link: [link1](http://www.rabbitmq.com/tutorials/tutorial-two-php.html)
+[link2](http://www.rabbitmq.com/amqp-0-9-1-reference.html#class.queue)
+
+```yaml
+    producers:
+        default:
+            connection:       default
+            service_alias:    default_queue_message_dispatcher
+            
+    consumers:
+        upload_picture:
+            connection:       default
+            queue_options:    {name: 'upload-picture'}
+            callback:         upload_picture_service
+            qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+            
+        render_treasure_map:
+            connection:       default
+            queue_options:    {name: 'render_treasure_map'}
+            callback:         render_treasure_map_service
+            qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+```
+
+```php
+public function indexAction($name)
+{
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $this->get('default_queue_message_dispatcher')->publish(serialize($msg), 'upload_picture');
+}
+```
+
 ### Callbacks ###
 
 Here's an example callback:
