@@ -138,6 +138,8 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('graceful_max_execution_timeout')->end()
+                            ->scalarNode('graceful_max_execution_timeout_exit_code')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
