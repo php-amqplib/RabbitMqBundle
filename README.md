@@ -424,8 +424,7 @@ If you don't want to use more advanced features (e.g. __exchanges__ with type __
 to rabbitmq's queues with only one __producer__ and without any additional __exchanges__. To do so, you need to define
 a producer without `exchange_options`, which means it'll use rabbitmq's default `AMQP Exchange`. This way, you can
 publish new messages to desired queues by the queues' names (the second paramater to the `Producer::publish()` method).
-If you're interested why this works, then check out these link: [link1](http://www.rabbitmq.com/tutorials/tutorial-two-php.html)
-[link2](http://www.rabbitmq.com/amqp-0-9-1-reference.html#class.queue)
+More info: [link](https://www.rabbitmq.com/tutorials/amqp-concepts.html#exchange-default).
 
 ```yaml
     producers:
