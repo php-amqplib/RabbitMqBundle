@@ -4,7 +4,7 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * Configuration
@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
         ;
 
         $this->addConnections($rootNode);
+        $this->addBindings($rootNode);
         $this->addProducers($rootNode);
         $this->addConsumers($rootNode);
         $this->addMultipleConsumers($rootNode);
@@ -49,6 +50,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->prototype('array')
                         ->children()
+                            ->scalarNode('url')->defaultValue('')->end()
                             ->scalarNode('host')->defaultValue('localhost')->end()
                             ->scalarNode('port')->defaultValue(5672)->end()
                             ->scalarNode('user')->defaultValue('guest')->end()
@@ -57,6 +59,7 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('lazy')->defaultFalse()->end()
                             ->scalarNode('connection_timeout')->defaultValue(3)->end()
                             ->scalarNode('read_write_timeout')->defaultValue(3)->end()
+                            ->booleanNode('use_socket')->defaultValue(false)->end()
                             ->arrayNode('ssl_context')
                                 ->useAttributeAsKey('key')
                                 ->canBeUnset()
@@ -86,6 +89,32 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.producer.class%')->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
+                            ->scalarNode('service_alias')->defaultValue(null)->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addBindings(ArrayNodeDefinition $node)
+    {
+        $node
+            ->fixXmlConfig('binding')
+            ->children()
+                ->arrayNode('bindings')
+                    ->canBeUnset()
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('exchange')->defaultNull()->end()
+                            ->scalarNode('destination')->defaultNull()->end()
+                            ->scalarNode('routing_key')->defaultNull()->end()
+                            ->booleanNode('nowait')->defaultFalse()->end()
+                            ->booleanNode('destination_is_exchange')->defaultFalse()->end()
+                            ->variableNode('arguments')->defaultNull()->end()
+                            ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.binding.class%')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -108,6 +137,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
+                            ->scalarNode('idle_timeout_exit_code')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
@@ -117,6 +147,7 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('global')->defaultFalse()->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -137,6 +168,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('connection')->defaultValue('default')->end()
                         ->scalarNode('idle_timeout')->end()
+                        ->scalarNode('idle_timeout_exit_code')->end()
                         ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                         ->append($this->getMultipleQueuesConfiguration())
                         ->arrayNode('qos_options')
@@ -148,6 +180,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('queues_provider')->defaultNull()->end()
+                        ->scalarNode('enable_logger')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()
@@ -168,6 +201,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
+                            ->scalarNode('idle_timeout_exit_code')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
@@ -178,6 +212,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('queue_options_provider')->isRequired()->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -218,6 +253,8 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->booleanNode('expect_serialized_response')->defaultTrue()->end()
                             ->scalarNode('unserializer')->defaultValue('unserialize')->end()
+                            ->booleanNode('lazy')->defaultFalse()->end()
+                            ->booleanNode('direct_reply_to')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -248,6 +285,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('serializer')->defaultValue('serialize')->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -310,6 +348,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('exclusive')->defaultFalse()->end()
                 ->booleanNode('auto_delete')->defaultFalse()->end()
                 ->booleanNode('nowait')->defaultFalse()->end()
+                ->booleanNode('declare')->defaultTrue()->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
                 ->arrayNode('routing_keys')

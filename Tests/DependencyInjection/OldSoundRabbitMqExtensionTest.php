@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -30,8 +31,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -57,8 +60,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'ssl_context' => array(
                 'verify_peer' => false,
             ),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -82,8 +87,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -107,12 +114,119 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
+    public function testSocketConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.socket_connection'));
+        $definiton = $container->getDefinition('old_sound_rabbit_mq.connection.socket_connection');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.socket_connection'));
+        $this->assertEquals('%old_sound_rabbit_mq.socket_connection.class%', $definiton->getClass());
+    }
+
+    public function testLazySocketConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.lazy_socket'));
+        $definiton = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_socket');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.lazy_socket'));
+        $this->assertEquals('%old_sound_rabbit_mq.lazy.socket_connection.class%', $definiton->getClass());
+    }
+
+    public function testFooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => null,
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default',
+            'exchange'                  => 'foo',
+            'destination'               => 'bar',
+            'destination_is_exchange'   => false,
+            'nowait'                    => false,
+            'routing_key'               => 'baz',
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
+        $this->assertTrue($container->has($name));
+        $definition = $container->getDefinition($name);
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertBindingMethodCalls($definition, $binding);
+    }
+
+    public function testMooBinding()
+    {
+        $container = $this->getContainer('test.yml');
+        $binding = array(
+            'arguments'                 => array('moo' => 'cow'),
+            'class'                     => '%old_sound_rabbit_mq.binding.class%',
+            'connection'                => 'default2',
+            'exchange'                  => 'moo',
+            'destination'               => 'cow',
+            'destination_is_exchange'   => true,
+            'nowait'                    => true,
+            'routing_key'               => null,
+        );
+        ksort($binding);
+        $key = md5(json_encode($binding));
+        $name = sprintf('old_sound_rabbit_mq.binding.%s', $key);
+        $this->assertTrue($container->has($name));
+        $definition = $container->getDefinition($name);
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default2');
+        $this->assertBindingMethodCalls($definition, $binding);
+    }
+
+    protected function assertBindingMethodCalls(Definition $definition, $binding)
+    {
+        $this->assertEquals(array(
+            array(
+                'setArguments',
+                array(
+                    $binding['arguments']
+                )
+            ),
+            array(
+                'setDestination',
+                array(
+                    $binding['destination']
+                )
+            ),
+            array(
+                'setDestinationIsExchange',
+                array(
+                    $binding['destination_is_exchange']
+                )
+            ),
+            array(
+                'setExchange',
+                array(
+                    $binding['exchange']
+                )
+            ),
+            array(
+                'isNowait',
+                array(
+                    $binding['nowait']
+                )
+            ),
+            array(
+                'setRoutingKey',
+                array(
+                    $binding['routing_key']
+                )
+            ),
+        ),
+            $definition->getMethodCalls()
+        );
+    }
     public function testFooProducerDefinition()
     {
         $container = $this->getContainer('test.yml');
@@ -143,7 +257,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'setQueueOptions',
                     array(
                         array(
-                            'name'        => null,
+                            'name'        => '',
+                            'declare'     => false,
                         )
                     )
                 )
@@ -151,6 +266,17 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
         $this->assertEquals('My\Foo\Producer', $definition->getClass());
+    }
+
+    /**
+     * @group alias
+     */
+    public function testAliasedFooProducerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_producer_producer'));
+        $this->assertTrue($container->has('foo_producer_alias'));
     }
 
     public function testDefaultProducerDefinition()
@@ -183,7 +309,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'setQueueOptions',
                     array(
                         array(
-                            'name'        => null,
+                            'name'        => '',
+                            'declare'     => false,
                         )
                     )
                 )
@@ -232,6 +359,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'arguments'    => null,
                             'ticket'       => null,
                             'routing_keys' => array('android.#.upload', 'iphone.upload'),
+                            'declare'      => true,
                         )
                     )
                 ),
@@ -284,6 +412,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                             'arguments'   => null,
                             'ticket'      => null,
                             'routing_keys' => array(),
+                            'declare'     => true,
                         )
                     )
                 ),
@@ -361,7 +490,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                 'arguments'    => null,
                                 'ticket'       => null,
                                 'routing_keys' => array(),
-                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute')
+                                'callback'     => array(new Reference('foo.multiple_test1.callback'), 'execute'),
+                                'declare'      => true,
                             ),
                             'foo_bar_2' => array(
                                 'name'         => 'foo_bar_2',
@@ -376,7 +506,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                                     'android.upload',
                                     'iphone.upload'
                                 ),
-                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute')
+                                'callback'     => array(new Reference('foo.multiple_test2.callback'), 'execute'),
+                                'declare'      => true,
                             )
                         )
                     )
@@ -391,14 +522,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
     }
-    
+
     public function testDynamicConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');
-        
+
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_dyn_consumer_dynamic'));
         $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
-        
+
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
         $this->assertEquals(array(
                 array(
@@ -509,7 +640,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFooRpcClientDefinition()
     {
-        $container = $this->getContainer('test.yml');
+        $container = $this->getContainer('rpc-clients.yml');
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_client_rpc'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_client_rpc');
@@ -518,7 +649,8 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 array('initClient', array(true)),
-                array('setUnserializer', array('json_decode'))
+                array('setUnserializer', array('json_decode')),
+                array('setDirectReplyTo', array(true)),
             ),
             $definition->getMethodCalls()
         );
@@ -527,7 +659,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultRpcClientDefinition()
     {
-        $container = $this->getContainer('test.yml');
+        $container = $this->getContainer('rpc-clients.yml');
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.default_client_rpc'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_client_rpc');
@@ -536,10 +668,32 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 array('initClient', array(true)),
-                array('setUnserializer', array('unserialize'))
+                array('setUnserializer', array('unserialize')),
+                array('setDirectReplyTo', array(false)),
             ),
             $definition->getMethodCalls()
         );
+        $this->assertFalse($definition->isLazy());
+        $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
+    }
+
+    public function testLazyRpcClientDefinition()
+    {
+        $container = $this->getContainer('rpc-clients.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.lazy_client_rpc'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.lazy_client_rpc');
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.lazy_client');
+        $this->assertEquals(
+            array(
+                array('initClient', array(true)),
+                array('setUnserializer', array('unserialize')),
+                array('setDirectReplyTo', array(false)),
+            ),
+            $definition->getMethodCalls()
+        );
+        $this->assertTrue($definition->isLazy());
         $this->assertEquals('%old_sound_rabbit_mq.rpc_client.class%', $definition->getClass());
     }
 
@@ -600,6 +754,7 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
                     'arguments'    => null,
                     'ticket'       => null,
                     'routing_keys' => array(),
+                    'declare'      => true,
                 ))),
                 array('setSerializer', array('serialize')),
             ),
@@ -695,6 +850,15 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('direct', $options[0]['type']);
         $this->assertEquals(false, $options[0]['declare']);
         $this->assertEquals(true, $options[0]['passive']);
+    }
+
+    public function testProducersWithLogger()
+    {
+        $container = $this->getContainer('config_with_enable_logger.yml');
+        $definition = $container->getDefinition('old_sound_rabbit_mq.default_consumer_consumer');
+        $this->assertTrue(
+            $definition->hasTag('monolog.logger'), 'service should be marked for logger'
+        );
     }
 
     private function getContainer($file, $debug = false)

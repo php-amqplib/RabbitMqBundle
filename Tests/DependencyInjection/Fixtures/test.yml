@@ -27,6 +27,24 @@ old_sound_rabbit_mq:
             vhost:    /lazy
             lazy:     true
 
+        socket_connection:
+            host:       bar_host
+            port:       789
+            user:       socket_user
+            password:   socket_password
+            vhost:      /socket
+            lazy:       false
+            use_socket: true
+
+        lazy_socket:
+            host:       joe_host
+            port:       987
+            user:       lazy_socket_user
+            password:   lazy_socket_password
+            vhost:      /lazy_socket
+            lazy:       true
+            use_socket: true
+
         default:
 
     producers:
@@ -43,6 +61,21 @@ old_sound_rabbit_mq:
                 nowait:      true
                 arguments:   null
                 ticket:      null
+
+        foo_producer_aliased:
+            class:           My\Foo\Producer
+            connection:      foo_connection
+            exchange_options:
+                name:        foo_exchange
+                type:        direct
+                passive:     true
+                durable:     false
+                auto_delete: true
+                internal:    true
+                nowait:      true
+                arguments:   null
+                ticket:      null
+            service_alias: foo_producer_alias
 
 
         default_producer:
@@ -138,7 +171,9 @@ old_sound_rabbit_mq:
                 type:           direct
             callback: bar.dynamic.callback
             queue_options_provider: bar.dynamic.provider
-            
+    bindings:
+        - {exchange: foo, destination: bar, routing_key: baz}
+        - {exchange: moo, connection: default2, destination: cow, nowait: true, destination_is_exchange: true, arguments: {moo:cow}}
     anon_consumers:
         foo_anon_consumer:
             connection:      foo_connection
@@ -164,6 +199,7 @@ old_sound_rabbit_mq:
         foo_client:
             connection:      foo_connection
             unserializer:    json_decode
+            direct_reply_to: true
 
         default_client:
 

@@ -16,6 +16,13 @@ class MultipleConsumer extends Consumer
      * @var QueuesProviderInterface
      */
     protected $queuesProvider = null;
+    
+    /**
+     * Context the consumer runs in
+     *
+     * @var string
+     */
+    protected $context = null;
 
     /**
      * QueuesProvider setter
@@ -38,6 +45,11 @@ class MultipleConsumer extends Consumer
     public function setQueues(array $queues)
     {
         $this->queues = $queues;
+    }
+    
+    public function setContext($context)
+    {
+        $this->context = $context;
     }
 
     protected function setupConsumer()
@@ -68,10 +80,10 @@ class MultipleConsumer extends Consumer
 
             if (isset($options['routing_keys']) && count($options['routing_keys']) > 0) {
                 foreach ($options['routing_keys'] as $routingKey) {
-                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
         }
 
@@ -84,9 +96,7 @@ class MultipleConsumer extends Consumer
             throw new QueueNotFoundException();
         }
 
-        $processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
-
-        $this->handleProcessMessage($msg, $processFlag);
+        $this->processMessageQueueCallback($msg, $queueName, $this->queues[$queueName]['callback']);
     }
 
     public function stopConsuming()
@@ -104,7 +114,7 @@ class MultipleConsumer extends Consumer
         if ($this->queuesProvider) {
             $this->queues = array_merge(
                 $this->queues,
-                $this->queuesProvider->getQueues()
+                $this->queuesProvider->getQueues($this->context)
             );
         }
     }

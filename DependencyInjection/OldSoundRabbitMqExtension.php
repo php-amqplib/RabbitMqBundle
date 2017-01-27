@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,6 +47,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->collectorEnabled = $this->config['enable_collector'];
 
         $this->loadConnections();
+        $this->loadBindings();
         $this->loadProducers();
         $this->loadConsumers();
         $this->loadMultipleConsumers();
@@ -70,10 +72,11 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadConnections()
     {
         foreach ($this->config['connections'] as $key => $connection) {
+            $connectionSuffix = $connection['use_socket'] ? 'socket_connection.class' : 'connection.class';
             $classParam =
                 $connection['lazy']
-                    ? '%old_sound_rabbit_mq.lazy.connection.class%'
-                    : '%old_sound_rabbit_mq.connection.class%';
+                    ? '%old_sound_rabbit_mq.lazy.'.$connectionSuffix.'%'
+                    : '%old_sound_rabbit_mq.'.$connectionSuffix.'%';
 
             $definition = new Definition('%old_sound_rabbit_mq.connection_factory.class%', array(
                 $classParam, $connection,
@@ -96,6 +99,31 @@ class OldSoundRabbitMqExtension extends Extension
         }
     }
 
+    protected function loadBindings()
+    {
+        if ($this->config['sandbox']) {
+            return;
+        }
+        foreach ($this->config['bindings'] as $binding) {
+            ksort($binding);
+            $definition = new Definition($binding['class']);
+            $definition->addTag('old_sound_rabbit_mq.binding');
+            $definition->addMethodCall('setArguments', array($binding['arguments']));
+            $definition->addMethodCall('setDestination', array($binding['destination']));
+            $definition->addMethodCall('setDestinationIsExchange', array($binding['destination_is_exchange']));
+            $definition->addMethodCall('setExchange', array($binding['exchange']));
+            $definition->addMethodCall('isNowait', array($binding['nowait']));
+            $definition->addMethodCall('setRoutingKey', array($binding['routing_key']));
+            $this->injectConnection($definition, $binding['connection']);
+            $key = md5(json_encode($binding));
+            if ($this->collectorEnabled) {
+                // in the context of a binding, I don't thing logged channels are needed?
+                $this->injectLoggedChannel($definition, $key, $binding['connection']);
+            }
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.binding.%s', $key), $definition);
+        }
+    }
+
     protected function loadProducers()
     {
         if ($this->config['sandbox'] == false) {
@@ -105,15 +133,12 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 //this producer doesn't define an exchange -> using AMQP Default
                 if (!isset($producer['exchange_options'])) {
-                    $producer['exchange_options']['name'] = '';
-                    $producer['exchange_options']['type'] = 'direct';
-                    $producer['exchange_options']['passive'] = true;
-                    $producer['exchange_options']['declare'] = false;
+                    $producer['exchange_options'] = $this->getDefaultExchangeOptions();
                 }
                 $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($producer['exchange_options'])));
-                //this producer doesn't define a queue
+                //this producer doesn't define a queue -> using AMQP Default
                 if (!isset($producer['queue_options'])) {
-                    $producer['queue_options']['name'] = null;
+                    $producer['queue_options'] = $this->getDefaultQueueOptions();
                 }
                 $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
                 $this->injectConnection($definition, $producer['connection']);
@@ -124,7 +149,16 @@ class OldSoundRabbitMqExtension extends Extension
                     $definition->addMethodCall('disableAutoSetupFabric');
                 }
 
-                $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+                if ($producer['enable_logger']) {
+                    $this->injectLogger($definition);
+                }
+
+                $producerServiceName = sprintf('old_sound_rabbit_mq.%s_producer', $key);
+
+                $this->container->setDefinition($producerServiceName, $definition);
+                if (null !== $producer['service_alias']) {
+                    $this->container->setAlias($producer['service_alias'], $producerServiceName);
+                }
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {
@@ -138,12 +172,19 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
-            $definition
-                ->addTag('old_sound_rabbit_mq.base_amqp')
-                ->addTag('old_sound_rabbit_mq.consumer')
-                ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
-                ->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+            $definition->addTag('old_sound_rabbit_mq.base_amqp');
+            $definition->addTag('old_sound_rabbit_mq.consumer');
+            //this consumer doesn't define an exchange -> using AMQP Default
+            if (!isset($consumer['exchange_options'])) {
+                $consumer['exchange_options'] = $this->getDefaultExchangeOptions();
+            }
+            $definition->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])));
+            //this consumer doesn't define a queue -> using AMQP Default
+            if (!isset($consumer['queue_options'])) {
+                $consumer['queue_options'] = $this->getDefaultQueueOptions();
+            }
+            $definition->addMethodCall('setQueueOptions', array($this->normalizeArgumentKeys($consumer['queue_options'])));
+            $definition->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
@@ -153,8 +194,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
-            if(isset($consumer['idle_timeout'])) {
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+            if (isset($consumer['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
@@ -163,6 +207,10 @@ class OldSoundRabbitMqExtension extends Extension
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['enable_logger']) {
+                $this->injectLogger($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
@@ -185,7 +233,7 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
-                $queues[$queueOptions['name']]  = $queueOptions;
+                $queues[$queueOptions['name']] = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
                 $callbacks[] = new Reference($queueOptions['callback']);
             }
@@ -212,8 +260,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
 
-            if(isset($consumer['idle_timeout'])) {
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+            if (isset($consumer['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
@@ -222,6 +273,10 @@ class OldSoundRabbitMqExtension extends Extension
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['enable_logger']) {
+                $this->injectLogger($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_multiple', $key);
@@ -234,18 +289,18 @@ class OldSoundRabbitMqExtension extends Extension
             }
         }
     }
-    
+
     protected function loadDynamicConsumers()
-    {   
+    {
         foreach ($this->config['dynamic_consumers'] as $key => $consumer) {
-            
+
             if (empty($consumer['queue_options_provider'])) {
                 throw new InvalidConfigurationException(
                     "Error on loading $key dynamic consumer. " .
                     "'queue_provider' parameter should be defined."
                 );
             }
-            
+
             $definition = new Definition('%old_sound_rabbit_mq.dynamic_consumer.class%');
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
@@ -261,14 +316,17 @@ class OldSoundRabbitMqExtension extends Extension
                     $consumer['qos_options']['global']
                 ));
             }
-            
+
             $definition->addMethodCall(
-                    'setQueueOptionsProvider',
-                    array(new Reference($consumer['queue_options_provider']))
-                );
-            
-            if(isset($consumer['idle_timeout'])) {
+                'setQueueOptionsProvider',
+                array(new Reference($consumer['queue_options_provider']))
+            );
+
+            if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
+            }
+            if (isset($consumer['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
@@ -277,6 +335,10 @@ class OldSoundRabbitMqExtension extends Extension
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);
+            }
+
+            if ($consumer['enable_logger']) {
+                $this->injectLogger($definition);
             }
 
             $name = sprintf('old_sound_rabbit_mq.%s_dynamic', $key);
@@ -363,6 +425,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['rpc_clients'] as $key => $client) {
             $definition = new Definition('%old_sound_rabbit_mq.rpc_client.class%');
+            $definition->setLazy($client['lazy']);
             $definition
                 ->addTag('old_sound_rabbit_mq.rpc_client')
                 ->addMethodCall('initClient', array($client['expect_serialized_response']));
@@ -372,6 +435,9 @@ class OldSoundRabbitMqExtension extends Extension
             }
             if (array_key_exists('unserializer', $client)) {
                 $definition->addMethodCall('setUnserializer', array($client['unserializer']));
+            }
+            if (array_key_exists('direct_reply_to', $client)) {
+                $definition->addMethodCall('setDirectReplyTo', array($client['direct_reply_to']));
             }
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
@@ -413,7 +479,7 @@ class OldSoundRabbitMqExtension extends Extension
 
     protected function injectLoggedChannel(Definition $definition, $name, $connectionName)
     {
-        $id      = sprintf('old_sound_rabbit_mq.channel.%s', $name);
+        $id = sprintf('old_sound_rabbit_mq.channel.%s', $name);
         $channel = new Definition('%old_sound_rabbit_mq.logged.channel.class%');
         $channel
             ->setPublic(false)
@@ -444,14 +510,50 @@ class OldSoundRabbitMqExtension extends Extension
      */
     protected function addDequeuerAwareCall($callback, $name)
     {
-        if (! $this->container->has($callback)) {
+        if (!$this->container->has($callback)) {
             return;
         }
 
         $callbackDefinition = $this->container->findDefinition($callback);
-        $refClass           = new \ReflectionClass($callbackDefinition->getClass());
+        $refClass = new \ReflectionClass($callbackDefinition->getClass());
         if ($refClass->implementsInterface('OldSound\RabbitMqBundle\RabbitMq\DequeuerAwareInterface')) {
             $callbackDefinition->addMethodCall('setDequeuer', array(new Reference($name)));
         }
+    }
+
+    private function injectLogger(Definition $definition)
+    {
+        $definition->addTag('monolog.logger', array(
+            'channel' => 'phpamqplib'
+        ));
+        $definition->addMethodCall('setLogger', array(new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+    }
+    
+    /**
+     * Get default AMQP exchange options
+     *
+     * @return array
+     */
+    protected function getDefaultExchangeOptions()
+    {
+        return array(
+            'name' => '',
+            'type' => 'direct',
+            'passive' => true,
+            'declare' => false
+        );
+    }
+
+    /**
+     * Get default AMQP queue options
+     *
+     * @return array
+     */
+    protected function getDefaultQueueOptions()
+    {
+        return array(
+            'name' => '',
+            'declare' => false
+        );
     }
 }

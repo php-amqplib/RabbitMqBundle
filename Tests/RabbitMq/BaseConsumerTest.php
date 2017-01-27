@@ -37,6 +37,13 @@ class BaseConsumerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(42, $this->consumer->getIdleTimeout());
     }
 
+    public function testItsIdleTimeoutExitCodeIsMutable()
+    {
+        $this->assertEquals(0, $this->consumer->getIdleTimeoutExitCode());
+        $this->consumer->setIdleTimeoutExitCode(43);
+        $this->assertEquals(43, $this->consumer->getIdleTimeoutExitCode());
+    }
+
     public function testForceStopConsumer()
     {
         $this->assertAttributeEquals(false, 'forceStop', $this->consumer);

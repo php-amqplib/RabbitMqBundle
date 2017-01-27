@@ -1,10 +1,12 @@
 # RabbitMqBundle #
 
+[![Join the chat at https://gitter.im/php-amqplib/RabbitMqBundle](https://badges.gitter.im/php-amqplib/RabbitMqBundle.svg)](https://gitter.im/php-amqplib/RabbitMqBundle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## About ##
 
 The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/php-amqplib/php-amqplib) library.
 
-The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/php-amqplib/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony2 controller is as easy as:
+The bundle implements several messaging patterns as seen on the [Thumper](https://github.com/php-amqplib/Thumper) library. Therefore publishing messages to RabbitMQ from a Symfony controller is as easy as:
 
 ```php
 $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
@@ -110,10 +112,20 @@ old_sound_rabbit_mq:
 
             # requires php-amqplib v2.4.1+
             heartbeat: 0
+
+            #requires php_sockets.dll
+            use_socket: true # default false
+        another:
+            # A different (unused) connection defined by an URL. One can omit all parts,
+            # except the scheme (amqp:). If both segment in the URL and a key value (see above)
+            # are given the value from the URL takes precedence.
+            # See https://www.rabbitmq.com/uri-spec.html on how to encode values.
+            url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
             connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
+            service_alias:    my_app_service # no alias by default
     consumers:
         upload_picture:
             connection:       default
@@ -271,18 +283,114 @@ For deleting the consumer's queue, use this command:
 $ ./app/console rabbitmq:delete --no-confirmation upload_picture
 ```
 
+#### Consumer Events ####
+
+This can be useful in many scenarios.
+There are 3 AMQPEvents:
+##### ON CONSUME #####
+```php
+class OnConsumeEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_CONSUME;
+
+    /**
+     * OnConsumeEvent constructor.
+     *
+     * @param Consumer $consumer
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+    }
+}
+```
+
+Let`s say you need to sleep / stop consumer/s on a new application deploy.
+You can listen for OnConsumeEvent (\OldSound\RabbitMqBundle\Event\OnConsumeEvent) and check for new application deploy.
+
+##### BEFORE PROCESSING MESSAGE #####
+
+```php
+class BeforeProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::BEFORE_PROCESSING_MESSAGE;
+
+    /**
+     * BeforeProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised before processing a AMQPMessage.
+
+##### AFTER PROCESSING MESSAGE #####
+
+```php
+class AfterProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::AFTER_PROCESSING_MESSAGE;
+
+    /**
+     * AfterProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised after processing a AMQPMessage.
+If the process message will throw an Exception the event will not raise.
+
+##### IDLE MESSAGE #####
+
+```php
+<?php
+class OnIdleEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_IDLE;
+
+    /**
+     * OnIdleEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+        
+        $this->forceStop = true;
+    }
+}
+```
+
+Event raised when `wait` method exit by timeout without receiving a message. 
+In order to make use of this event a consumer `idle_timeout` has to be [configured](#idle-timeout). 
+By default process exit on idle timeout, you can prevent it by setting `$event->setForceStop(false)` in a listener.
+
 #### Idle timeout ####
 
-If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
+If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds.
+The `idle_timeout_exit_code` specifies what exit code should be returned by the consumer when the idle timeout occurs. Without specifying it, the consumer will throw an **PhpAmqpLib\Exception\AMQPTimeoutException** exception.
 
 ```yaml
 consumers:
     upload_picture:
-        connection:       default
-        exchange_options: {name: 'upload-picture', type: direct}
-        queue_options:    {name: 'upload-picture'}
-        callback:         upload_picture_service
-        idle_timeout:     60
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+        idle_timeout:           60
+        idle_timeout_exit_code: 0
 ```
 
 #### Fair dispatching ####
@@ -296,7 +404,7 @@ consumers:
 From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
 
 Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing.
-You should evaluate, as the blogpost reccommand, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
+You should evaluate, as the blogpost recommends, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
 
 With RabbitMqBundle, you can configure that qos_options per consumer like that:
 
@@ -346,7 +454,7 @@ class UploadPictureConsumer implements ConsumerInterface
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
 
-Keep in mind that your callbacks _need to be registered_ as normal Symfony2 services. There you can inject the service container, the database service, the Symfony logger, and so on.
+Keep in mind that your callbacks _need to be registered_ as normal Symfony services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
 See [https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
@@ -361,17 +469,36 @@ This seems to be quite a lot of work for just sending messages, let's recap to h
 
 And that's it!
 
+### Audit / Logging ###
+
+This was a requirement to have a traceability of messages received/published.
+In order to enable this you'll need to add "enable_logger" config to consumers or publishers.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:       default
+        exchange_options: {name: 'upload-picture', type: direct}
+        queue_options:    {name: 'upload-picture'}
+        callback:         upload_picture_service
+        enable_logger: true
+```
+
+If you would like you can also treat logging from queues with different handlers in monolog, by referencing channel "phpamqplib"
+
 ### RPC or Reply/Response ###
 
-So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony2.
+So far we just have sent messages to consumers, but what if we want to get a reply from them? To achieve this we have to implement RPC calls into our application. This bundle makes it pretty easy to achieve such things with Symfony.
 
 Let's add a RPC client and server into the configuration:
 
 ```yaml
 rpc_clients:
     integer_store:
-        connection: default
-        unserializer: json_decode
+        connection: default #default: default
+        unserializer: json_decode #default: unserialize
+        lazy: true #default: false
+        direct_reply_to: false
 rpc_servers:
     random_int:
         connection: default
@@ -472,6 +599,12 @@ public function indexAction($name)
 
 Is very similar to the previous example, we just have an extra `addRequest` call. Also we provide meaningful request identifiers so later will be easier for us to find the reply we want in the __$replies__ array.
 
+### Direct Reply-To clients ###
+
+To enable [direct reply-to clients](https://www.rabbitmq.com/direct-reply-to.html) you just have to enable option __direct_reply_to__ on the __rpc_clients__ configuration for the client.
+
+This option will use pseudo-queue __amq.rabbitmq.reply-to__ when doing RPC calls. On the RPC server there is no modification needed.
+
 ### Multiple Consumers ###
 
 It's a good practice to have a lot of queues for logic separation. With a simple consumer you will have to create one worker (consumer) per queue and it can be hard to manage when dealing
@@ -516,10 +649,25 @@ Be aware that queues providers are responsible for the proper calls to `setDeque
 (not `ConsumerInterface`). In case service providing queues implements `DequeuerAwareInterface`, a call to
 `setDequeuer` is added to the definition of the service with a `DequeuerInterface` currently being a `MultipleConsumer`.
 
+### Arbitrary Bindings ###
+
+You may find that your application has a complex workflow and you you need to have arbitrary binding. Arbitrary
+binding scenarios might include exchange to exchange bindings via `destination_is_exchange` property.
+
+```yaml
+bindings:
+    - {exchange: foo, destination: bar, routing_key: 'baz.*' }
+    - {exchange: foo1, destination: foo, routing_key: 'baz.*' destination_is_exchange: true}
+```
+
+The rabbitmq:setup-fabric command will declare exchanges and queues as defined in your producer, consumer
+and multi consumer configurations before it creates your arbitrary bindings. However, the rabbitmq:setup-fabric will
+*NOT* declare addition queues and exchanges defined in the bindings. It's up to you to make sure exchanges/queues are declared.
+
 ### Dynamic Consumers ###
 
 Sometimes you have to change the consumer's configuration on the fly.
-Dynamic consumers allow you to define the consumers queue options programatically, based on the context.
+Dynamic consumers allow you to define the consumers queue options programmatically, based on the context.
 
 e.g. In a scenario when the defined consumer must be responsible for a dynamic number of topics and you do not want (or can't) change it's configuration every time.
 

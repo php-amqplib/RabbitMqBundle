@@ -1,0 +1,20 @@
+old_sound_rabbit_mq:
+    enable_collector: true
+    connections:
+        foo_connection:
+            host:     foo_host
+            port:     123
+            user:     foo_user
+            password: foo_password
+            vhost:    /foo
+
+    rpc_clients:
+        foo_client:
+            connection:      foo_connection
+            unserializer:    json_decode
+            direct_reply_to: true
+        lazy_client:
+            connection:      default
+            lazy: true
+
+        default_client:
