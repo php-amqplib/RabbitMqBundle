@@ -114,6 +114,7 @@ class Consumer extends BaseConsumer
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
+            $this->handleProcessMessage($msg, $e->getHandleCode());
             $this->stopConsuming();
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), array(
