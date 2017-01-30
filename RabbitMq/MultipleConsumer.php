@@ -102,7 +102,7 @@ class MultipleConsumer extends Consumer
     public function stopConsuming()
     {
         foreach ($this->queues as $name => $options) {
-            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name));
+            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name), false, true);
         }
     }
 
