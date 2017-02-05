@@ -395,9 +395,9 @@ consumers:
 
 #### Graceful max execution timeout ####
 
-If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution_timeout` in seconds.
+If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution.timeout` in seconds.
 "Gracefully exit" means, that the consumer will exit either after the currently running task or immediatelly, when waiting for new tasks.
-The `graceful_max_execution_timeout_exit_code` specifies what exit code should be returned by the consumer when the graceful max execution timeout occurs. Without specifying it, the consumer will exit with status `0`.
+The `graceful_max_execution.exit_code` specifies what exit code should be returned by the consumer when the graceful max execution timeout occurs. Without specifying it, the consumer will exit with status `0`.
 
 This feature is great in conjuction with supervisord, which together can allow for periodical memory leaks cleanup, connection with database/rabbitmq renewal and more.
 
@@ -408,12 +408,10 @@ consumers:
         exchange_options:       {name: 'upload-picture', type: direct}
         queue_options:          {name: 'upload-picture'}
         callback:               upload_picture_service
-        
-        # 30 minutes
-        graceful_max_execution_timeout: 1800
-         
-        # default is 0
-        graceful_max_execution_timeout_exit_code: 10 
+
+        graceful_max_execution:
+            timeout: 1800 # 30 minutes 
+            exit_code: 10 # default is 0 
 ```
 
 #### Fair dispatching ####

@@ -285,7 +285,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('wait')
             ->willThrowException(new AMQPTimeoutException());
 
-        $this->assertTrue(10 == $consumer->consume(1));
+        $this->assertSame(10, $consumer->consume(1));
     }
 
     public function testGracefulMaxExecutionWontWaitIfPastTheTimeout()

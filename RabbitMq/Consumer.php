@@ -77,7 +77,7 @@ class Consumer extends BaseConsumer
                 $waitTimeout['timeoutType'] === self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION
                 && $waitTimeout['seconds'] < 1
             ) {
-                return $this->getGracefulMaxExecutionTimeoutExitCode();
+                return $this->gracefulMaxExecutionTimeoutExitCode;
             }
 
             if (!$this->forceStop) {
@@ -85,7 +85,7 @@ class Consumer extends BaseConsumer
                     $this->getChannel()->wait(null, false, $waitTimeout['seconds']);
                 } catch (AMQPTimeoutException $e) {
                     if (self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION === $waitTimeout['timeoutType']) {
-                        return $this->getGracefulMaxExecutionTimeoutExitCode();
+                        return $this->gracefulMaxExecutionTimeoutExitCode;
                     }
 
                     $idleEvent = new OnIdleEvent($this);
@@ -214,7 +214,7 @@ class Consumer extends BaseConsumer
     /**
      * @param \DateTime|null $dateTime
      */
-    public function setGracefulMaxExecutionDateTime($dateTime = null)
+    public function setGracefulMaxExecutionDateTime(\DateTime $dateTime = null)
     {
         $this->gracefulMaxExecutionDateTime = $dateTime;
     }
