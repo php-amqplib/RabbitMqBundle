@@ -43,7 +43,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
-            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
         ;
