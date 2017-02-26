@@ -246,7 +246,8 @@ abstract class BaseAmqp
     {
         // queue binding is not permitted on the default exchange
         if ('' !== $exchange) {
-            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
+            $this->getChannel()->queue_bind($queue, $exchange, $routing_key, false,
+                isset($this->queueOptions['application_headers']) ? $this->queueOptions['application_headers'] : null);
         }
     }
 
