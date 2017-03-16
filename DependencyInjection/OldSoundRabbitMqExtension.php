@@ -79,7 +79,7 @@ class OldSoundRabbitMqExtension extends Extension
                     : '%old_sound_rabbit_mq.'.$connectionSuffix.'%';
 
             $definition = new Definition('%old_sound_rabbit_mq.connection_factory.class%', array(
-                $classParam, $connection,
+                $classParam, $connection, $key
             ));
             $definition->setPublic(false);
             $factoryName = sprintf('old_sound_rabbit_mq.connection_factory.%s', $key);

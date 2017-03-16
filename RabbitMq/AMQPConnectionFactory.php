@@ -9,6 +9,9 @@ class AMQPConnectionFactory
     /** @var \ReflectionClass */
     private $class;
 
+    /** @var string */
+    private $connectionAlias;
+
     /** @var array */
     private $parameters = array(
         'url'                => '',
@@ -29,8 +32,9 @@ class AMQPConnectionFactory
      *
      * @param string $class      FQCN of AMQPConnection class to instantiate.
      * @param array  $parameters Map containing parameters resolved by Extension.
+     * @param string $connectionAlias   The connection name
      */
-    public function __construct($class, array $parameters)
+    public function __construct($class, array $parameters, $connectionAlias = null)
     {
         $this->class = $class;
         $this->parameters = array_merge($this->parameters, $parameters);
@@ -40,26 +44,38 @@ class AMQPConnectionFactory
                 ? stream_context_create(array('ssl' => $this->parameters['ssl_context']))
                 : null;
         }
+        $this->connectionAlias = $connectionAlias;
     }
 
     public function createConnection()
     {
-        return new $this->class(
-            $this->parameters['host'],
-            $this->parameters['port'],
-            $this->parameters['user'],
-            $this->parameters['password'],
-            $this->parameters['vhost'],
-            false,      // insist
-            'AMQPLAIN', // login_method
-            null,       // login_response
-            'en_US',    // locale
-            $this->parameters['connection_timeout'],
-            $this->parameters['read_write_timeout'],
-            $this->parameters['ssl_context'],
-            $this->parameters['keepalive'],
-            $this->parameters['heartbeat']
-        );
+        try {
+            return new $this->class(
+                $this->parameters['host'],
+                $this->parameters['port'],
+                $this->parameters['user'],
+                $this->parameters['password'],
+                $this->parameters['vhost'],
+                false,      // insist
+                'AMQPLAIN', // login_method
+                null,       // login_response
+                'en_US',    // locale
+                $this->parameters['connection_timeout'],
+                $this->parameters['read_write_timeout'],
+                $this->parameters['ssl_context'],
+                $this->parameters['keepalive'],
+                $this->parameters['heartbeat']
+            );
+        } catch (\Exception $e) {
+            $exceptionClass = get_class($e);
+                throw new $exceptionClass(
+                    sprintf(
+                        "Could not create connection for %s: %s",
+                        $this->connectionAlias,
+                        $e->getMessage()
+                    )
+            );
+        }
     }
 
     private function parseUrl($parameters)
