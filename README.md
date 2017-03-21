@@ -57,7 +57,7 @@ From version 1.6, you can use the Dependency Injection component to load this bu
 
 Require the bundle in your composer.json file:
 
-````
+```
 {
     "require": {
         "php-amqplib/rabbitmq-bundle": "~1.6",
