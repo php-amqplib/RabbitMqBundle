@@ -208,4 +208,23 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             0,           // heartbeat
         ), $instance->constructParams);
     }
+
+    /**
+     * Test that failed AMQPConnection throws an error with reference for the
+     * collection alias name
+     *
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Could not create connection for my_connection: Dummy exception
+     */
+    public function testConnectionAliasAwareness()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\FailedAMQPConnection',
+            array(
+                'host' => 'foo',
+            ),
+            'my_connection'
+        );
+        $factory->createConnection();
+    }
 }
