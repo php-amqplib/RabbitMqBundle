@@ -861,6 +861,22 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test that the factory definition contains the alias argument
+     */
+    public function testConnectionFactoryAlias()
+    {
+        $definition = $this->getContainer('test.yml')
+            ->getDefinition('old_sound_rabbit_mq.connection_factory.foo_connection');
+
+        // arguments: [0 => $class, 1 => $parameters, $connectionAlias]
+        $this->assertEquals(
+            $definition->getArgument(2),
+            'foo_connection',
+            "Factory definition does not contain alias argument"
+        );
+    }
+
     private function getContainer($file, $debug = false)
     {
         $container = new ContainerBuilder(new ParameterBag(array('kernel.debug' => $debug)));
