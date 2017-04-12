@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Command to delete a queue
@@ -32,8 +33,15 @@ class DeleteCommand extends ConsumerCommand
         $noConfirmation = (bool) $input->getOption('no-confirmation');
 
         if (!$noConfirmation && $input->isInteractive()) {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, sprintf('<question>Are you sure you wish to delete "%s" consumer\'s queue?(y/n)</question>', $input->getArgument('name')), false);
-            if (!$confirmation) {
+            $question = new ConfirmationQuestion(
+                sprintf(
+                    '<question>Are you sure you wish to delete "%s" consumer\'s queue? (y/n)</question>',
+                    $input->getArgument('name')
+                ),
+                false
+            );
+
+            if (!$this->getHelper('question')->ask($input, $output, $question)) {
                 $output->writeln('<error>Deletion cancelled!</error>');
 
                 return 1;
