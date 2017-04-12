@@ -5,6 +5,9 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
+use OldSound\RabbitMqBundle\Event\OnIdleEvent;
+use OldSound\RabbitMqBundle\MemoryChecker\MemoryConsumptionChecker;
+use OldSound\RabbitMqBundle\MemoryChecker\NativeMemoryUsageProvider;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -53,10 +56,15 @@ class Consumer extends BaseConsumer
                 try {
                     $this->getChannel()->wait(null, false, $this->getIdleTimeout());
                 } catch (AMQPTimeoutException $e) {
-                    if (null !== $this->getIdleTimeoutExitCode()) {
-                        return $this->getIdleTimeoutExitCode();
-                    } else {
-                        throw $e;
+                    $idleEvent = new OnIdleEvent($this);
+                    $this->dispatchEvent(OnIdleEvent::NAME, $idleEvent);
+
+                    if ($idleEvent->isForceStop()) {
+                        if (null !== $this->getIdleTimeoutExitCode()) {
+                            return $this->getIdleTimeoutExitCode();
+                        } else {
+                            throw $e;
+                        }
                     }
                 }
             }
@@ -106,6 +114,7 @@ class Consumer extends BaseConsumer
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
+            $this->handleProcessMessage($msg, $e->getHandleCode());
             $this->stopConsuming();
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), array(
@@ -164,10 +173,8 @@ class Consumer extends BaseConsumer
      */
     protected function isRamAlmostOverloaded()
     {
-        if (memory_get_usage(true) >= ($this->getMemoryLimit() * 1024 * 1024)) {
-            return true;
-        } else {
-            return false;
-        }
+        $memoryManager = new MemoryConsumptionChecker(new NativeMemoryUsageProvider());
+
+        return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit(), '5M');
     }
 }
