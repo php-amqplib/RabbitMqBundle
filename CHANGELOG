@@ -1,3 +1,6 @@
+- 2017-01-22
+    * Add `graceful_max_execution_timeout`
+
 - 2015-02-07
     * Added possibility to set serialize/unserialize function for rpc servers/clients
 
