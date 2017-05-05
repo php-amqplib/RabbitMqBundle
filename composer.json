@@ -1,7 +1,7 @@
 {
     "name": "php-amqplib/rabbitmq-bundle",
     "type": "symfony-bundle",
-    "description": "Integrates php-amqplib with Symfony2|3 and RabbitMq. Formerly oldsound/rabbitmq-bundle.",
+    "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly oldsound/rabbitmq-bundle.",
     "keywords": ["symfony2", "rabbitmq", "message", "queue", "amqp"],
     "license": "MIT",
     "authors": [{
@@ -37,6 +37,14 @@
     "autoload": {
         "psr-4": {
             "OldSound\\RabbitMqBundle\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OldSound\\RabbitMqBundle\\Tests\\": "Tests/"
         }
     }
 }

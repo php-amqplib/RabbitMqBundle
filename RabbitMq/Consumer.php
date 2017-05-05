@@ -13,10 +13,24 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
+    const TIMEOUT_TYPE_IDLE = 'idle';
+    const TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION = 'graceful-max-execution';
+
     /**
      * @var int $memoryLimit
      */
     protected $memoryLimit = null;
+
+    /**
+     * @var \DateTime|null DateTime after which the consumer will gracefully exit. "Gracefully" means, that
+     *      any currently running consumption will not be interrupted.
+     */
+    protected $gracefulMaxExecutionDateTime;
+
+    /**
+     * @var int Exit code used, when consumer is closed by the Graceful Max Execution Timeout feature.
+     */
+    protected $gracefulMaxExecutionTimeoutExitCode = 0;
 
     /**
      * Set the memory limit
@@ -42,6 +56,7 @@ class Consumer extends BaseConsumer
      * Consume the message
      *
      * @param int $msgAmount
+     * @return int
      */
     public function consume($msgAmount)
     {
@@ -52,10 +67,27 @@ class Consumer extends BaseConsumer
         while (count($this->getChannel()->callbacks)) {
             $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
+
+            /*
+             * Be careful not to trigger ::wait() with 0 or less seconds, when
+             * graceful max execution timeout is being used.
+             */
+            $waitTimeout = $this->chooseWaitTimeout();
+            if (
+                $waitTimeout['timeoutType'] === self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION
+                && $waitTimeout['seconds'] < 1
+            ) {
+                return $this->gracefulMaxExecutionTimeoutExitCode;
+            }
+
             if (!$this->forceStop) {
                 try {
-                    $this->getChannel()->wait(null, false, $this->getIdleTimeout());
+                    $this->getChannel()->wait(null, false, $waitTimeout['seconds']);
                 } catch (AMQPTimeoutException $e) {
+                    if (self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION === $waitTimeout['timeoutType']) {
+                        return $this->gracefulMaxExecutionTimeoutExitCode;
+                    }
+
                     $idleEvent = new OnIdleEvent($this);
                     $this->dispatchEvent(OnIdleEvent::NAME, $idleEvent);
 
@@ -69,6 +101,8 @@ class Consumer extends BaseConsumer
                 }
             }
         }
+
+        return 0;
     }
 
     /**
@@ -176,5 +210,93 @@ class Consumer extends BaseConsumer
         $memoryManager = new MemoryConsumptionChecker(new NativeMemoryUsageProvider());
 
         return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit(), '5M');
+    }
+
+    /**
+     * @param \DateTime|null $dateTime
+     */
+    public function setGracefulMaxExecutionDateTime(\DateTime $dateTime = null)
+    {
+        $this->gracefulMaxExecutionDateTime = $dateTime;
+    }
+
+    /**
+     * @param int $secondsInTheFuture
+     */
+    public function setGracefulMaxExecutionDateTimeFromSecondsInTheFuture($secondsInTheFuture)
+    {
+        $this->setGracefulMaxExecutionDateTime(new \DateTime("+{$secondsInTheFuture} seconds"));
+    }
+
+    /**
+     * @param int $exitCode
+     */
+    public function setGracefulMaxExecutionTimeoutExitCode($exitCode)
+    {
+        $this->gracefulMaxExecutionTimeoutExitCode = $exitCode;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getGracefulMaxExecutionDateTime()
+    {
+        return $this->gracefulMaxExecutionDateTime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGracefulMaxExecutionTimeoutExitCode()
+    {
+        return $this->gracefulMaxExecutionTimeoutExitCode;
+    }
+
+    /**
+     * Choose the timeout to use for the $this->getChannel()->wait() method.
+     *
+     * @return array Of structure
+     *  {
+     *      timeoutType: string; // one of self::TIMEOUT_TYPE_*
+     *      seconds: int;
+     *  }
+     */
+    private function chooseWaitTimeout()
+    {
+        if ($this->gracefulMaxExecutionDateTime) {
+            $allowedExecutionDateInterval = $this->gracefulMaxExecutionDateTime->diff(new \DateTime());
+            $allowedExecutionSeconds =  $allowedExecutionDateInterval->days * 86400
+                + $allowedExecutionDateInterval->h * 3600
+                + $allowedExecutionDateInterval->i * 60
+                + $allowedExecutionDateInterval->s;
+
+            if (!$allowedExecutionDateInterval->invert) {
+                $allowedExecutionSeconds *= -1;
+            }
+
+            /*
+             * Respect the idle timeout if it's set and if it's less than
+             * the remaining allowed execution.
+             */
+            if (
+                $this->getIdleTimeout()
+                && $this->getIdleTimeout() < $allowedExecutionSeconds
+            ) {
+                return array(
+                    'timeoutType' => self::TIMEOUT_TYPE_IDLE,
+                    'seconds' => $this->getIdleTimeout(),
+                );
+            }
+
+            return array(
+                'timeoutType' => self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION,
+                'seconds' => $allowedExecutionSeconds,
+            );
+        }
+
+        return array(
+            'timeoutType' => self::TIMEOUT_TYPE_IDLE,
+            'seconds' => $this->getIdleTimeout(),
+        );
     }
 }
