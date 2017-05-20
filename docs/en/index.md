@@ -99,7 +99,7 @@ If you want to bind queue with specific routing keys you can declare it in produ
 ```yaml
 queue:
 	name: "upload-picture"
-	routingKeys:
+	routing_keys:
 	  - 'android.#.upload'
 	  - 'iphone.upload'
 ```
@@ -501,13 +501,13 @@ Here is how you can set a consumer with multiple queues:
 				upload-picture:
 					name: uploadPicture
 					callback: [@MyApp\MediaStorage, uploadPicture]
-					routingKeys:
+					routing_keys:
 						- picture
 
 				upload-video:
 					name: upload_video
 					callback: [@MyApp\MediaStorage, uploadVideo]
-					routingKeys:
+					routing_keys:
 						- video
 
 				upload-stats:

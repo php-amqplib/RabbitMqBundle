@@ -56,7 +56,7 @@ rabbitmq:
 				nowait: true
 				arguments: null
 				ticket: null
-				routingKeys:
+				routing_keys:
 					- 'android.#.upload'
 					- 'iphone.upload'
 			callback: KdybyTests\RabbitMq\Callback()
@@ -100,7 +100,7 @@ rabbitmq:
 					nowait: true
 					arguments: null
 					ticket: null
-					routingKeys:
+					routing_keys:
 						- 'android.upload'
 						- 'iphone.upload'
 					callback: KdybyTests\RabbitMq\Callback()
