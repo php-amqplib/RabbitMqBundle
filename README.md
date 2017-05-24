@@ -57,7 +57,7 @@ From version 1.6, you can use the Dependency Injection component to load this bu
 
 Require the bundle in your composer.json file:
 
-````
+```
 {
     "require": {
         "php-amqplib/rabbitmq-bundle": "~1.6",
@@ -351,6 +351,32 @@ class AfterProcessingMessageEvent extends AMQPEvent
 Event raised after processing a AMQPMessage.
 If the process message will throw an Exception the event will not raise.
 
+##### IDLE MESSAGE #####
+
+```php
+<?php
+class OnIdleEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_IDLE;
+
+    /**
+     * OnIdleEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+        
+        $this->forceStop = true;
+    }
+}
+```
+
+Event raised when `wait` method exit by timeout without receiving a message. 
+In order to make use of this event a consumer `idle_timeout` has to be [configured](#idle-timeout). 
+By default process exit on idle timeout, you can prevent it by setting `$event->setForceStop(false)` in a listener.
+
 #### Idle timeout ####
 
 If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds.
@@ -365,6 +391,27 @@ consumers:
         callback:               upload_picture_service
         idle_timeout:           60
         idle_timeout_exit_code: 0
+```
+
+#### Graceful max execution timeout ####
+
+If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution.timeout` in seconds.
+"Gracefully exit" means, that the consumer will exit either after the currently running task or immediatelly, when waiting for new tasks.
+The `graceful_max_execution.exit_code` specifies what exit code should be returned by the consumer when the graceful max execution timeout occurs. Without specifying it, the consumer will exit with status `0`.
+
+This feature is great in conjuction with supervisord, which together can allow for periodical memory leaks cleanup, connection with database/rabbitmq renewal and more.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+
+        graceful_max_execution:
+            timeout: 1800 # 30 minutes 
+            exit_code: 10 # default is 0 
 ```
 
 #### Fair dispatching ####

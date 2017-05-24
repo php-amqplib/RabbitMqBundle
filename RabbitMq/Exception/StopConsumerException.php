@@ -1,6 +1,7 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq\Exception;
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 /**
  * If this exception is thrown in consumer service the message
@@ -11,6 +12,10 @@ namespace OldSound\RabbitMqBundle\RabbitMq\Exception;
  */
 class StopConsumerException extends \RuntimeException
 {
+    public function getHandleCode()
+    {
+        return ConsumerInterface::MSG_SINGLE_NACK_REQUEUE;
+    }
 
 }
 

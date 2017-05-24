@@ -6,23 +6,43 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
+    /** @var int */
     protected $target;
 
+    /** @var int */
     protected $consumed = 0;
 
+    /** @var callable */
     protected $callback;
 
+    /** @var bool */
     protected $forceStop = false;
 
+    /** @var int */
     protected $idleTimeout = 0;
 
+    /** @var int */
     protected $idleTimeoutExitCode;
 
+    /**
+     * @param $callback
+     */
     public function setCallback($callback)
     {
         $this->callback = $callback;
     }
 
+    /**
+     * @return callable
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
+
+    /**
+     * @param int $msgAmount
+     */
     public function start($msgAmount = 0)
     {
         $this->target = $msgAmount;
@@ -34,9 +54,15 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         }
     }
 
+    /**
+     * Tell the server you are going to stop consuming.
+     *
+     * It will finish up the last message and not send you any more.
+     */
     public function stopConsuming()
     {
-        $this->getChannel()->basic_cancel($this->getConsumerTag());
+        // This gets stuck and will not exit without the last two parameters set.
+        $this->getChannel()->basic_cancel($this->getConsumerTag(), false, true);
     }
 
     protected function setupConsumer()
