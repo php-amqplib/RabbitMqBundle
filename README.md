@@ -184,6 +184,42 @@ by default to avoid possible breaks in applications already using this bundle.
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
 
+### Dynamic Connection Parameters ###
+
+Sometimes your connection information may need to be dynamic. Dynamic connection parameters allow you to supply or
+override parameters programmatically through a service.
+
+e.g. In a scenario when the `vhost` parameter of the connection depends on the current tenant of your white-labeled
+application and you do not want (or can't) change it's configuration every time.
+
+Define a service under `connection_parameters_provider` that implements the `ConnectionParametersProviderInterface`,
+and add it to the appropriate `connections` configuration.
+
+```yaml
+connections:
+    default:
+        host:     'localhost'
+        port:     5672
+        user:     'guest'
+        password: 'guest'
+        vhost:    'foo' # to be dynamically overridden by `connection_parameters_provider`
+        connection_parameters_provider: connection_parameters_provider_service
+```
+
+Example Implementation:
+
+```php
+class ConnectionParametersProviderService implements ConnectionParametersProvider {
+    ...
+    public function getConnectionParameters() {
+        return array('vhost' => $this->getVhost());
+    }
+    ...
+}
+```
+
+In this case, the `vhost` parameter will be overridden by the output of `getVhost()`.
+
 ## Producers, Consumers, What? ##
 
 In a messaging application, the process sending messages to the broker is called __producer__ while the process receiving those messages is called __consumer__. In your application you will have several of them that you can list under their respective entries in the configuration.

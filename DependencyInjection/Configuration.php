@@ -67,6 +67,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->booleanNode('keepalive')->defaultFalse()->info('requires php-amqplib v2.4.1+ and PHP5.4+')->end()
                             ->scalarNode('heartbeat')->defaultValue(0)->info('requires php-amqplib v2.4.1+')->end()
+                            ->scalarNode('connection_parameters_provider')->end()
                         ->end()
                     ->end()
                 ->end()
