@@ -96,6 +96,7 @@ Add the `old_sound_rabbit_mq` section in your configuration file:
 
 ```yaml
 old_sound_rabbit_mq:
+    enable_amqp:       true
     connections:
         default:
             host:     'localhost'
