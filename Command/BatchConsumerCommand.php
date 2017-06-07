@@ -9,16 +9,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BatchConsumerCommand extends BaseRabbitMqCommand
+final class BatchConsumerCommand extends BaseRabbitMqCommand
 {
     /**
      * @var BatchConsumer
      */
     protected $consumer;
 
-    /**
-     * @return  void
-     */
     public function stopConsumer()
     {
         if ($this->consumer instanceof BatchConsumer) {
@@ -31,12 +28,6 @@ class BatchConsumerCommand extends BaseRabbitMqCommand
             } catch (AMQPTimeoutException $e) {}
         }
     }
-
-    public function restartConsumer()
-    {
-        // TODO: Implement restarting of consumer
-    }
-
 
     protected function configure()
     {
@@ -97,7 +88,10 @@ class BatchConsumerCommand extends BaseRabbitMqCommand
         $this->consumer = $this->getContainer()
             ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
-        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
+        if (null !== $input->getOption('memory-limit') &&
+            ctype_digit((string) $input->getOption('memory-limit')) &&
+            $input->getOption('memory-limit') > 0
+        ) {
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }
         $this->consumer->setRoutingKey($input->getOption('route'));

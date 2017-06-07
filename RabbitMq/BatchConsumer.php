@@ -7,57 +7,57 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class BatchConsumer extends BaseAmqp implements DequeuerInterface
+final class BatchConsumer extends BaseAmqp implements DequeuerInterface
 {
     /**
      * @var int
      */
-    protected $consumed = 0;
+    private $consumed = 0;
 
     /**
      * @var \Closure|callable
      */
-    protected $callback;
+    private $callback;
 
     /**
      * @var bool
      */
-    protected $forceStop = false;
+    private $forceStop = false;
 
     /**
      * @var int
      */
-    protected $idleTimeout = 0;
+    private $idleTimeout = 0;
 
     /**
      * @var int
      */
-    protected $idleTimeoutExitCode;
+    private $idleTimeoutExitCode;
 
     /**
      * @var int
      */
-    protected $memoryLimit = null;
+    private $memoryLimit = null;
 
     /**
      * @var int
      */
-    protected $prefetchCount;
+    private $prefetchCount;
 
     /**
      * @var int
      */
-    protected $timeoutWait = 3;
+    private $timeoutWait = 3;
 
     /**
      * @var array
      */
-    protected $messages = array();
+    private $messages = array();
 
     /**
      * @var int
      */
-    protected $batchCounter = 0;
+    private $batchCounter = 0;
 
     /**
      * @param   \Closure|callable    $callback
@@ -86,7 +86,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
 
         $this->maybeStopConsumer();
 
-        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+        if (null !== $this->getMemoryLimit() && $this->isRamAlmostOverloaded()) {
             $this->stopConsuming();
         }
     }
@@ -188,7 +188,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         $this->consumed++;
         $this->maybeStopConsumer();
 
-        if (!is_null($this->getMemoryLimit()) && $this->isRamAlmostOverloaded()) {
+        if (null !== $this->getMemoryLimit() && $this->isRamAlmostOverloaded()) {
             $this->stopConsuming();
         }
     }

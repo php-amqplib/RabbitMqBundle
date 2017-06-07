@@ -776,7 +776,7 @@ batch_consumers:
         idle_timeout_exit_code: -2
 ```
 
-You can implement a batch consumer that will acknoledge all messages in one return or you can have control on what message to acknoledge.
+You can implement a batch consumer that will acknowledge all messages in one return or you can have control on what message to acknoledge.
 
 ```php
 namespace AppBundle\Service;
@@ -800,8 +800,9 @@ class DevckBasicConsumer implements BatchConsumerInterface
         return true; 
     }
 }
-
 ```
+
+```php
 namespace AppBundle\Service;
 
 use OldSound\RabbitMqBundle\RabbitMq\BatchConsumerInterface;
