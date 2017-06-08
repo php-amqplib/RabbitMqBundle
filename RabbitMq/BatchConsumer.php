@@ -121,13 +121,13 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
                 $this->batchConsume();
             }
 
-            $timeoutWanted = ($isConsuming) ? $this->getTimeoutWait() : $this->getIdleTimeout();
+            $timeoutWanted = $isConsuming ? $this->getTimeoutWait() : $this->getIdleTimeout();
         }
     }
 
     public function batchConsume()
     {
-        if ($this->batchCounter == 0) {
+        if ($this->batchCounter === 0) {
             return;
         }
 
@@ -387,8 +387,6 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
 
         if ($this->forceStop) {
             $this->stopConsuming();
-        } else {
-            return;
         }
     }
 
