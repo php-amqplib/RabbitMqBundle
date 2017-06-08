@@ -68,7 +68,6 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
 
             pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
             pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
-//            pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
         }
 
         if (defined('AMQP_DEBUG') === false) {

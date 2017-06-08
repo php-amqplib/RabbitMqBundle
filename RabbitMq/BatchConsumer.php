@@ -158,6 +158,7 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
+            $this->resetBatch();
             throw $e;
         } catch (\Error $e) {
             $this->logger->error($e->getMessage(), array(
@@ -167,10 +168,11 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
-            throw $e;
-        } finally {
             $this->resetBatch();
+            throw $e;
         }
+
+        $this->resetBatch();
     }
 
     /**
@@ -323,7 +325,7 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
      *
      * @return  AMQPMessage
      */
-    public function getMessage($deliveryTag)
+    private function getMessage($deliveryTag)
     {
         return isset($this->messages[$deliveryTag])
             ? $this->messages[$deliveryTag]
@@ -338,7 +340,7 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
      *
      * @throws  AMQPRuntimeException
      */
-    public function getMessageChannel($deliveryTag)
+    private function getMessageChannel($deliveryTag)
     {
         $message = $this->getMessage($deliveryTag);
         if (!$message) {
