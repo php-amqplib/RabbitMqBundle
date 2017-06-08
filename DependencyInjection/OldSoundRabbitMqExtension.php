@@ -383,6 +383,10 @@ class OldSoundRabbitMqExtension extends Extension
                 ))
             ;
 
+            if (isset($consumer['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
+            }
+
             if (isset($consumer['idle_timeout'])) {
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
