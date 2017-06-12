@@ -97,6 +97,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->setFactoryService($factoryName);
                 $definition->setFactoryMethod('createConnection');
             }
+            $definition->addTag('old_sound_rabbit_mq.connection');
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
         }
