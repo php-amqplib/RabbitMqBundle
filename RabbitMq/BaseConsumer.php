@@ -90,8 +90,6 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
         if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
-        } else {
-            return;
         }
     }
 
