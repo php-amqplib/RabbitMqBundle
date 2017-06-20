@@ -402,6 +402,7 @@ class Configuration implements ConfigurationInterface
     protected function addQueueNodeConfiguration(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('routing_key')
             ->children()
                 ->scalarNode('name')->end()
                 ->booleanNode('passive')->defaultFalse()->end()
