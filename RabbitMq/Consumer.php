@@ -212,7 +212,7 @@ class Consumer extends BaseConsumer
     {
         $memoryManager = new MemoryConsumptionChecker(new NativeMemoryUsageProvider());
 
-        return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit(), '5M');
+        return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit().'M', '5M');
     }
 
     /**

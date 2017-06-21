@@ -23,7 +23,7 @@ class MemoryConsumptionCheckerTest extends \PHPUnit_Framework_TestCase
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
 
-        $this->assertFalse($memoryManager->isRamAlmostOverloaded($allowedConsumptionUntil, $maxConsumptionAllowed));
+        $this->assertFalse($memoryManager->isRamAlmostOverloaded($maxConsumptionAllowed, $allowedConsumptionUntil));
     }
 
     public function testMemoryIsAlmostOverloaded()
@@ -37,6 +37,32 @@ class MemoryConsumptionCheckerTest extends \PHPUnit_Framework_TestCase
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
 
-        $this->assertTrue($memoryManager->isRamAlmostOverloaded($allowedConsumptionUntil, $maxConsumptionAllowed));
+        $this->assertTrue($memoryManager->isRamAlmostOverloaded($maxConsumptionAllowed, $allowedConsumptionUntil));
+    }
+
+    public function testMemoryExactValueIsNotAlmostOverloaded()
+    {
+        $currentMemoryUsage = '7M';
+        $maxConsumptionAllowed = '10M';
+
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
+
+        $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
+
+        $this->assertFalse($memoryManager->isRamAlmostOverloaded($maxConsumptionAllowed));
+    }
+
+    public function testMemoryExactValueIsAlmostOverloaded()
+    {
+        $currentMemoryUsage = '11M';
+        $maxConsumptionAllowed = '10M';
+
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
+
+        $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
+
+        $this->assertTrue($memoryManager->isRamAlmostOverloaded($maxConsumptionAllowed));
     }
 }
