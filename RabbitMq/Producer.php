@@ -53,7 +53,18 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+        if(
+            trim($this->queueOptions['name']) =='' &&
+            $routingKey == '' &&
+            count($this->queueOptions['routing_keys']) > 0
+        ) {
+            foreach($this->queueOptions['routing_keys'] as $configuredRoutingKeys) {
+                $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $configuredRoutingKeys);
+            }
+        } else {
+            $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+        }
+        
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
                 'body' => $msgBody,
