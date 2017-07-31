@@ -85,23 +85,23 @@ class ProducerTest extends \PHPUnit_Framework_TestCase
 
     public function provideTestSetWaitConfirmationTimeout()
     {
-        return [
-            'correct timeout' => [
+        return array(
+            'correct timeout' => array(
                 'timeout' => 5,
                 'expectedException' => false,
-            ],
-            'timeout zero' => [
+            ),
+            'timeout zero' => array(
                 'timeout' => 0,
                 'expectedException' => false,
-            ],
-            'timeout less then zero' => [
+            ),
+            'timeout less then zero' => array(
                 'timeout' => -1,
                 'expectedException' => '\InvalidArgumentException',
-            ],
-            'timeout not integer' => [
+            ),
+            'timeout not integer' => array(
                 'timeout' => '5',
                 'expectedException' => '\InvalidArgumentException',
-            ],
-        ];
+            ),
+        );
     }
 }
