@@ -5,7 +5,6 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -308,12 +307,7 @@ abstract class BaseAmqp
         if (!$this->ch) {
             return;
         }
-        try {
-            $this->ch = null;
-        } catch (\Exception $e) {
-            // ignore exception on Channel object destructor
-            // TODO: this workaround can be removed after php-amqplib will be updated till 2.6.3
-        }
+        $this->ch = null;
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
-use PhpAmqpLib\Channel\AMQPChannel;
 
 class ProducerTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,12 +64,42 @@ class ProducerTest extends \PHPUnit_Framework_TestCase
         $producer->waitConfirmation();
     }
 
-    public function testSetWaitConfirmationTimeout()
+    /**
+     * @dataProvider provideTestSetWaitConfirmationTimeout
+     */
+    public function testSetWaitConfirmationTimeout($timeout, $expectedException)
     {
         $connection = $this->prophesize('\PhpAmqpLib\Connection\AMQPLazyConnection');
 
         $producer = new Producer($connection->reveal());
-        $producer->setWaitConfirmationTimeout(5);
-        $this->assertEquals(5, $producer->getWaitConfirmationTimeout());
+
+        if ($expectedException) {
+            $this->expectException($expectedException);
+        }
+
+        $producer->setWaitConfirmationTimeout($timeout);
+        $this->assertEquals($timeout, $producer->getWaitConfirmationTimeout());
+    }
+
+    public function provideTestSetWaitConfirmationTimeout()
+    {
+        return [
+            'correct timeout' => [
+                'timeout' => 5,
+                'expectedException' => false,
+            ],
+            'timeout zero' => [
+                'timeout' => 0,
+                'expectedException' => false,
+            ],
+            'timeout less then zero' => [
+                'timeout' => -1,
+                'expectedException' => '\InvalidArgumentException',
+            ],
+            'timeout not integer' => [
+                'timeout' => '5',
+                'expectedException' => '\InvalidArgumentException',
+            ],
+        ];
     }
 }
