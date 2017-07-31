@@ -73,12 +73,14 @@ class ProducerTest extends \PHPUnit_Framework_TestCase
 
         $producer = new Producer($connection->reveal());
 
-        if ($expectedException) {
-            $this->expectException($expectedException);
+        try {
+            $producer->setWaitConfirmationTimeout($timeout);
+            $this->assertEquals($timeout, $producer->getWaitConfirmationTimeout());
+        } catch (\InvalidArgumentException $e) {
+            if ($expectedException) {
+                $this->addToAssertionCount(1);
+            }
         }
-
-        $producer->setWaitConfirmationTimeout($timeout);
-        $this->assertEquals($timeout, $producer->getWaitConfirmationTimeout());
     }
 
     public function provideTestSetWaitConfirmationTimeout()
