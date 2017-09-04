@@ -115,4 +115,10 @@ class RpcClient extends BaseAmqp
     {
         $this->directReplyTo = $directReplyTo;
     }
+
+    public function reset()
+    {
+        $this->replies = array();
+        $this->requests = 0;
+    }
 }
