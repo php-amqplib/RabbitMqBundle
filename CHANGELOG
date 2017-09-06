@@ -1,3 +1,13 @@
+- 2017-01-22
+    * Add `graceful_max_execution_timeout`
+
+- 2015-02-07
+    * Added possibility to set serialize/unserialize function for rpc servers/clients
+
+- 2014-11-27
+    * Added interface `OldSound\RabbitMqBundle\Provider\QueuesProviderInterface`
+    * Added `queues_provider` configuration for multiple consumer
+
 - 2014-07-21
     * Added `reconnect` method into `OldSound\RabbitMqBundle\RabbitMq\BaseAmqp`
 

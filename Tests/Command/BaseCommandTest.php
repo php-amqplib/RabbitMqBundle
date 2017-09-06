@@ -11,13 +11,13 @@ abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->application = $this->getMockBuilder('Symfony\\Bundle\\FrameworkBundle\\Console\\Application')
+        $this->application = $this->getMockBuilder('Symfony\\Component\\Console\\Application')
             ->disableOriginalConstructor()
             ->getMock();
         $this->definition = $this->getMockBuilder('Symfony\\Component\\Console\\Input\\InputDefinition')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->helperSet = $this->getMock('Symfony\\Component\\Console\\Helper\\HelperSet');
+        $this->helperSet = $this->getMockBuilder('Symfony\\Component\\Console\\Helper\\HelperSet')->getMock();
 
         $this->application->expects($this->any())
             ->method('getDefinition')

@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Command;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,9 +20,13 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
     public function stopConsumer()
     {
         if ($this->consumer instanceof Consumer) {
+            // Process current message, then halt consumer
             $this->consumer->forceStopConsumer();
-        } else {
-            exit();
+
+            // Halt consumer if waiting for a new message from the queue
+            try {
+                $this->consumer->stopConsuming();
+            } catch (AMQPTimeoutException $e) {}
         }
     }
 
@@ -38,7 +43,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
-            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
         ;
@@ -80,14 +85,19 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         if (0 > $this->amount) {
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
+        $this->initConsumer($input);
 
+        return $this->consumer->consume($this->amount);
+    }
+
+    protected function initConsumer($input)
+    {
         $this->consumer = $this->getContainer()
-            ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
+                ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
-        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string)$input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
+        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }
         $this->consumer->setRoutingKey($input->getOption('route'));
-        $this->consumer->consume($this->amount);
     }
 }

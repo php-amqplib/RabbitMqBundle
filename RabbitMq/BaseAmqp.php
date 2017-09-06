@@ -1,9 +1,14 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+
+use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class BaseAmqp
 {
@@ -15,6 +20,11 @@ abstract class BaseAmqp
     protected $routingKey = '';
     protected $autoSetupFabric = true;
     protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     protected $exchangeOptions = array(
         'passive' => false,
@@ -35,34 +45,55 @@ abstract class BaseAmqp
         'auto_delete' => false,
         'nowait' => false,
         'arguments' => null,
-        'ticket' => null
+        'ticket' => null,
+        'declare' => true,
     );
 
     /**
-     * @param AMQPConnection   $conn
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @param AbstractConnection   $conn
      * @param AMQPChannel|null $ch
      * @param null             $consumerTag
      */
-    public function __construct(AMQPConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
+    public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
         $this->conn = $conn;
         $this->ch = $ch;
 
-        if (!($conn instanceof AMQPLazyConnection)) {
+        if ($conn->connectOnConstruct()) {
             $this->getChannel();
         }
 
         $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
+
+        $this->logger = new NullLogger();
     }
 
     public function __destruct()
     {
+        $this->close();
+    }
+
+    public function close()
+    {
         if ($this->ch) {
-            $this->ch->close();
+            try {
+                $this->ch->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
-        
-        if ($this->conn->isConnected()) {
-            $this->conn->close();
+
+        if ($this->conn && $this->conn->isConnected()) {
+            try {
+                $this->conn->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
     }
 
@@ -80,7 +111,7 @@ abstract class BaseAmqp
      */
     public function getChannel()
     {
-        if (empty($this->ch)) {
+        if (empty($this->ch) || null === $this->ch->getChannelId()) {
             $this->ch = $this->conn->channel();
         }
 
@@ -89,6 +120,7 @@ abstract class BaseAmqp
 
     /**
      * @param  AMQPChannel $ch
+     *
      * @return void
      */
     public function setChannel(AMQPChannel $ch)
@@ -132,6 +164,36 @@ abstract class BaseAmqp
         $this->routingKey = $routingKey;
     }
 
+    public function setupFabric()
+    {
+        if (!$this->exchangeDeclared) {
+            $this->exchangeDeclare();
+        }
+
+        if (!$this->queueDeclared) {
+            $this->queueDeclare();
+        }
+    }
+
+    /**
+     * disables the automatic SetupFabric when using a consumer or producer
+     */
+    public function disableAutoSetupFabric()
+    {
+        $this->autoSetupFabric = false;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Declares exchange
+     */
     protected function exchangeDeclare()
     {
         if ($this->exchangeOptions['declare']) {
@@ -150,9 +212,12 @@ abstract class BaseAmqp
         }
     }
 
+    /**
+     * Declares queue, creates if needed
+     */
     protected function queueDeclare()
     {
-        if (null !== $this->queueOptions['name']) {
+        if ($this->queueOptions['declare']) {
             list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
                 $this->queueOptions['durable'], $this->queueOptions['exclusive'],
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
@@ -160,31 +225,62 @@ abstract class BaseAmqp
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
 
             $this->queueDeclared = true;
         }
     }
 
-    public function setupFabric()
+    /**
+     * Binds queue to an exchange
+     *
+     * @param string $queue
+     * @param string $exchange
+     * @param string $routing_key
+     */
+    protected function queueBind($queue, $exchange, $routing_key)
     {
-        if (!$this->exchangeDeclared) {
-            $this->exchangeDeclare();
-        }
-
-        if (!$this->queueDeclared) {
-            $this->queueDeclare();
+        // queue binding is not permitted on the default exchange
+        if ('' !== $exchange) {
+            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
         }
     }
 
     /**
-     * disables the automatic SetupFabric when using a consumer or producer
+     * @param EventDispatcherInterface $eventDispatcher
+     *
+     * @return BaseAmqp
      */
-    public function disableAutoSetupFabric() {
-        $this->autoSetupFabric = false;
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
+    /**
+     * @param string $eventName
+     * @param AMQPEvent  $event
+     */
+    protected function dispatchEvent($eventName, AMQPEvent $event)
+    {
+        if ($this->getEventDispatcher()) {
+            $this->getEventDispatcher()->dispatch(
+                $eventName,
+                $event
+            );
+        }
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
     }
 }

@@ -2,12 +2,40 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use OldSound\RabbitMqBundle\Provider\QueuesProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\Exception\QueueNotFoundException;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class MultipleConsumer extends Consumer
 {
     protected $queues = array();
+
+    /**
+     * Queues provider
+     *
+     * @var QueuesProviderInterface
+     */
+    protected $queuesProvider = null;
+    
+    /**
+     * Context the consumer runs in
+     *
+     * @var string
+     */
+    protected $context = null;
+
+    /**
+     * QueuesProvider setter
+     *
+     * @param QueuesProviderInterface $queuesProvider
+     *
+     * @return self
+     */
+    public function setQueuesProvider(QueuesProviderInterface $queuesProvider)
+    {
+        $this->queuesProvider = $queuesProvider;
+        return $this;
+    }
 
     public function getQueueConsumerTag($queue)
     {
@@ -18,9 +46,16 @@ class MultipleConsumer extends Consumer
     {
         $this->queues = $queues;
     }
+    
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
 
     protected function setupConsumer()
     {
+        $this->mergeQueues();
+
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
@@ -45,10 +80,10 @@ class MultipleConsumer extends Consumer
 
             if (isset($options['routing_keys']) && count($options['routing_keys']) > 0) {
                 foreach ($options['routing_keys'] as $routingKey) {
-                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
             }
         }
 
@@ -61,15 +96,26 @@ class MultipleConsumer extends Consumer
             throw new QueueNotFoundException();
         }
 
-        $processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
-
-        $this->handleProcessMessage($msg, $processFlag);
+        $this->processMessageQueueCallback($msg, $queueName, $this->queues[$queueName]['callback']);
     }
 
     public function stopConsuming()
     {
         foreach ($this->queues as $name => $options) {
-            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name));
+            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name), false, true);
+        }
+    }
+
+    /**
+     * Merges static and provided queues into one array
+     */
+    protected function mergeQueues()
+    {
+        if ($this->queuesProvider) {
+            $this->queues = array_merge(
+                $this->queues,
+                $this->queuesProvider->getQueues($this->context)
+            );
         }
     }
 }
