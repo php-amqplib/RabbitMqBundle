@@ -111,10 +111,13 @@ abstract class BaseAmqp
 
     public function reconnect()
     {
-        if (!$this->conn->isConnected()) {
-            return;
-        }
-
+        /**
+         * TODO: Reconnect do not restore channels. This issue persists in 2.6.3 and 2.7.0-rc1. Following PRs doesn't help:
+         * https://github.com/php-amqplib/php-amqplib/commit/2ccc97ca5b1229f9b12ea47fbab6c16fad26df41
+         * https://github.com/php-amqplib/php-amqplib/commit/c87469ecbbf38fdc18688d3216c1e253d640ba32
+         */
+        $this->conn->reconnect();
+        $this->closeChannel();
         $this->conn->reconnect();
     }
 
