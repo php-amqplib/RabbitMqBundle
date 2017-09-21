@@ -55,6 +55,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadAnonConsumers();
         $this->loadRpcClients();
         $this->loadRpcServers();
+        $this->loadChannels();
 
         if ($this->collectorEnabled && $this->channelIds) {
             $channels = array();
@@ -429,6 +430,21 @@ class OldSoundRabbitMqExtension extends Extension
             $name = sprintf('old_sound_rabbit_mq.%s_anon', $key);
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($anon['callback'], $name);
+        }
+    }
+
+    protected function loadChannels()
+    {
+        foreach ($this->config['channels'] as $key => $channel) {
+            $definition = new Definition('%old_sound_rabbit_mq.channel.class%');
+            $definition->addTag('old_sound_rabbit_mq.producer');
+            $this->injectConnection($definition, $channel['connection']);
+            $channelServiceName = sprintf('old_sound_rabbit_mq.%s_channel', $key);
+            $this->container->setDefinition($channelServiceName, $definition);
+
+            if(false !== $channel['service_alias']) {
+                $this->container->setAlias($channel['service_alias'], $channelServiceName);
+            }
         }
     }
 

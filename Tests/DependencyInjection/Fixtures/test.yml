@@ -222,3 +222,8 @@ old_sound_rabbit_mq:
             exchange_options:
                 name: exchange
                 type: topic
+
+    channels:
+        foo_channel:
+            connection: foo_connection
+            service_alias: foo_channel_alias

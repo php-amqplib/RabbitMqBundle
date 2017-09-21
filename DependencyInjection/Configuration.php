@@ -52,6 +52,7 @@ class Configuration implements ConfigurationInterface
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
+        $this->addChannels($rootNode);
 
         return $tree;
     }
@@ -419,5 +420,27 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    /**
+     * @param ArrayNodeDefinition $node
+     *
+     * @return void
+     */
+    protected function addChannels(ArrayNodeDefinition $node)
+    {
+        $node->fixXmlConfig('channel')
+            ->children()
+                ->arrayNode('channels')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('service_alias')->defaultValue(null)->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 }

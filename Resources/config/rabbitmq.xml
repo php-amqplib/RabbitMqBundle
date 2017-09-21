@@ -22,6 +22,7 @@
         <parameter key="old_sound_rabbit_mq.data_collector.class">OldSound\RabbitMqBundle\DataCollector\MessageDataCollector</parameter>
         <parameter key="old_sound_rabbit_mq.parts_holder.class">OldSound\RabbitMqBundle\RabbitMq\AmqpPartsHolder</parameter>
         <parameter key="old_sound_rabbit_mq.fallback.class">OldSound\RabbitMqBundle\RabbitMq\Fallback</parameter>
+        <parameter key="old_sound_rabbit_mq.channel.class">PhpAmqpLib\Channel\AMQPChannel</parameter>
     </parameters>
 
     <services>

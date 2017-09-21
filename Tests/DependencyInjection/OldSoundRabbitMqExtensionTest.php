@@ -861,6 +861,25 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFooChannelDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_channel_channel'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.foo_channel_channel');
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
+    }
+
+    /**
+     * @group alias
+     */
+    public function testAliasedFooChannelDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_channel_channel'));
+        $this->assertTrue($container->has('foo_channel_alias'));
+    }
+
     private function getContainer($file, $debug = false)
     {
         $container = new ContainerBuilder(new ParameterBag(array('kernel.debug' => $debug)));

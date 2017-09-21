@@ -132,6 +132,10 @@ old_sound_rabbit_mq:
             exchange_options: {name: 'upload-picture', type: direct}
             queue_options:    {name: 'upload-picture'}
             callback:         upload_picture_service
+    channels:
+        send_log:
+            connection: another
+            service_alias: my_channel_service # no alias by default
 ```
 
 Here we configure the connection service and the message endpoints that our application will have. In this example your service container will contain the service `old_sound_rabbit_mq.upload_picture_producer` and `old_sound_rabbit_mq.upload_picture_consumer`. The later expects that there's a service called `upload_picture_service`.
@@ -542,6 +546,17 @@ consumers:
 ```
 
 If you would like you can also treat logging from queues with different handlers in monolog, by referencing channel "phpamqplib"
+
+### Channels ###
+Sometimes you might be need to instance of AMQPChannel object as a dependency to using in another third-party libraries. 
+This option provide an ability to define your channels as a service.   
+
+```yaml
+channels:
+    monolog_amqp_channel:
+        connection: another
+        service_alias: my_channel_service # no alias by default
+```
 
 ### RPC or Reply/Response ###
 
