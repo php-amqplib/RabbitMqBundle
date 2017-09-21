@@ -133,7 +133,7 @@ old_sound_rabbit_mq:
             queue_options:    {name: 'upload-picture'}
             callback:         upload_picture_service
     channels:
-        send_log:
+        monolog_amqp_channel:
             connection: another
             service_alias: my_channel_service # no alias by default
 ```
@@ -549,7 +549,7 @@ If you would like you can also treat logging from queues with different handlers
 
 ### Channels ###
 Sometimes you might be need to instance of AMQPChannel object as a dependency to using in another third-party libraries. 
-This option provide an ability to define your channels as a service.   
+This option provides able to define your channels as a service.   
 
 ```yaml
 channels:

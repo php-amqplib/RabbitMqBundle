@@ -437,7 +437,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['channels'] as $key => $channel) {
             $definition = new Definition('%old_sound_rabbit_mq.channel.class%');
-            $definition->addTag('old_sound_rabbit_mq.producer');
+            $definition->addTag('old_sound_rabbit_mq.channel');
             $this->injectConnection($definition, $channel['connection']);
             $channelServiceName = sprintf('old_sound_rabbit_mq.%s_channel', $key);
             $this->container->setDefinition($channelServiceName, $definition);
