@@ -6,23 +6,43 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
+    /** @var int */
     protected $target;
 
+    /** @var int */
     protected $consumed = 0;
 
+    /** @var callable */
     protected $callback;
 
+    /** @var bool */
     protected $forceStop = false;
 
+    /** @var int */
     protected $idleTimeout = 0;
 
+    /** @var int */
     protected $idleTimeoutExitCode;
 
+    /**
+     * @param $callback
+     */
     public function setCallback($callback)
     {
         $this->callback = $callback;
     }
 
+    /**
+     * @return callable
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
+
+    /**
+     * @param int $msgAmount
+     */
     public function start($msgAmount = 0)
     {
         $this->target = $msgAmount;
@@ -70,8 +90,6 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
         if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
             $this->stopConsuming();
-        } else {
-            return;
         }
     }
 

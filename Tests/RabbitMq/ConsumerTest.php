@@ -255,4 +255,66 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('PhpAmqpLib\Exception\AMQPTimeoutException');
         $consumer->consume(10);
     }
+
+    public function testGracefulMaxExecutionTimeoutExitCode()
+    {
+        // set up amqp connection
+        $amqpConnection = $this->prepareAMQPConnection();
+        // set up amqp channel
+        $amqpChannel = $this->prepareAMQPChannel();
+        $amqpChannel->expects($this->atLeastOnce())
+            ->method('getChannelId')
+            ->with()
+            ->willReturn(true);
+        $amqpChannel->expects($this->once())
+            ->method('basic_consume')
+            ->withAnyParameters()
+            ->willReturn(true);
+
+        // set up consumer
+        $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
+        // disable autosetup fabric so we do not mock more objects
+        $consumer->disableAutoSetupFabric();
+        $consumer->setChannel($amqpChannel);
+
+        $consumer->setGracefulMaxExecutionDateTimeFromSecondsInTheFuture(60);
+        $consumer->setGracefulMaxExecutionTimeoutExitCode(10);
+        $amqpChannel->callbacks = array('graceful_max_execution_timeout_test');
+
+        $amqpChannel->expects($this->exactly(1))
+            ->method('wait')
+            ->willThrowException(new AMQPTimeoutException());
+
+        $this->assertSame(10, $consumer->consume(1));
+    }
+
+    public function testGracefulMaxExecutionWontWaitIfPastTheTimeout()
+    {
+        // set up amqp connection
+        $amqpConnection = $this->prepareAMQPConnection();
+        // set up amqp channel
+        $amqpChannel = $this->prepareAMQPChannel();
+        $amqpChannel->expects($this->atLeastOnce())
+            ->method('getChannelId')
+            ->with()
+            ->willReturn(true);
+        $amqpChannel->expects($this->once())
+            ->method('basic_consume')
+            ->withAnyParameters()
+            ->willReturn(true);
+
+        // set up consumer
+        $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
+        // disable autosetup fabric so we do not mock more objects
+        $consumer->disableAutoSetupFabric();
+        $consumer->setChannel($amqpChannel);
+
+        $consumer->setGracefulMaxExecutionDateTimeFromSecondsInTheFuture(0);
+        $amqpChannel->callbacks = array('graceful_max_execution_timeout_test');
+
+        $amqpChannel->expects($this->never())
+            ->method('wait');
+
+        $consumer->consume(1);
+    }
 }

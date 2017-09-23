@@ -13,11 +13,26 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Configuration constructor.
+     *
+     * @param   string  $name
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
     public function getConfigTreeBuilder()
     {
         $tree = new TreeBuilder();
 
-        $rootNode = $tree->root('old_sound_rabbit_mq');
+        $rootNode = $tree->root($this->name);
 
         $rootNode
             ->children()
@@ -33,6 +48,7 @@ class Configuration implements ConfigurationInterface
         $this->addConsumers($rootNode);
         $this->addMultipleConsumers($rootNode);
         $this->addDynamicConsumers($rootNode);
+        $this->addBatchConsumers($rootNode);
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
@@ -67,6 +83,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->booleanNode('keepalive')->defaultFalse()->info('requires php-amqplib v2.4.1+ and PHP5.4+')->end()
                             ->scalarNode('heartbeat')->defaultValue(0)->info('requires php-amqplib v2.4.1+')->end()
+                            ->scalarNode('connection_parameters_provider')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -138,6 +155,13 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
+                            ->arrayNode('graceful_max_execution')
+                                ->canBeUnset()
+                                ->children()
+                                    ->integerNode('timeout')->end()
+                                    ->integerNode('exit_code')->defaultValue(0)->end()
+                                ->end()
+                            ->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->arrayNode('qos_options')
                                 ->canBeUnset()
@@ -212,6 +236,43 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->scalarNode('queue_options_provider')->isRequired()->end()
+                            ->scalarNode('enable_logger')->defaultFalse()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    /**
+     * @param   ArrayNodeDefinition     $node
+     *
+     * @return  void
+     */
+    protected function addBatchConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('batch_consumers')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->append($this->getExchangeConfiguration())
+                        ->append($this->getQueueConfiguration())
+                        ->children()
+                            ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('callback')->isRequired()->end()
+                            ->scalarNode('idle_timeout')->end()
+                            ->scalarNode('timeout_wait')->defaultValue(3)->end()
+                            ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                            ->arrayNode('qos_options')
+                                ->children()
+                                    ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                    ->scalarNode('prefetch_count')->defaultValue(2)->end()
+                                    ->booleanNode('global')->defaultFalse()->end()
+                                ->end()
+                            ->end()
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                         ->end()
                     ->end()
@@ -341,6 +402,7 @@ class Configuration implements ConfigurationInterface
     protected function addQueueNodeConfiguration(ArrayNodeDefinition $node)
     {
         $node
+            ->fixXmlConfig('routing_key')
             ->children()
                 ->scalarNode('name')->end()
                 ->booleanNode('passive')->defaultFalse()->end()
