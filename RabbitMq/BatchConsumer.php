@@ -85,10 +85,6 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
         $this->addMessage($msg);
 
         $this->maybeStopConsumer();
-
-        if (null !== $this->getMemoryLimit() && $this->isRamAlmostOverloaded()) {
-            $this->stopConsuming();
-        }
     }
 
     public function consume()
@@ -189,10 +185,6 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
 
         $this->consumed++;
         $this->maybeStopConsumer();
-
-        if (null !== $this->getMemoryLimit() && $this->isRamAlmostOverloaded()) {
-            $this->stopConsuming();
-        }
     }
 
     /**
@@ -388,6 +380,10 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
         }
 
         if ($this->forceStop) {
+            $this->stopConsuming();
+        }
+
+        if (null !== $this->getMemoryLimit() && $this->isRamAlmostOverloaded()) {
             $this->stopConsuming();
         }
     }
