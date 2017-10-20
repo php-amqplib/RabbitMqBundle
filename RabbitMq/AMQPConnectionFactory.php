@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPSocketConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class AMQPConnectionFactory
@@ -60,6 +61,25 @@ class AMQPConnectionFactory
      */
     public function createConnection()
     {
+        // AMQPSocketConnection doesn't take same parameters than AMQPStreamConnection
+        if (is_a($this->class, AMQPSocketConnection::class, true)) {
+            return new $this->class(
+                $this->parameters['host'],
+                $this->parameters['port'],
+                $this->parameters['user'],
+                $this->parameters['password'],
+                $this->parameters['vhost'],
+                false,      // insist
+                'AMQPLAIN', // login_method
+                null,       // login_response
+                'en_US',    // locale
+                $this->parameters['read_write_timeout'],
+                $this->parameters['keepalive'],
+                $this->parameters['read_write_timeout'],
+                $this->parameters['heartbeat']
+            );
+        }
+
         return new $this->class(
             $this->parameters['host'],
             $this->parameters['port'],

@@ -70,6 +70,69 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
         ), $instance->constructParams);
     }
 
+    public function testSocketDefaultValues()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection',
+            array()
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection', $instance);
+        $this->assertEquals(array(
+            'localhost', // host
+            5672,        // port
+            'guest',     // user
+            'guest',     // password
+            '/',         // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            3,           // read timeout
+            false,       // keepalive
+            3,           // write timeout
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    public function testSocketStandardConnectionParameters()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection',
+            array(
+                'host' => 'foo_host',
+                'port' => 123,
+                'user' => 'foo_user',
+                'password' => 'foo_password',
+                'vhost' => '/vhost',
+                'keepalive' => true,
+                'read_write_timeout' => 321,
+                'heartbeat' => 111,
+            )
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection', $instance);
+        $this->assertEquals(array(
+            'foo_host',  // host
+            123,         // port
+            'foo_user',  // user
+            'foo_password', // password
+            '/vhost',    // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            321,           // read timeout
+            true,       // keepalive
+            321,           // write timeout
+            111,           // heartbeat
+        ), $instance->constructParams);
+    }
+
     public function testSetConnectionParametersWithUrl()
     {
         $factory = new AMQPConnectionFactory(
