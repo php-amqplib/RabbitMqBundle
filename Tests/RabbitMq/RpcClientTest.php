@@ -31,7 +31,10 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $expectedNotify = 'message';
-        $message = $this->getMock('\PhpAmqpLib\Message\AMQPMessage', array('get'), array($expectedNotify));
+        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
+            ->setMethods(array('get'))
+            ->setConstructorArgs(array($expectedNotify))
+            ->getMock();
         $notified = false;
         $client->notify(function ($message) use (&$notified) {
             $notified = $message;
