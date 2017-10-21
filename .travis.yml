@@ -10,11 +10,14 @@ matrix:
       env: SYMFONY_VERSION=2.8.*
 
   include:
-    - php: 5.3
+    - dist: precise
+      php: 5.3
       env: SYMFONY_VERSION=2.3.*
-    - php: 5.3
+    - dist: precise
+      php: 5.3
       env: SYMFONY_VERSION=2.7.*
-    - php: 5.3
+    - dist: precise
+      php: 5.3
       env: SYMFONY_VERSION=2.8.*
 
     - php: 5.4
