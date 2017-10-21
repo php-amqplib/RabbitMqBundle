@@ -40,7 +40,7 @@ class OldSoundRabbitMqExtension extends Extension
         $loader = new XmlFileLoader($this->container, new FileLocator(array(__DIR__ . '/../Resources/config')));
         $loader->load('rabbitmq.xml');
 
-        $configuration = new Configuration($this->getAlias());
+        $configuration = $this->getConfiguration($configs, $container);
         $this->config = $this->processConfiguration($configuration, $configs);
 
         $this->collectorEnabled = $this->config['enable_collector'];
@@ -67,6 +67,11 @@ class OldSoundRabbitMqExtension extends Extension
         } else {
             $this->container->removeDefinition('old_sound_rabbit_mq.data_collector');
         }
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($this->getAlias());
     }
 
     protected function loadConnections()

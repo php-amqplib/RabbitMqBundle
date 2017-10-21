@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class RpcClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,8 +14,14 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('sendReply', 'maybeStopConsumer'))
             ->disableOriginalConstructor()
             ->getMock();
-        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')->setMethods(array('get'))->setConstructorArgs(array('message'))->getMock();
-        $serializer = $this->getMockBuilder('\Symfony\Component\Serializer\SerializerInterface')->setMethods(array('serialize', 'deserialize'))->getMock();
+        /** @var AMQPMessage $message */
+        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
+            ->setMethods(array('get'))
+            ->setConstructorArgs(array('message'))
+            ->getMock();
+        $serializer = $this->getMockBuilder('\Symfony\Component\Serializer\SerializerInterface')
+            ->setMethods(array('serialize', 'deserialize'))
+            ->getMock();
         $serializer->expects($this->once())->method('deserialize')->with('message', 'json', null);
         $client->initClient(true);
         $client->setUnserializer(function($data) use ($serializer) {
@@ -22,7 +29,7 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
         });
         $client->processMessage($message);
     }
-    
+
     public function testProcessMessageWithNotifyMethod()
     {
         /** @var RpcClient $client */
@@ -31,7 +38,11 @@ class RpcClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $expectedNotify = 'message';
-        $message = $this->getMock('\PhpAmqpLib\Message\AMQPMessage', array('get'), array($expectedNotify));
+        /** @var AMQPMessage $message */
+        $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
+            ->setMethods(array('get'))
+            ->setConstructorArgs(array($expectedNotify))
+            ->getMock();
         $notified = false;
         $client->notify(function ($message) use (&$notified) {
             $notified = $message;
