@@ -77,6 +77,9 @@ old_sound_rabbit_mq:
                 ticket:      null
             service_alias: foo_producer_alias
 
+        publisher_confirms_producer:
+            publisher_confirms: true
+            publisher_confirms_timeout: 42
 
         default_producer:
             exchange_options:

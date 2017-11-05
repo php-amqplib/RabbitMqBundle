@@ -261,6 +261,29 @@ If you need to use a custom class for a producer (which should inherit from `Old
     ...
 ```
 
+#### Publisher confirms ####
+
+According to the official [documentation](https://www.rabbitmq.com/confirms.html), using standard AMQP 0-9-1, the only way to guarantee that a message isn't lost is by using transactions.
+It decreases throughput by a factor of 250, which is why another confirmation mechanism was introduced.
+
+In order to ensure messages are delivered, instead of using transactions, the channel used by the producer can be put in confirm mode.
+
+Producer channel can be put in confirm mode by setting ```publisher_confirms``` to ```true``` (```false``` per default).
+Default producer class then switches to ```OldSound\RabbitMqBundle\RabbitMq\PublisherConfirmsProducer```.
+To make sure producer does not wait indefinitely for confirmation, ```publisher_confirms_timeout``` can be set to a duration in seconds (```3``` per default).
+If timeout is reached a ```PhpAmqpLib\Exception\AMQPTimeoutException``` is thrown.
+To disable timeout, set ```publisher_confirms_timeout``` to 0.
+
+```yaml
+    ...
+    producers:
+        upload_picture:
+            ...
+            publisher_confirms: true
+            publisher_confirms_timeout: 3
+            ...
+    ...
+```
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 

@@ -53,7 +53,12 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
+        $this->beforePublish();
+
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+
+        $this->afterPublishBeforeLogPublished();
+
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
                 'body' => $msgBody,
@@ -62,5 +67,13 @@ class Producer extends BaseAmqp implements ProducerInterface
                 'headers' => $headers
             )
         ));
+    }
+
+    protected function beforePublish()
+    {
+    }
+
+    protected function afterPublishBeforeLogPublished()
+    {
     }
 }
