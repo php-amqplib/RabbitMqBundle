@@ -15,7 +15,10 @@ final class PublisherConfirmsProducerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPublish()
     {
-        $channelStub = self::createMock('\PhpAmqpLib\Channel\AMQPChannel');
+        $channelStub = self::getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
 
         $channelStub
             ->expects(self::once())
@@ -29,7 +32,10 @@ final class PublisherConfirmsProducerTest extends \PHPUnit_Framework_TestCase
             ->with(42)
         ;
 
-        $connectionStub = self::createMock('\PhpAmqpLib\Connection\AbstractConnection');
+        $connectionStub = self::getMockBuilder('\PhpAmqpLib\Connection\AbstractConnection')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
 
         $connectionStub
             ->method('channel')
@@ -62,7 +68,10 @@ final class PublisherConfirmsProducerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPublishMultiplePublishCallsOnlyCallConfirmSelectOnce()
     {
-        $channelStub = self::createMock('\PhpAmqpLib\Channel\AMQPChannel');
+        $channelStub = self::getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
 
         $channelStub
             ->expects(self::once())
@@ -76,7 +85,10 @@ final class PublisherConfirmsProducerTest extends \PHPUnit_Framework_TestCase
             ->with(42)
         ;
 
-        $connectionStub = self::createMock('\PhpAmqpLib\Connection\AbstractConnection');
+        $connectionStub = self::getMockBuilder('\PhpAmqpLib\Connection\AbstractConnection')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
 
         $connectionStub
             ->method('channel')
