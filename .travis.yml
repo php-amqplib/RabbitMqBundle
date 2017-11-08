@@ -16,9 +16,11 @@ cache:
 matrix:
   fast_finish: true
   include:
-    - php: 5.3
+    - dist: precise
+      php: 5.3
       env: SYMFONY_VERSION=2.7.*
-    - php: 5.3
+    - dist: precise
+      php: 5.3
       env: SYMFONY_VERSION=2.8.*
 
     - php: 5.6

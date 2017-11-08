@@ -55,8 +55,11 @@ class Consumer extends BaseConsumer
     /**
      * Consume the message
      *
-     * @param int $msgAmount
-     * @return int
+     * @param   int     $msgAmount
+     *
+     * @return  int
+     *
+     * @throws  AMQPTimeoutException
      */
     public function consume($msgAmount)
     {
@@ -209,7 +212,7 @@ class Consumer extends BaseConsumer
     {
         $memoryManager = new MemoryConsumptionChecker(new NativeMemoryUsageProvider());
 
-        return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit(), '5M');
+        return $memoryManager->isRamAlmostOverloaded($this->getMemoryLimit().'M', '5M');
     }
 
     /**

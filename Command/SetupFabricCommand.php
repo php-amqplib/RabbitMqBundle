@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
+use OldSound\RabbitMqBundle\RabbitMq\DynamicConsumer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,6 +30,9 @@ class SetupFabricCommand extends BaseRabbitMqCommand
 
         foreach (array('base_amqp', 'binding') as $key) {
             foreach ($partsHolder->getParts('old_sound_rabbit_mq.' . $key) as $baseAmqp) {
+                if ($baseAmqp instanceof DynamicConsumer) {
+                    continue;
+                }
                 $baseAmqp->setupFabric();
             }
         }

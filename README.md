@@ -184,6 +184,42 @@ by default to avoid possible breaks in applications already using this bundle.
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
 
+### Dynamic Connection Parameters ###
+
+Sometimes your connection information may need to be dynamic. Dynamic connection parameters allow you to supply or
+override parameters programmatically through a service.
+
+e.g. In a scenario when the `vhost` parameter of the connection depends on the current tenant of your white-labeled
+application and you do not want (or can't) change it's configuration every time.
+
+Define a service under `connection_parameters_provider` that implements the `ConnectionParametersProviderInterface`,
+and add it to the appropriate `connections` configuration.
+
+```yaml
+connections:
+    default:
+        host:     'localhost'
+        port:     5672
+        user:     'guest'
+        password: 'guest'
+        vhost:    'foo' # to be dynamically overridden by `connection_parameters_provider`
+        connection_parameters_provider: connection_parameters_provider_service
+```
+
+Example Implementation:
+
+```php
+class ConnectionParametersProviderService implements ConnectionParametersProvider {
+    ...
+    public function getConnectionParameters() {
+        return array('vhost' => $this->getVhost());
+    }
+    ...
+}
+```
+
+In this case, the `vhost` parameter will be overridden by the output of `getVhost()`.
+
 ## Producers, Consumers, What? ##
 
 In a messaging application, the process sending messages to the broker is called __producer__ while the process receiving those messages is called __consumer__. In your application you will have several of them that you can list under their respective entries in the configuration.
@@ -754,6 +790,101 @@ $ ./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
 ```
 
 The only new option compared to the commands that we have seen before is the one that specifies the __routing key__: `-r '#.error'`.
+
+### Batch Consumers ###
+
+In some cases you will want to get a batch of messages and then do some processing on all of them. Batch consumers will allow you to define logic for this type of processing.
+
+e.g: Imagine that you have a queue where you receive a message for inserting some information in the database, and you realize that if you do a batch insert is much better then by inserting one by one.
+
+Define a callback service that implements `BatchConsumerInterface` and add the definition of the consumer to your configuration.
+
+```yaml
+batch_consumers:
+    batch_basic_consumer:
+        connection:       default
+        exchange_options: {name: 'batch', type: fanout}
+        queue_options:    {name: 'batch'}
+        callback:         batch.basic
+        qos_options:      {prefetch_size: 0, prefetch_count: 2, global: false}
+        timeout_wait:     5
+        auto_setup_fabric: false
+        idle_timeout_exit_code: -2
+```
+
+You can implement a batch consumer that will acknowledge all messages in one return or you can have control on what message to acknoledge.
+
+```php
+namespace AppBundle\Service;
+
+use OldSound\RabbitMqBundle\RabbitMq\BatchConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
+
+class DevckBasicConsumer implements BatchConsumerInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function batchExecute(array $messages)
+    {
+        echo sprintf('Doing batch execution%s', PHP_EOL);
+        foreach ($messages as $message) {
+            $this->executeSomeLogicPerMessage($message);
+        }
+
+        // you ack all messages got in batch
+        return true; 
+    }
+}
+```
+
+```php
+namespace AppBundle\Service;
+
+use OldSound\RabbitMqBundle\RabbitMq\BatchConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
+
+class DevckBasicConsumer implements BatchConsumerInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function batchExecute(array $messages)
+    {
+        echo sprintf('Doing batch execution%s', PHP_EOL);
+        $result = [];
+        /** @var AMQPMessage $message */
+        foreach ($messages as $message) {
+            $result[(int)$message->delivery_info['delivery_tag']] = $this->executeSomeLogicPerMessage($message);
+        }
+
+        // you ack only some messages that have return true
+        // e.g:
+        // $return = [
+        //      1 => true,
+        //      2 => true,
+        //      3 => false,
+        //      4 => true,
+        //      5 => -1,
+        //      6 => 2,
+        //  ];
+        // The following will happen:
+        //  * ack: 1,2,4
+        //  * reject and requeq: 3
+        //  * nack and requeue: 6
+        //  * reject and drop: 5
+        return $result;
+    }
+}
+```
+
+How to run the following batch consumer:
+
+```bash
+    $ ./bin/console rabbitmq:batch:consumer batch_basic_consumer -w
+```
+
+Important: BatchConsumers will not have the -m|messages option available
 
 ### STDIN Producer ###
 

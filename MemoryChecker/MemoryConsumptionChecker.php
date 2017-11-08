@@ -27,7 +27,7 @@ class MemoryConsumptionChecker
      *
      * @return bool
      */
-    public function isRamAlmostOverloaded($allowedConsumptionUntil, $maxConsumptionAllowed)
+    public function isRamAlmostOverloaded($maxConsumptionAllowed, $allowedConsumptionUntil = 0)
     {
         $allowedConsumptionUntil = $this->convertHumanUnitToNumerical($allowedConsumptionUntil);
         $maxConsumptionAllowed = $this->convertHumanUnitToNumerical($maxConsumptionAllowed);
