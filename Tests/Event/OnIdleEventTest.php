@@ -4,13 +4,14 @@ namespace OldSound\RabbitMqBundle\Tests\Event;
 
 use OldSound\RabbitMqBundle\Event\OnIdleEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class OnIdleEventTest
  *
  * @package OldSound\RabbitMqBundle\Tests\Event
  */
-class OnIdleEventTest extends \PHPUnit_Framework_TestCase
+class OnIdleEventTest extends TestCase
 {
     protected function getConsumer()
     {

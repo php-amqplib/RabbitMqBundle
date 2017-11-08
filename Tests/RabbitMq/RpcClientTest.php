@@ -4,8 +4,9 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\TestCase;
 
-class RpcClientTest extends \PHPUnit_Framework_TestCase
+class RpcClientTest extends TestCase
 {
     public function testProcessMessageWithCustomUnserializer()
     {

@@ -5,8 +5,9 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory;
 use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection;
+use PHPUnit\Framework\TestCase;
 
-class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
+class AMQPConnectionFactoryTest extends TestCase
 {
     public function testDefaultValues()
     {
