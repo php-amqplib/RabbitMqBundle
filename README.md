@@ -501,8 +501,6 @@ class UploadPictureConsumer implements ConsumerInterface
             // If your image upload failed due to a temporary error you can return false
             // from your callback so the message will be rejected by the consumer and
             // requeued by RabbitMQ.
-            // Any other value not equal to false will acknowledge the message and remove it
-            // from the queue
             return false;
         }
     }
@@ -510,6 +508,13 @@ class UploadPictureConsumer implements ConsumerInterface
 ```
 
 As you can see, this is as simple as implementing one method: __ConsumerInterface::execute__.
+
+The value returned by this method defines whether the message must be acknowledged or rejected. The possible values are:
+
+* `ConsumerInterface::MSG_REJECT_REQUEUE` or `false`: reject message and requeue it
+* `ConsumerInterface::MSG_SINGLE_NACK_REQUEUE`: reject (nack) message and requeue it
+* `ConsumerInterface::MSG_REJECT`: reject message and drop it
+* any other value (including `ConsumerInterface::MSG_ACK` and `true`): acknowledge message
 
 Keep in mind that your callbacks _need to be registered_ as normal Symfony services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
