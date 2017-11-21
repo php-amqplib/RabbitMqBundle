@@ -182,6 +182,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
+            $definition->setPublic(true);
             $definition->addTag('old_sound_rabbit_mq.base_amqp');
             $definition->addTag('old_sound_rabbit_mq.consumer');
             //this consumer doesn't define an exchange -> using AMQP Default
@@ -259,6 +260,7 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
+            $definition->setPublic(true);
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.multi_consumer')
