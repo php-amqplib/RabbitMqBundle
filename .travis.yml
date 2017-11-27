@@ -32,6 +32,8 @@ matrix:
       env: SYMFONY_VERSION=2.8.*
     - php: 7.0
       env: SYMFONY_VERSION=3.0.*
+    - php: 7.1
+      env: DEPENDENCIES=beta
 
   allow_failures:
     - php: nightly
@@ -42,6 +44,7 @@ env:
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available";
+  - if [ "$DEPENDENCIES" = "beta" ]; then perl -pi -e 's/^}$/,"minimum-stability":"beta"}/' composer.json; fi;
   - if [ "$SYMFONY_VERSION" != "" ]; then composer require --no-update symfony/framework-bundle "$SYMFONY_VERSION"; fi
   - if [ "$COMPOSER_FLAGS" != "" ]; then composer update --prefer-dist --no-interaction --no-scripts $COMPOSER_FLAGS; fi;
 

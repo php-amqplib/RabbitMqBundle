@@ -255,7 +255,7 @@ class OldSoundRabbitMqExtension extends Extension
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
                 $queues[$queueOptions['name']] = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
-                $callbacks[] = new Reference($queueOptions['callback']);
+                $callbacks[] = $queueOptions['callback'];
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
