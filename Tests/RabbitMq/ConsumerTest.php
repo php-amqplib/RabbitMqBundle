@@ -10,9 +10,10 @@ use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConsumerTest extends \PHPUnit_Framework_TestCase
-{   
+class ConsumerTest extends TestCase
+{
     protected function getConsumer($amqpConnection, $amqpChannel)
     {
         return new Consumer($amqpConnection, $amqpChannel);

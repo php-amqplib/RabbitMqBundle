@@ -5,8 +5,9 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PHPUnit\Framework\TestCase;
 
-class BaseAmqpTest extends \PHPUnit_Framework_TestCase
+class BaseAmqpTest extends TestCase
 {
 
     public function testLazyConnection()
