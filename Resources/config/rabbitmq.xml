@@ -57,7 +57,7 @@
         </service>
 
         <service id="old_sound_rabbit_mq.purge_consumer_command" class="OldSound\RabbitMqBundle\Command\PurgeConsumerCommand">
-            <tag name="console.command" command="rabbitmq:multiple-consumer" />
+            <tag name="console.command" command="rabbitmq:purge" />
         </service>
 
         <service id="old_sound_rabbit_mq.command.rpc_server_command" class="OldSound\RabbitMqBundle\Command\RpcServerCommand">
