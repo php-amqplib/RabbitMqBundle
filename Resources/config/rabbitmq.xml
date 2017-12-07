@@ -38,6 +38,7 @@
 
         <service id="old_sound_rabbit_mq.batch_consumer_command" class="OldSound\RabbitMqBundle\Command\BatchConsumerCommand">
             <tag name="console.command" command="rabbitmq:batch:consumer" />
+            <tag name="old_sound_rabbit_mq.consumer.command"/>
         </service>
 
         <service id="old_sound_rabbit_mq.consumer_command" class="OldSound\RabbitMqBundle\Command\ConsumerCommand">
@@ -46,6 +47,7 @@
 
         <service id="old_sound_rabbit_mq.delete_command" class="OldSound\RabbitMqBundle\Command\DeleteCommand">
             <tag name="console.command" command="rabbitmq:delete" />
+            <tag name="old_sound_rabbit_mq.consumer.command"/>
         </service>
 
         <service id="old_sound_rabbit_mq.dynamic_consumer_command" class="OldSound\RabbitMqBundle\Command\DynamicConsumerCommand">
@@ -57,7 +59,8 @@
         </service>
 
         <service id="old_sound_rabbit_mq.purge_consumer_command" class="OldSound\RabbitMqBundle\Command\PurgeConsumerCommand">
-            <tag name="console.command" command="rabbitmq:multiple-consumer" />
+            <tag name="console.command" command="rabbitmq:purge" />
+            <tag name="old_sound_rabbit_mq.consumer.command"/>
         </service>
 
         <service id="old_sound_rabbit_mq.command.rpc_server_command" class="OldSound\RabbitMqBundle\Command\RpcServerCommand">
