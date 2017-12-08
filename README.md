@@ -107,7 +107,7 @@ old_sound_rabbit_mq:
             connection_timeout: 3
             read_write_timeout: 3
 
-            # requires php-amqplib v2.4.1+ and PHP5.4+
+            # requires php-amqplib v2.4.1+ and PHP5.4+, in version php-amqplib/rabbitmq-bundle 1.13 - requires php_sockents extension
             keepalive: false
 
             # requires php-amqplib v2.4.1+
