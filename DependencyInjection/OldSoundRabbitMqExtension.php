@@ -149,6 +149,7 @@ class OldSoundRabbitMqExtension extends Extension
                 }
 
                 $definition = new Definition($producerClass);
+                $definition->setPublic(true);
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 //this producer doesn't define an exchange -> using AMQP Default

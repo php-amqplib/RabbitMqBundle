@@ -9,8 +9,9 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\Reference;
+use PHPUnit\Framework\TestCase;
 
-class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
+class OldSoundRabbitMqExtensionTest extends TestCase
 {
     public function testFooConnectionDefinition()
     {
