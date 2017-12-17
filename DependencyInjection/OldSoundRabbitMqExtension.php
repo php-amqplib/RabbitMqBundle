@@ -3,13 +3,13 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * OldSoundRabbitMqExtension.
@@ -19,6 +19,7 @@ use Symfony\Component\Config\FileLocator;
  */
 class OldSoundRabbitMqExtension extends Extension
 {
+    const EXTENSION_PREFIX = 'old_sound_rabbit_mq';
     /**
      * @var ContainerBuilder
      */
@@ -44,6 +45,11 @@ class OldSoundRabbitMqExtension extends Extension
         $this->config = $this->processConfiguration($configuration, $configs);
 
         $this->collectorEnabled = $this->config['enable_collector'];
+
+        $definition = new Definition(ConsumerBag::class);
+        $definition->setAutowired(true);
+        $definition->setAutoconfigured(true);
+        $this->container->setDefinition(ConsumerBag::class, $definition);
 
         $this->loadConnections();
         $this->loadBindings();
@@ -139,7 +145,6 @@ class OldSoundRabbitMqExtension extends Extension
         if ($this->config['sandbox'] == false) {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition($producer['class']);
-                $definition->setPublic(true);
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 //this producer doesn't define an exchange -> using AMQP Default
@@ -235,9 +240,12 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLogger($definition);
             }
 
-            $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
+            $name = sprintf(ServiceNameFormat::CONSUMER, $key);
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($consumer['callback'], $name);
+
+            $consumerBagDefinition = $this->container->findDefinition(ConsumerBag::class);
+            $consumerBagDefinition->addMethodCall('addConsumer', [$name, new Reference($name)]);
         }
     }
 
@@ -261,7 +269,6 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
-            $definition->setPublic(true);
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.multi_consumer')
@@ -629,3 +636,4 @@ class OldSoundRabbitMqExtension extends Extension
         );
     }
 }
+

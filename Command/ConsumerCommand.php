@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
+use OldSound\RabbitMqBundle\DependencyInjection\ServiceNameFormat;
+
 class ConsumerCommand extends BaseConsumerCommand
 {
     protected function configure()
@@ -13,6 +15,6 @@ class ConsumerCommand extends BaseConsumerCommand
 
     protected function getConsumerService()
     {
-        return 'old_sound_rabbit_mq.%s_consumer';
+        return ServiceNameFormat::CONSUMER;
     }
 }
