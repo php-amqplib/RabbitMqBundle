@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
+use OldSound\RabbitMqBundle\DependencyInjection\ConsumerBag;
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +16,17 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
     protected $amount;
 
+    /** @var ConsumerBag */
+    private $consumerBag;
+
     abstract protected function getConsumerService();
+
+    public function __construct(ConsumerBag $consumerBag)
+    {
+        $this->consumerBag = $consumerBag;
+
+        parent::__construct();
+    }
 
     public function stopConsumer()
     {
@@ -45,8 +56,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
-            ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
-        ;
+            ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals');
     }
 
     /**
@@ -92,8 +102,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
     protected function initConsumer($input)
     {
-        $this->consumer = $this->getContainer()
-                ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
+        $this->consumer = $this->consumerBag->findConsumerByKey(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
         if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
