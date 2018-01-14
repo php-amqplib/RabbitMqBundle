@@ -173,7 +173,7 @@ old_sound_rabbit_mq:
             queue_options_provider: bar.dynamic.provider
     bindings:
         - {exchange: foo, destination: bar, routing_key: baz}
-        - {exchange: moo, connection: default2, destination: cow, nowait: true, destination_is_exchange: true, arguments: {moo:cow}}
+        - {exchange: moo, connection: default2, destination: cow, nowait: true, destination_is_exchange: true, arguments: {moo: cow}}
     anon_consumers:
         foo_anon_consumer:
             connection:      foo_connection

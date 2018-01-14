@@ -40,7 +40,7 @@ class OldSoundRabbitMqExtension extends Extension
         $loader = new XmlFileLoader($this->container, new FileLocator(array(__DIR__ . '/../Resources/config')));
         $loader->load('rabbitmq.xml');
 
-        $configuration = new Configuration($this->getAlias());
+        $configuration = $this->getConfiguration($configs, $container);
         $this->config = $this->processConfiguration($configuration, $configs);
 
         $this->collectorEnabled = $this->config['enable_collector'];
@@ -67,6 +67,11 @@ class OldSoundRabbitMqExtension extends Extension
         } else {
             $this->container->removeDefinition('old_sound_rabbit_mq.data_collector');
         }
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($this->getAlias());
     }
 
     protected function loadConnections()
@@ -134,6 +139,7 @@ class OldSoundRabbitMqExtension extends Extension
         if ($this->config['sandbox'] == false) {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition($producer['class']);
+                $definition->setPublic(true);
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
                 //this producer doesn't define an exchange -> using AMQP Default
@@ -177,6 +183,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.consumer.class%');
+            $definition->setPublic(true);
             $definition->addTag('old_sound_rabbit_mq.base_amqp');
             $definition->addTag('old_sound_rabbit_mq.consumer');
             //this consumer doesn't define an exchange -> using AMQP Default
@@ -250,10 +257,11 @@ class OldSoundRabbitMqExtension extends Extension
             foreach ($consumer['queues'] as $queueName => $queueOptions) {
                 $queues[$queueOptions['name']] = $queueOptions;
                 $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
-                $callbacks[] = new Reference($queueOptions['callback']);
+                $callbacks[] = $queueOptions['callback'];
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.multi_consumer.class%');
+            $definition->setPublic(true);
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.multi_consumer')

@@ -4,13 +4,14 @@ namespace OldSound\RabbitMqBundle\Tests\Event;
 
 use OldSound\RabbitMqBundle\MemoryChecker\MemoryConsumptionChecker;
 use OldSound\RabbitMqBundle\MemoryChecker\NativeMemoryUsageProvider;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class MemoryManagerTest
  *
  * @package OldSound\RabbitMqBundle\Tests\Manager
  */
-class MemoryConsumptionCheckerTest extends \PHPUnit_Framework_TestCase
+class MemoryConsumptionCheckerTest extends TestCase
 {
     public function testMemoryIsNotAlmostOverloaded()
     {
