@@ -104,6 +104,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->setFactoryMethod('createConnection');
             }
             $definition->addTag('old_sound_rabbit_mq.connection');
+            $definition->setPublic(true);
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.connection.%s', $key), $definition);
         }
@@ -521,6 +522,7 @@ class OldSoundRabbitMqExtension extends Extension
             if (array_key_exists('direct_reply_to', $client)) {
                 $definition->addMethodCall('setDirectReplyTo', array($client['direct_reply_to']));
             }
+            $definition->setPublic(true);
 
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
         }
