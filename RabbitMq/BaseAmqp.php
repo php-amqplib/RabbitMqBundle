@@ -2,6 +2,11 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use Enqueue\AmqpTools\RabbitMqDlxDelayStrategy;
+use Interop\Amqp\AmqpContext;
+use Interop\Amqp\AmqpQueue;
+use Interop\Amqp\AmqpTopic;
+use Interop\Amqp\Impl\AmqpBind;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
@@ -118,6 +123,24 @@ abstract class BaseAmqp
     }
 
     /**
+     * @return AmqpContext
+     */
+    public function getContext()
+    {
+        $ch = $this->getChannel();
+
+        // TODO fix it
+        $context = new \Enqueue\AmqpLib\AmqpContext($this->conn);
+        $context->setDelayStrategy(new RabbitMqDlxDelayStrategy());
+        $rp = new \ReflectionProperty($context, 'channel');
+        $rp->setAccessible(true);
+        $rp->setValue($context, $ch);
+        $rp->setAccessible(false);
+
+        return $context;
+    }
+
+    /**
      * @param  AMQPChannel $ch
      *
      * @return void
@@ -196,16 +219,31 @@ abstract class BaseAmqp
     protected function exchangeDeclare()
     {
         if ($this->exchangeOptions['declare']) {
-            $this->getChannel()->exchange_declare(
-                $this->exchangeOptions['name'],
-                $this->exchangeOptions['type'],
-                $this->exchangeOptions['passive'],
-                $this->exchangeOptions['durable'],
-                $this->exchangeOptions['auto_delete'],
-                $this->exchangeOptions['internal'],
-                $this->exchangeOptions['nowait'],
-                $this->exchangeOptions['arguments'],
-                $this->exchangeOptions['ticket']);
+            $context = $this->getContext();
+
+            $topic = $context->createTopic($this->exchangeOptions['name']);
+            $topic->setType($this->exchangeOptions['type']);
+
+            if ($this->exchangeOptions['passive']) {
+                $topic->addFlag(AmqpTopic::FLAG_PASSIVE);
+            }
+            if ($this->exchangeOptions['durable']) {
+                $topic->addFlag(AmqpTopic::FLAG_DURABLE);
+            }
+            if ($this->exchangeOptions['auto_delete']) {
+                $topic->addFlag(AmqpTopic::FLAG_AUTODELETE);
+            }
+            if ($this->exchangeOptions['internal']) {
+                $topic->addFlag(AmqpTopic::FLAG_INTERNAL);
+            }
+            if ($this->exchangeOptions['nowait']) {
+                $topic->addFlag(AmqpTopic::FLAG_NOWAIT);
+            }
+            if ($this->exchangeOptions['arguments']) {
+                $topic->setArguments($this->exchangeOptions['arguments']);
+            }
+
+            $context->declareTopic($topic);
 
             $this->exchangeDeclared = true;
         }
@@ -217,17 +255,36 @@ abstract class BaseAmqp
     protected function queueDeclare()
     {
         if ($this->queueOptions['declare']) {
-            list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
-                $this->queueOptions['durable'], $this->queueOptions['exclusive'],
-                $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-                $this->queueOptions['arguments'], $this->queueOptions['ticket']);
+            $context = $this->getContext();
+            $queue = $context->createQueue($this->queueOptions['name']);
+
+            if ($this->queueOptions['passive']) {
+                $queue->addFlag(AmqpQueue::FLAG_PASSIVE);
+            }
+            if ($this->queueOptions['durable']) {
+                $queue->addFlag(AmqpQueue::FLAG_DURABLE);
+            }
+            if ($this->queueOptions['exclusive']) {
+                $queue->addFlag(AmqpQueue::FLAG_EXCLUSIVE);
+            }
+            if ($this->queueOptions['auto_delete']) {
+                $queue->addFlag(AmqpQueue::FLAG_AUTODELETE);
+            }
+            if ($this->queueOptions['nowait']) {
+                $queue->addFlag(AmqpQueue::FLAG_NOWAIT);
+            }
+            if ($this->queueOptions['arguments']) {
+                $queue->setArguments($this->queueOptions['arguments']);
+            }
+
+            $topic = $context->createTopic($this->exchangeOptions['name']);
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $context->bind(new AmqpBind($queue, $topic, $routingKey));
                 }
             } else {
-                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $context->bind(new AmqpBind($queue, $topic, $this->routingKey));
             }
 
             $this->queueDeclared = true;
@@ -237,15 +294,21 @@ abstract class BaseAmqp
     /**
      * Binds queue to an exchange
      *
-     * @param string $queue
-     * @param string $exchange
-     * @param string $routing_key
+     * @param string $queueName
+     * @param string $exchangeName
+     * @param string $routingKey
      */
-    protected function queueBind($queue, $exchange, $routing_key)
+    protected function queueBind($queueName, $exchangeName, $routingKey)
     {
+        $context = $this->getContext();
+
+        $queue = $context->createQueue($queueName);
+        $topic = $context->createTopic($exchangeName);
+
+        // TODO I don't know why we cannot bind to the default exchange. Should be investigated.
         // queue binding is not permitted on the default exchange
-        if ('' !== $exchange) {
-            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
+        if ('' !== $exchangeName) {
+            $context->bind(new AmqpBind($queue, $topic, $routingKey));
         }
     }
 

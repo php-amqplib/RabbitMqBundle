@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use Enqueue\AmqpLib\AmqpContext;
+use Interop\Queue\PsrProcessor;
 use OldSound\RabbitMqBundle\Event\AfterProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
@@ -130,7 +132,23 @@ class Consumer extends BaseConsumer
             new BeforeProcessingMessageEvent($this, $msg)
         );
         try {
-            $processFlag = call_user_func($callback, $msg);
+            if ($callback instanceof PsrProcessor) {
+                /** @var AmqpContext $context */
+                $context = $this->getContext();
+                $interopMessage = $context->convertMessage($msg);
+
+                $result = (string) $callback->process($interopMessage, $context);
+                $map = [
+                    PsrProcessor::ACK => ConsumerInterface::MSG_ACK,
+                    PsrProcessor::REQUEUE => ConsumerInterface::MSG_REJECT_REQUEUE,
+                    PsrProcessor::REJECT => ConsumerInterface::MSG_REJECT,
+                ];
+
+                $processFlag = $map[$result];
+            } else {
+                $processFlag = call_user_func($callback, $msg);
+            }
+
             $this->handleProcessMessage($msg, $processFlag);
             $this->dispatchEvent(
                 AfterProcessingMessageEvent::NAME,
