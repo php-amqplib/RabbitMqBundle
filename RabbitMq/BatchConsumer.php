@@ -25,6 +25,11 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
     private $idleTimeout = 0;
 
     /**
+     * @var bool
+     */
+    private $keepAlive = false;
+
+    /**
      * @var int
      */
     private $idleTimeoutExitCode;
@@ -84,6 +89,8 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
             } catch (AMQPTimeoutException $e) {
                 if (!$this->isEmptyBatch()) {
                     $this->batchConsume();
+                } elseif ($this->keepAlive === true) {
+                    continue;
                 } elseif (null !== $this->getIdleTimeoutExitCode()) {
                     return $this->getIdleTimeoutExitCode();
                 } else {
@@ -395,6 +402,18 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
     public function setIdleTimeoutExitCode($idleTimeoutExitCode)
     {
         $this->idleTimeoutExitCode = $idleTimeoutExitCode;
+
+        return $this;
+    }
+
+    /**
+     * keepAlive
+     *
+     * @return $this
+     */
+    public function keepAlive()
+    {
+        $this->keepAlive = true;
 
         return $this;
     }

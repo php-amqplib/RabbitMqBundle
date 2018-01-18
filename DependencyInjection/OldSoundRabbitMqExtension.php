@@ -418,6 +418,10 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
 
+            if ($consumer['keep_alive']) {
+                $definition->addMethodCall('keepAlive');
+            }
+
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $consumer['connection']);

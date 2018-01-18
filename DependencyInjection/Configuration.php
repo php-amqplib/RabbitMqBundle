@@ -272,6 +272,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('timeout_wait')->defaultValue(3)->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('keep_alive')->defaultFalse()->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                             ->arrayNode('qos_options')
                                 ->children()
