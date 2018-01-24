@@ -209,7 +209,7 @@ class ConsumerTest extends TestCase
             ->with(null, false, $consumer->getIdleTimeout())
             ->willThrowException(new AMQPTimeoutException());
 
-        $this->assertTrue(2 == $consumer->consume(1));
+        $this->assertEquals(2, $consumer->consume(1));
     }
 
     public function testShouldAllowContinueConsumptionAfterIdleTimeout()
