@@ -810,6 +810,8 @@ batch_consumers:
         timeout_wait:     5
         auto_setup_fabric: false
         idle_timeout_exit_code: -2
+        graceful_max_execution:
+            timeout: 60
 ```
 
 You can implement a batch consumer that will acknowledge all messages in one return or you can have control on what message to acknoledge.
