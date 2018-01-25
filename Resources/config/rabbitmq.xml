@@ -29,8 +29,48 @@
             <argument type="collection" />
             <tag name="data_collector" template="OldSoundRabbitMqBundle:Collector:collector.html.twig" id="rabbit_mq" />
         </service>
+        
+        <service id="old_sound_rabbit_mq.parts_holder" class="%old_sound_rabbit_mq.parts_holder.class%" public="true" />
 
-        <service id="old_sound_rabbit_mq.parts_holder" class="%old_sound_rabbit_mq.parts_holder.class%" />
+        <service id="old_sound_rabbit_mq.anon_consumer_command" class="OldSound\RabbitMqBundle\Command\AnonConsumerCommand">
+            <tag name="console.command" command="rabbitmq:anon-consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.batch_consumer_command" class="OldSound\RabbitMqBundle\Command\BatchConsumerCommand">
+            <tag name="console.command" command="rabbitmq:batch:consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.consumer_command" class="OldSound\RabbitMqBundle\Command\ConsumerCommand">
+            <tag name="console.command" command="rabbitmq:consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.delete_command" class="OldSound\RabbitMqBundle\Command\DeleteCommand">
+            <tag name="console.command" command="rabbitmq:delete" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.dynamic_consumer_command" class="OldSound\RabbitMqBundle\Command\DynamicConsumerCommand">
+            <tag name="console.command" command="rabbitmq:dynamic-consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.multiple_consumer_command" class="OldSound\RabbitMqBundle\Command\MultipleConsumerCommand">
+            <tag name="console.command" command="rabbitmq:multiple-consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.purge_consumer_command" class="OldSound\RabbitMqBundle\Command\PurgeConsumerCommand">
+            <tag name="console.command" command="rabbitmq:purge" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.command.rpc_server_command" class="OldSound\RabbitMqBundle\Command\RpcServerCommand">
+            <tag name="console.command" command="rabbitmq:rpc-server" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.command.setup_fabric_command" class="OldSound\RabbitMqBundle\Command\SetupFabricCommand">
+            <tag name="console.command" command="rabbitmq:setup-fabric" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.command.std_in_producer_command" class="OldSound\RabbitMqBundle\Command\StdInProducerCommand">
+            <tag name="console.command" command="rabbitmq:stdin-producer" />
+        </service>
     </services>
 
 </container>

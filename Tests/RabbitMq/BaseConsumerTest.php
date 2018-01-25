@@ -3,8 +3,9 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
+use PHPUnit\Framework\TestCase;
 
-class BaseConsumerTest extends \PHPUnit_Framework_TestCase
+class BaseConsumerTest extends TestCase
 {
     /** @var BaseConsumer */
     protected $consumer;

@@ -190,7 +190,7 @@ class Consumer extends BaseConsumer
         } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
-        } else {
+        } else if ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
             // Remove message from queue only if callback return not false
             $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
         }

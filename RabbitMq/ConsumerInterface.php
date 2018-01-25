@@ -26,6 +26,10 @@ interface ConsumerInterface
      */
     const MSG_REJECT = -1;
 
+    /**
+     * Flag for consumers that wants to handle ACKs on their own
+     */
+    const MSG_ACK_SENT = -2;
 
     /**
      * @param AMQPMessage $msg The message

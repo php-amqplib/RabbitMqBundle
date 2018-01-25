@@ -3,11 +3,11 @@
 namespace OldSound\RabbitMqBundle\Tests\Command;
 
 use OldSound\RabbitMqBundle\Command\DynamicConsumerCommand;
-
 use Symfony\Component\Console\Input\InputOption;
 
-class DynamicConsumerCommandTest extends BaseCommandTest{
-    
+class DynamicConsumerCommandTest extends BaseCommandTest
+{
+
     protected function setUp()
     {
         parent::setUp();
@@ -25,7 +25,7 @@ class DynamicConsumerCommandTest extends BaseCommandTest{
         $this->command = new DynamicConsumerCommand();
         $this->command->setApplication($this->application);
     }
-    
+
     /**
      * testInputsDefinitionCommand
      */
@@ -35,7 +35,7 @@ class DynamicConsumerCommandTest extends BaseCommandTest{
         $definition = $this->command->getDefinition();
         $this->assertTrue($definition->hasArgument('name'));
         $this->assertTrue($definition->getArgument('name')->isRequired()); // Name is required to find the service
-        
+
         $this->assertTrue($definition->hasArgument('context'));
         $this->assertTrue($definition->getArgument('context')->isRequired()); // Context is required for the queue options provider
 
