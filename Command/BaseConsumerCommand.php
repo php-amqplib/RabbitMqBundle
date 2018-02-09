@@ -62,6 +62,35 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->handleSignals($input);
+        $this->enableDebug($input);
+
+        $this->amount = $input->getOption('messages');
+
+        if (0 > $this->amount) {
+            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
+        }
+        $this->initConsumer($input);
+        $this->consumer->setRoutingKey($input->getOption('route'));
+
+        return $this->consumer->consume($this->amount);
+    }
+
+    protected function initConsumer(InputInterface $input)
+    {
+        $this->consumer = $this->getContainer()
+                ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
+
+        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
+            $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    protected function handleSignals(InputInterface $input)
+    {
         if (defined('AMQP_WITHOUT_SIGNALS') === false) {
             define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
         }
@@ -75,29 +104,15 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
             pcntl_signal(SIGHUP, array(&$this, 'restartConsumer'));
         }
-
-        if (defined('AMQP_DEBUG') === false) {
-            define('AMQP_DEBUG', (bool) $input->getOption('debug'));
-        }
-
-        $this->amount = $input->getOption('messages');
-
-        if (0 > $this->amount) {
-            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
-        }
-        $this->initConsumer($input);
-
-        return $this->consumer->consume($this->amount);
     }
 
-    protected function initConsumer($input)
+    /**
+     * @param InputInterface $input
+     */
+    protected function enableDebug(InputInterface $input)
     {
-        $this->consumer = $this->getContainer()
-                ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
-
-        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
-            $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
+        if (defined('AMQP_DEBUG') === false) {
+            define('AMQP_DEBUG', (bool)$input->getOption('debug'));
         }
-        $this->consumer->setRoutingKey($input->getOption('route'));
     }
 }

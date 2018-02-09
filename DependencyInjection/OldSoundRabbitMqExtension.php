@@ -558,6 +558,16 @@ class OldSoundRabbitMqExtension extends Extension
             if (array_key_exists('queue_options', $server)) {
                 $definition->addMethodCall('setQueueOptions', array($server['queue_options']));
             }
+            if (isset($server['graceful_max_execution'])) {
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
+                    array($server['graceful_max_execution']['timeout'])
+                );
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionTimeoutExitCode',
+                    array($server['graceful_max_execution']['exit_code'])
+                );
+            }
             if (array_key_exists('serializer', $server)) {
                 $definition->addMethodCall('setSerializer', array($server['serializer']));
             }

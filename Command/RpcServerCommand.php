@@ -2,12 +2,10 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RpcServerCommand extends BaseRabbitMqCommand
+class RpcServerCommand extends BaseConsumerCommand
 {
     protected function configure()
     {
@@ -15,11 +13,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
 
         $this
             ->setName('rabbitmq:rpc-server')
-            ->setDescription('Start an RPC server')
-            ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
-            ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)
-        ;
+            ->setDescription('Start an RPC server');
     }
 
     /**
@@ -34,15 +28,21 @@ class RpcServerCommand extends BaseRabbitMqCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+        $this->handleSignals($input);
+        $this->enableDebug($input);
+
         $amount = $input->getOption('messages');
 
         if (0 > $amount) {
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
 
-        $this->getContainer()
-               ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
-               ->start($amount);
+        $this->initConsumer($input);
+        $this->consumer->consume($amount);
+    }
+
+    protected function getConsumerService()
+    {
+        return 'old_sound_rabbit_mq.%s_server';
     }
 }
