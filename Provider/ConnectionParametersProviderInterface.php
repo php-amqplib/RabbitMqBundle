@@ -25,7 +25,11 @@ interface ConnectionParametersProviderInterface
      *   'keepalive' => false,
      *   'heartbeat' => 0,
      *   'use_socket' => true,
+     *   'constructor_args' => array(...)
      * )
+     *
+     * If constructor_args is present, all the other parameters are ignored; constructor_args are passes as constructor
+     * arguments.
      *
      * @return array
      */

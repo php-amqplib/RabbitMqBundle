@@ -60,6 +60,11 @@ class AMQPConnectionFactory
      */
     public function createConnection()
     {
+        if (isset($this->parameters['constructor_args']) && is_array($this->parameters['constructor_args'])) {
+            $ref = new \ReflectionClass($this->class);
+            return $ref->newInstanceArgs($this->parameters['constructor_args']);
+        }
+
         if ($this->class == 'PhpAmqpLib\Connection\AMQPSocketConnection' || is_subclass_of($this->class , 'PhpAmqpLib\Connection\AMQPSocketConnection')) {
             return new $this->class(
                 $this->parameters['host'],

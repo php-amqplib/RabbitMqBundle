@@ -269,6 +269,28 @@ class AMQPConnectionFactoryTest extends TestCase
         ), $instance->constructParams);
     }
 
+    public function testConnectionsParametersProviderWithConstructorArgs()
+    {
+        $connectionParametersProvider = $this->prepareConnectionParametersProvider();
+        $connectionParametersProvider->expects($this->once())
+            ->method('getConnectionParameters')
+            ->will($this->returnValue(
+                array(
+                    'constructor_args' => array(1,2,3,4)
+                )
+            ));
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(),
+            $connectionParametersProvider
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(1,2,3,4), $instance->constructParams);
+    }
+
     public function testConnectionsParametersProvider()
     {
         $connectionParametersProvider = $this->prepareConnectionParametersProvider();
