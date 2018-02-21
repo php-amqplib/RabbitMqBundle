@@ -27,7 +27,7 @@
     <services>
         <service id="old_sound_rabbit_mq.data_collector" class="%old_sound_rabbit_mq.data_collector.class%">
             <argument type="collection" />
-            <tag name="data_collector" template="OldSoundRabbitMqBundle:Collector:collector.html.twig" id="rabbit_mq" />
+            <tag name="data_collector" template="@OldSoundRabbitMq/Collector/collector.html.twig" id="rabbit_mq" />
         </service>
         
         <service id="old_sound_rabbit_mq.parts_holder" class="%old_sound_rabbit_mq.parts_holder.class%" public="true" />
