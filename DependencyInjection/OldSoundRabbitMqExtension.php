@@ -386,6 +386,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['batch_consumers'] as $key => $consumer) {
             $definition = new Definition('%old_sound_rabbit_mq.batch_consumer.class%');
+            $definition->setPublic(true);
 
             if (!isset($consumer['exchange_options'])) {
                 $consumer['exchange_options'] = $this->getDefaultExchangeOptions();
@@ -439,6 +440,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['anon_consumers'] as $key => $anon) {
             $definition = new Definition('%old_sound_rabbit_mq.anon_consumer.class%');
+            $definition->setPublic(true);
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.anon_consumer')
