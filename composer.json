@@ -2,7 +2,7 @@
     "name": "php-amqplib/rabbitmq-bundle",
     "type": "symfony-bundle",
     "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly oldsound/rabbitmq-bundle.",
-    "keywords": ["symfony2", "rabbitmq", "message", "queue", "amqp"],
+    "keywords": ["symfony", "symfony2", "symfony3", "symfony4", "rabbitmq", "message", "queue", "amqp"],
     "license": "MIT",
     "authors": [{
         "name" : "Alvaro Videla"
