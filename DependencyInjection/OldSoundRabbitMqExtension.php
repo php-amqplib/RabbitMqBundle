@@ -537,6 +537,7 @@ class OldSoundRabbitMqExtension extends Extension
         foreach ($this->config['rpc_servers'] as $key => $server) {
             $definition = new Definition('%old_sound_rabbit_mq.rpc_server.class%');
             $definition
+                ->setPublic(true)
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.rpc_server')
                 ->addMethodCall('initServer', array($key))
