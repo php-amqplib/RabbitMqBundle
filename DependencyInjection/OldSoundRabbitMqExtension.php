@@ -442,6 +442,7 @@ class OldSoundRabbitMqExtension extends Extension
     {
         foreach ($this->config['anon_consumers'] as $key => $anon) {
             $definition = new Definition('%old_sound_rabbit_mq.anon_consumer.class%');
+            $definition->setPublic(true);
             $definition
                 ->setPublic(true)
                 ->addTag('old_sound_rabbit_mq.base_amqp')

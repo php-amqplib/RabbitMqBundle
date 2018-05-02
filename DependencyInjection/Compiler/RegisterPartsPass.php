@@ -25,6 +25,7 @@ class RegisterPartsPass implements CompilerPassInterface
             'old_sound_rabbit_mq.consumer',
             'old_sound_rabbit_mq.multi_consumer',
             'old_sound_rabbit_mq.anon_consumer',
+            'old_sound_rabbit_mq.batch_consumer',
             'old_sound_rabbit_mq.rpc_client',
             'old_sound_rabbit_mq.rpc_server',
         );
