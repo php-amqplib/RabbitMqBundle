@@ -336,6 +336,7 @@ class OldSoundRabbitMqExtension extends Extension
             }
 
             $definition = new Definition('%old_sound_rabbit_mq.dynamic_consumer.class%');
+            $definition->setPublic(true);
             $definition
                 ->setPublic(true)
                 ->addTag('old_sound_rabbit_mq.base_amqp')
