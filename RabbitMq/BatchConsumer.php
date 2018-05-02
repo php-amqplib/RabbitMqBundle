@@ -7,22 +7,22 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-final class BatchConsumer extends BaseAmqp implements DequeuerInterface
+class BatchConsumer extends BaseAmqp implements DequeuerInterface
 {
     /**
      * @var \Closure|callable
      */
-    private $callback;
+    protected $callback;
 
     /**
      * @var bool
      */
-    private $forceStop = false;
+    protected $forceStop = false;
 
     /**
      * @var int
      */
-    private $idleTimeout = 0;
+    protected $idleTimeout = 0;
 
     /**
      * @var bool
@@ -32,32 +32,54 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
     /**
      * @var int
      */
-    private $idleTimeoutExitCode;
+    protected $idleTimeoutExitCode;
 
     /**
      * @var int
      */
-    private $memoryLimit = null;
+    protected $memoryLimit = null;
 
     /**
      * @var int
      */
-    private $prefetchCount;
+    protected $prefetchCount;
 
     /**
      * @var int
      */
-    private $timeoutWait = 3;
+    protected $timeoutWait = 3;
 
     /**
      * @var array
      */
-    private $messages = array();
+    protected $messages = array();
 
     /**
      * @var int
      */
-    private $batchCounter = 0;
+    protected $batchCounter = 0;
+
+    /**
+     * @var \DateTime|null DateTime after which the consumer will gracefully exit. "Gracefully" means, that
+     *      any currently running consumption will not be interrupted.
+     */
+    protected $gracefulMaxExecutionDateTime;
+
+    /**
+     * @param \DateTime|null $dateTime
+     */
+    public function setGracefulMaxExecutionDateTime(\DateTime $dateTime = null)
+    {
+        $this->gracefulMaxExecutionDateTime = $dateTime;
+    }
+
+    /**
+     * @param int $secondsInTheFuture
+     */
+    public function setGracefulMaxExecutionDateTimeFromSecondsInTheFuture($secondsInTheFuture)
+    {
+        $this->setGracefulMaxExecutionDateTime(new \DateTime("+{$secondsInTheFuture} seconds"));
+    }
 
     /**
      * @param   \Closure|callable    $callback
@@ -80,6 +102,7 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
                 $this->batchConsume();
             }
 
+            $this->checkGracefulMaxExecutionDateTime();
             $this->maybeStopConsumer();
 
             $timeout = $this->isEmptyBatch() ? $this->getIdleTimeout() : $this->getTimeoutWait();
@@ -529,5 +552,25 @@ final class BatchConsumer extends BaseAmqp implements DequeuerInterface
     public function getMemoryLimit()
     {
         return $this->memoryLimit;
+    }
+
+    /**
+     * Check graceful max execution date time and stop if limit is reached
+     *
+     * @return void
+     */
+    private function checkGracefulMaxExecutionDateTime()
+    {
+        if (!$this->gracefulMaxExecutionDateTime) {
+            return;
+        }
+
+        $now = new \DateTime();
+
+        if ($this->gracefulMaxExecutionDateTime > $now) {
+            return;
+        }
+
+        $this->forceStopConsumer();
     }
 }

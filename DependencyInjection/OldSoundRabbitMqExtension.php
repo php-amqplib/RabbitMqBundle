@@ -416,6 +416,13 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addMethodCall('setIdleTimeout', array($consumer['idle_timeout']));
             }
 
+            if (isset($consumer['graceful_max_execution'])) {
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
+                    array($consumer['graceful_max_execution']['timeout'])
+                );
+            }
+
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }

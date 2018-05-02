@@ -811,6 +811,8 @@ batch_consumers:
         auto_setup_fabric: false
         idle_timeout_exit_code: -2
         keep_alive: false
+        graceful_max_execution:
+            timeout: 60
 ```
 
 *Note*: If the `keep_alive` option is set to `true`, `idle_timeout_exit_code` will be ignored and the consumer process continues.
