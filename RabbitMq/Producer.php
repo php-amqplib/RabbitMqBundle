@@ -2,16 +2,16 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use PhpAmqpLib\Message\AMQPMessage;
-use PhpAmqpLib\Wire\AMQPTable;
-
 /**
  * Producer, that publishes AMQP Messages
  */
 class Producer extends BaseAmqp implements ProducerInterface
 {
     protected $contentType = 'text/plain';
-    protected $deliveryMode = 2;
+    protected $deliveryMode = \Interop\Amqp\AmqpMessage::DELIVERY_MODE_PERSISTENT;
+    protected $deliveryDelay = null;
+    protected $timeToLive = null;
+    protected $priority = null;
 
     public function setContentType($contentType)
     {
@@ -25,6 +25,54 @@ class Producer extends BaseAmqp implements ProducerInterface
         $this->deliveryMode = $deliveryMode;
 
         return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getDeliveryDelay()
+    {
+        return $this->deliveryDelay;
+    }
+
+    /**
+     * @param null $deliveryDelay
+     */
+    public function setDeliveryDelay($deliveryDelay)
+    {
+        $this->deliveryDelay = $deliveryDelay;
+    }
+
+    /**
+     * @return null
+     */
+    public function getTimeToLive()
+    {
+        return $this->timeToLive;
+    }
+
+    /**
+     * @param null $timeToLive
+     */
+    public function setTimeToLive($timeToLive)
+    {
+        $this->timeToLive = $timeToLive;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param null $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
     protected function getBasicProperties()
@@ -46,14 +94,31 @@ class Producer extends BaseAmqp implements ProducerInterface
             $this->setupFabric();
         }
 
-        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+        $context = $this->getContext();
+
+        $topic = $context->createTopic($this->exchangeOptions['name']);
+
+        $message = $context->createMessage((string) $msgBody, [], array_merge($this->getBasicProperties(), $additionalProperties));
+        $message->setRoutingKey($routingKey);
 
         if (!empty($headers)) {
-            $headersTable = new AMQPTable($headers);
-            $msg->set('application_headers', $headersTable);
+            $message->setHeaders($headers);
         }
 
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+        $producer = $context->createProducer();
+
+        if (null !== $this->deliveryDelay) {
+            $producer->setDeliveryDelay($this->deliveryDelay);
+        }
+        if (null !== $this->timeToLive) {
+            $producer->setTimeToLive($this->timeToLive);
+        }
+        if (null !== $this->priority) {
+            $producer->setPriority($this->priority);
+        }
+
+        $producer->send($topic, $message);
+
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
                 'body' => $msgBody,
