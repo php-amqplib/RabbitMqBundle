@@ -2,7 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Connection\AbstractConnection;
 
 abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
@@ -23,6 +25,17 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     /** @var int */
     protected $idleTimeoutExitCode;
+
+    protected $timeLimit;
+
+    protected $startDateTime = null;
+
+    public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
+    {
+        parent::__construct($conn, $ch, $consumerTag);
+
+        $this->startDateTime = new \DateTime();
+    }
 
     /**
      * @param $callback
@@ -88,7 +101,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
             pcntl_signal_dispatch();
         }
 
-        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0) || $this->isTimeLimitExceeded()) {
             $this->stopConsuming();
         }
     }
@@ -159,4 +172,30 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     {
         $this->consumed = 0;
     }
+
+    public function setTimeLimit($timeLimit)
+    {
+        $this->timeLimit = $timeLimit;
+    }
+
+    public function getTimeLimit()
+    {
+        return $this->timeLimit;
+    }
+
+    protected function isTimeLimitExceeded()
+    {
+        if( $this->timeLimit == 0 ){
+            return false;
+        }
+
+        $now = new \DateTime();
+
+        if ((int)$now->format('YmdHis') >= ((int)$this->startDateTime->format('YmdHis') + $this->timeLimit)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

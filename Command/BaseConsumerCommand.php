@@ -46,6 +46,9 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
+            ->addOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'Stop consumer after n seconds. This works if queue is full, if not check idle-timeout')
+            ->addOption('idle-timeout', 'i', InputOption::VALUE_REQUIRED, 'Stop consumer after n idle seconds. "Idle time" = time spend waiting for next message from Amqp server')
+            ->addOption('comment', 'c', InputOption::VALUE_OPTIONAL, 'Optional comment')
         ;
     }
 
@@ -81,10 +84,18 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         }
 
         $this->amount = $input->getOption('messages');
-
         if (0 > $this->amount) {
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
+
+        if (0 > $input->getOption('idle-timeout')) {
+            throw new \InvalidArgumentException("The -i option should be greater than 0");
+        }
+
+        if (0 > $input->getOption('time-limit')) {
+            throw new \InvalidArgumentException("The -t option should be greater than 0");
+        }
+
         $this->initConsumer($input);
 
         return $this->consumer->consume($this->amount);
@@ -99,5 +110,13 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }
         $this->consumer->setRoutingKey($input->getOption('route'));
+
+        if ($input->getOption('idle-timeout') > 0) {
+            $this->consumer->setIdleTimeout($input->getOption('idle-timeout'));
+        }
+
+        if ($input->getOption('time-limit') > 0) {
+            $this->consumer->setTimeLimit($input->getOption('time-limit'));
+        }
     }
 }
