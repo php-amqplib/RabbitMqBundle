@@ -46,7 +46,10 @@ class DynamicConsumer extends Consumer{
     }
     
     protected function mergeQueueOptions()
-    {   
+    {
+        if (null === $this->queueOptionsProvider) {
+            return;
+        }
         $this->queueOptions = array_merge($this->queueOptions, $this->queueOptionsProvider->getQueueOptions($this->context));
     }
 }

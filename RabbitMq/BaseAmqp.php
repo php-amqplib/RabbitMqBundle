@@ -1,11 +1,13 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
+
+use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class BaseAmqp
 {
@@ -22,7 +24,7 @@ abstract class BaseAmqp
      * @var LoggerInterface
      */
     protected $logger;
-    
+
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
@@ -47,6 +49,11 @@ abstract class BaseAmqp
     );
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param AbstractConnection   $conn
      * @param AMQPChannel|null $ch
      * @param null             $consumerTag
@@ -56,7 +63,7 @@ abstract class BaseAmqp
         $this->conn = $conn;
         $this->ch = $ch;
 
-        if (!($conn instanceof AMQPLazyConnection)) {
+        if ($conn->connectOnConstruct()) {
             $this->getChannel();
         }
 
@@ -67,12 +74,25 @@ abstract class BaseAmqp
 
     public function __destruct()
     {
+        $this->close();
+    }
+
+    public function close()
+    {
         if ($this->ch) {
-            $this->ch->close();
+            try {
+                $this->ch->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
-        
+
         if ($this->conn && $this->conn->isConnected()) {
-            $this->conn->close();
+            try {
+                $this->conn->close();
+            } catch (\Exception $e) {
+                // ignore on shutdown
+            }
         }
     }
 
@@ -99,6 +119,7 @@ abstract class BaseAmqp
 
     /**
      * @param  AMQPChannel $ch
+     *
      * @return void
      */
     public function setChannel(AMQPChannel $ch)
@@ -140,6 +161,33 @@ abstract class BaseAmqp
     public function setRoutingKey($routingKey)
     {
         $this->routingKey = $routingKey;
+    }
+
+    public function setupFabric()
+    {
+        if (!$this->exchangeDeclared) {
+            $this->exchangeDeclare();
+        }
+
+        if (!$this->queueDeclared) {
+            $this->queueDeclare();
+        }
+    }
+
+    /**
+     * disables the automatic SetupFabric when using a consumer or producer
+     */
+    public function disableAutoSetupFabric()
+    {
+        $this->autoSetupFabric = false;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -201,29 +249,37 @@ abstract class BaseAmqp
         }
     }
 
-    public function setupFabric()
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     *
+     * @return BaseAmqp
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
-        if (!$this->exchangeDeclared) {
-            $this->exchangeDeclare();
-        }
+        $this->eventDispatcher = $eventDispatcher;
 
-        if (!$this->queueDeclared) {
-            $this->queueDeclare();
+        return $this;
+    }
+
+    /**
+     * @param string $eventName
+     * @param AMQPEvent  $event
+     */
+    protected function dispatchEvent($eventName, AMQPEvent $event)
+    {
+        if ($this->getEventDispatcher()) {
+            $this->getEventDispatcher()->dispatch(
+                $eventName,
+                $event
+            );
         }
     }
 
     /**
-     * disables the automatic SetupFabric when using a consumer or producer
+     * @return EventDispatcherInterface
      */
-    public function disableAutoSetupFabric() {
-        $this->autoSetupFabric = false;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger($logger)
+    public function getEventDispatcher()
     {
-        $this->logger = $logger;
+        return $this->eventDispatcher;
     }
 }

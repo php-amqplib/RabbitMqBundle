@@ -28,7 +28,6 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
                 $this->consumer->stopConsuming();
             } catch (AMQPTimeoutException $e) {}
         }
-        exit();
     }
 
     public function restartConsumer()
@@ -44,7 +43,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
-            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
             ->addOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'Stop consumer after n seconds. This works if queue is full, if not check idle-timeout')
@@ -98,10 +97,10 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         }
 
         $this->initConsumer($input);
-        
-        $this->consumer->consume($this->amount);   
+
+        return $this->consumer->consume($this->amount);
     }
-    
+
     protected function initConsumer($input)
     {
         $this->consumer = $this->getContainer()

@@ -16,6 +16,13 @@ class MultipleConsumer extends Consumer
      * @var QueuesProviderInterface
      */
     protected $queuesProvider = null;
+    
+    /**
+     * Context the consumer runs in
+     *
+     * @var string
+     */
+    protected $context = null;
 
     /**
      * QueuesProvider setter
@@ -38,6 +45,11 @@ class MultipleConsumer extends Consumer
     public function setQueues(array $queues)
     {
         $this->queues = $queues;
+    }
+    
+    public function setContext($context)
+    {
+        $this->context = $context;
     }
 
     protected function setupConsumer()
@@ -84,15 +96,13 @@ class MultipleConsumer extends Consumer
             throw new QueueNotFoundException();
         }
 
-        $processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
-
-        $this->handleProcessMessage($msg, $processFlag);
+        $this->processMessageQueueCallback($msg, $queueName, $this->queues[$queueName]['callback']);
     }
 
     public function stopConsuming()
     {
         foreach ($this->queues as $name => $options) {
-            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name));
+            $this->getChannel()->basic_cancel($this->getQueueConsumerTag($name), false, true);
         }
     }
 
@@ -104,7 +114,7 @@ class MultipleConsumer extends Consumer
         if ($this->queuesProvider) {
             $this->queues = array_merge(
                 $this->queues,
-                $this->queuesProvider->getQueues()
+                $this->queuesProvider->getQueues($this->context)
             );
         }
     }

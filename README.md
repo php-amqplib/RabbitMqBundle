@@ -1,5 +1,7 @@
 # RabbitMqBundle #
 
+[![Join the chat at https://gitter.im/php-amqplib/RabbitMqBundle](https://badges.gitter.im/php-amqplib/RabbitMqBundle.svg)](https://gitter.im/php-amqplib/RabbitMqBundle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## About ##
 
 The RabbitMqBundle incorporates messaging in your application via [RabbitMQ](http://www.rabbitmq.com/) using the [php-amqplib](http://github.com/php-amqplib/php-amqplib) library.
@@ -55,7 +57,7 @@ From version 1.6, you can use the Dependency Injection component to load this bu
 
 Require the bundle in your composer.json file:
 
-````
+```
 {
     "require": {
         "php-amqplib/rabbitmq-bundle": "~1.6",
@@ -110,10 +112,20 @@ old_sound_rabbit_mq:
 
             # requires php-amqplib v2.4.1+
             heartbeat: 0
+
+            #requires php_sockets.dll
+            use_socket: true # default false
+        another:
+            # A different (unused) connection defined by an URL. One can omit all parts,
+            # except the scheme (amqp:). If both segment in the URL and a key value (see above)
+            # are given the value from the URL takes precedence.
+            # See https://www.rabbitmq.com/uri-spec.html on how to encode values.
+            url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
             connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
+            service_alias:    my_app_service # no alias by default
     consumers:
         upload_picture:
             connection:       default
@@ -171,6 +183,42 @@ by default to avoid possible breaks in applications already using this bundle.
 ### Import notice - Heartbeats ###
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
+
+### Dynamic Connection Parameters ###
+
+Sometimes your connection information may need to be dynamic. Dynamic connection parameters allow you to supply or
+override parameters programmatically through a service.
+
+e.g. In a scenario when the `vhost` parameter of the connection depends on the current tenant of your white-labeled
+application and you do not want (or can't) change it's configuration every time.
+
+Define a service under `connection_parameters_provider` that implements the `ConnectionParametersProviderInterface`,
+and add it to the appropriate `connections` configuration.
+
+```yaml
+connections:
+    default:
+        host:     'localhost'
+        port:     5672
+        user:     'guest'
+        password: 'guest'
+        vhost:    'foo' # to be dynamically overridden by `connection_parameters_provider`
+        connection_parameters_provider: connection_parameters_provider_service
+```
+
+Example Implementation:
+
+```php
+class ConnectionParametersProviderService implements ConnectionParametersProvider {
+    ...
+    public function getConnectionParameters() {
+        return array('vhost' => $this->getVhost());
+    }
+    ...
+}
+```
+
+In this case, the `vhost` parameter will be overridden by the output of `getVhost()`.
 
 ## Producers, Consumers, What? ##
 
@@ -271,18 +319,135 @@ For deleting the consumer's queue, use this command:
 $ ./app/console rabbitmq:delete --no-confirmation upload_picture
 ```
 
+#### Consumer Events ####
+
+This can be useful in many scenarios.
+There are 3 AMQPEvents:
+##### ON CONSUME #####
+```php
+class OnConsumeEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_CONSUME;
+
+    /**
+     * OnConsumeEvent constructor.
+     *
+     * @param Consumer $consumer
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+    }
+}
+```
+
+Let`s say you need to sleep / stop consumer/s on a new application deploy.
+You can listen for OnConsumeEvent (\OldSound\RabbitMqBundle\Event\OnConsumeEvent) and check for new application deploy.
+
+##### BEFORE PROCESSING MESSAGE #####
+
+```php
+class BeforeProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::BEFORE_PROCESSING_MESSAGE;
+
+    /**
+     * BeforeProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised before processing a AMQPMessage.
+
+##### AFTER PROCESSING MESSAGE #####
+
+```php
+class AfterProcessingMessageEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::AFTER_PROCESSING_MESSAGE;
+
+    /**
+     * AfterProcessingMessageEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer, AMQPMessage $AMQPMessage)
+    {
+        $this->setConsumer($consumer);
+        $this->setAMQPMessage($AMQPMessage);
+    }
+}
+``` 
+Event raised after processing a AMQPMessage.
+If the process message will throw an Exception the event will not raise.
+
+##### IDLE MESSAGE #####
+
+```php
+<?php
+class OnIdleEvent extends AMQPEvent
+{
+    const NAME = AMQPEvent::ON_IDLE;
+
+    /**
+     * OnIdleEvent constructor.
+     *
+     * @param AMQPMessage $AMQPMessage
+     */
+    public function __construct(Consumer $consumer)
+    {
+        $this->setConsumer($consumer);
+        
+        $this->forceStop = true;
+    }
+}
+```
+
+Event raised when `wait` method exit by timeout without receiving a message. 
+In order to make use of this event a consumer `idle_timeout` has to be [configured](#idle-timeout). 
+By default process exit on idle timeout, you can prevent it by setting `$event->setForceStop(false)` in a listener.
+
 #### Idle timeout ####
 
-If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds:
+If you need to set a timeout when there are no messages from your queue during a period of time, you can set the `idle_timeout` in seconds.
+The `idle_timeout_exit_code` specifies what exit code should be returned by the consumer when the idle timeout occurs. Without specifying it, the consumer will throw an **PhpAmqpLib\Exception\AMQPTimeoutException** exception.
 
 ```yaml
 consumers:
     upload_picture:
-        connection:       default
-        exchange_options: {name: 'upload-picture', type: direct}
-        queue_options:    {name: 'upload-picture'}
-        callback:         upload_picture_service
-        idle_timeout:     60
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+        idle_timeout:           60
+        idle_timeout_exit_code: 0
+```
+
+#### Graceful max execution timeout ####
+
+If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution.timeout` in seconds.
+"Gracefully exit" means, that the consumer will exit either after the currently running task or immediatelly, when waiting for new tasks.
+The `graceful_max_execution.exit_code` specifies what exit code should be returned by the consumer when the graceful max execution timeout occurs. Without specifying it, the consumer will exit with status `0`.
+
+This feature is great in conjuction with supervisord, which together can allow for periodical memory leaks cleanup, connection with database/rabbitmq renewal and more.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+
+        graceful_max_execution:
+            timeout: 1800 # 30 minutes 
+            exit_code: 10 # default is 0 
 ```
 
 #### Fair dispatching ####
@@ -296,7 +461,7 @@ consumers:
 From: http://www.rabbitmq.com/tutorials/tutorial-two-python.html
 
 Be careful as implementing the fair dispatching introduce a latency that will hurt performance (see [this blogpost](http://www.rabbitmq.com/blog/2012/05/11/some-queuing-theory-throughput-latency-and-bandwidth/)). But implemeting it allow you to scale horizontally dynamically as the queue is increasing.
-You should evaluate, as the blogpost reccommand, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
+You should evaluate, as the blogpost recommends, the right value of prefetch_size accordingly with the time taken to process each message and your network performance.
 
 With RabbitMqBundle, you can configure that qos_options per consumer like that:
 
@@ -559,7 +724,7 @@ and multi consumer configurations before it creates your arbitrary bindings. How
 ### Dynamic Consumers ###
 
 Sometimes you have to change the consumer's configuration on the fly.
-Dynamic consumers allow you to define the consumers queue options programatically, based on the context.
+Dynamic consumers allow you to define the consumers queue options programmatically, based on the context.
 
 e.g. In a scenario when the defined consumer must be responsible for a dynamic number of topics and you do not want (or can't) change it's configuration every time.
 
@@ -625,6 +790,106 @@ $ ./app/console_dev rabbitmq:anon-consumer -m 5 -r '#.error' logs_watcher
 ```
 
 The only new option compared to the commands that we have seen before is the one that specifies the __routing key__: `-r '#.error'`.
+
+### Batch Consumers ###
+
+In some cases you will want to get a batch of messages and then do some processing on all of them. Batch consumers will allow you to define logic for this type of processing.
+
+e.g: Imagine that you have a queue where you receive a message for inserting some information in the database, and you realize that if you do a batch insert is much better then by inserting one by one.
+
+Define a callback service that implements `BatchConsumerInterface` and add the definition of the consumer to your configuration.
+
+```yaml
+batch_consumers:
+    batch_basic_consumer:
+        connection:       default
+        exchange_options: {name: 'batch', type: fanout}
+        queue_options:    {name: 'batch'}
+        callback:         batch.basic
+        qos_options:      {prefetch_size: 0, prefetch_count: 2, global: false}
+        timeout_wait:     5
+        auto_setup_fabric: false
+        idle_timeout_exit_code: -2
+        keep_alive: false
+        graceful_max_execution:
+            timeout: 60
+```
+
+*Note*: If the `keep_alive` option is set to `true`, `idle_timeout_exit_code` will be ignored and the consumer process continues.
+
+You can implement a batch consumer that will acknowledge all messages in one return or you can have control on what message to acknoledge.
+
+```php
+namespace AppBundle\Service;
+
+use OldSound\RabbitMqBundle\RabbitMq\BatchConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
+
+class DevckBasicConsumer implements BatchConsumerInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function batchExecute(array $messages)
+    {
+        echo sprintf('Doing batch execution%s', PHP_EOL);
+        foreach ($messages as $message) {
+            $this->executeSomeLogicPerMessage($message);
+        }
+
+        // you ack all messages got in batch
+        return true; 
+    }
+}
+```
+
+```php
+namespace AppBundle\Service;
+
+use OldSound\RabbitMqBundle\RabbitMq\BatchConsumerInterface;
+use PhpAmqpLib\Message\AMQPMessage;
+
+class DevckBasicConsumer implements BatchConsumerInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function batchExecute(array $messages)
+    {
+        echo sprintf('Doing batch execution%s', PHP_EOL);
+        $result = [];
+        /** @var AMQPMessage $message */
+        foreach ($messages as $message) {
+            $result[(int)$message->delivery_info['delivery_tag']] = $this->executeSomeLogicPerMessage($message);
+        }
+
+        // you ack only some messages that have return true
+        // e.g:
+        // $return = [
+        //      1 => true,
+        //      2 => true,
+        //      3 => false,
+        //      4 => true,
+        //      5 => -1,
+        //      6 => 2,
+        //  ];
+        // The following will happen:
+        //  * ack: 1,2,4
+        //  * reject and requeq: 3
+        //  * nack and requeue: 6
+        //  * reject and drop: 5
+        return $result;
+    }
+}
+```
+
+How to run the following batch consumer:
+
+```bash
+    $ ./bin/console rabbitmq:batch:consumer batch_basic_consumer -w
+```
+
+Important: BatchConsumers will not have the -m|messages option available
 
 ### STDIN Producer ###
 

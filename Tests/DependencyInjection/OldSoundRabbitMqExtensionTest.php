@@ -9,8 +9,9 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\Reference;
+use PHPUnit\Framework\TestCase;
 
-class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
+class OldSoundRabbitMqExtensionTest extends TestCase
 {
     public function testFooConnectionDefinition()
     {
@@ -31,8 +32,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -58,8 +61,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'ssl_context' => array(
                 'verify_peer' => false,
             ),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -83,8 +88,10 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -108,10 +115,30 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             'connection_timeout' => 3,
             'read_write_timeout' => 3,
             'ssl_context' => array(),
-            'keepalive' => null,
+            'keepalive' => false,
             'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
+    }
+
+    public function testSocketConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.socket_connection'));
+        $definiton = $container->getDefinition('old_sound_rabbit_mq.connection.socket_connection');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.socket_connection'));
+        $this->assertEquals('%old_sound_rabbit_mq.socket_connection.class%', $definiton->getClass());
+    }
+
+    public function testLazySocketConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.lazy_socket'));
+        $definiton = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_socket');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.lazy_socket'));
+        $this->assertEquals('%old_sound_rabbit_mq.lazy.socket_connection.class%', $definiton->getClass());
     }
 
     public function testFooBinding()
@@ -240,6 +267,17 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
         $this->assertEquals('My\Foo\Producer', $definition->getClass());
+    }
+
+    /**
+     * @group alias
+     */
+    public function testAliasedFooProducerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.foo_producer_producer'));
+        $this->assertTrue($container->has('foo_producer_alias'));
     }
 
     public function testDefaultProducerDefinition()
@@ -485,14 +523,14 @@ class OldSoundRabbitMqExtensionTest extends \PHPUnit_Framework_TestCase
             $definition->getMethodCalls()
         );
     }
-    
+
     public function testDynamicConsumerDefinition()
     {
         $container = $this->getContainer('test.yml');
-        
+
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_dyn_consumer_dynamic'));
         $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
-        
+
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
         $this->assertEquals(array(
                 array(

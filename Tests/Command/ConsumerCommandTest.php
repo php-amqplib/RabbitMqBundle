@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\Tests\Command;
 
 use OldSound\RabbitMqBundle\Command\ConsumerCommand;
-
 use Symfony\Component\Console\Input\InputOption;
 
 class ConsumerCommandTest extends BaseCommandTest
@@ -31,21 +30,22 @@ class ConsumerCommandTest extends BaseCommandTest
      */
     public function testInputsDefinitionCommand()
     {
+        $definition = $this->command->getDefinition();
         // check argument
-        $this->assertTrue($this->command->getDefinition()->hasArgument('name'));
-        $this->assertTrue($this->command->getDefinition()->getArgument('name')->isRequired()); // Name is required to find the service
+        $this->assertTrue($definition->hasArgument('name'));
+        $this->assertTrue($definition->getArgument('name')->isRequired()); // Name is required to find the service
 
         //check options
-        $this->assertTrue($this->command->getDefinition()->hasOption('messages'));
-        $this->assertTrue($this->command->getDefinition()->getOption('messages')->isValueOptional()); // It should accept value
+        $this->assertTrue($definition->hasOption('messages'));
+        $this->assertTrue($definition->getOption('messages')->isValueOptional()); // It should accept value
 
-        $this->assertTrue($this->command->getDefinition()->hasOption('route'));
-        $this->assertTrue($this->command->getDefinition()->getOption('route')->isValueOptional()); // It should accept value
+        $this->assertTrue($definition->hasOption('route'));
+        $this->assertTrue($definition->getOption('route')->isValueOptional()); // It should accept value
 
-        $this->assertTrue($this->command->getDefinition()->hasOption('without-signals'));
-        $this->assertFalse($this->command->getDefinition()->getOption('without-signals')->acceptValue()); // It shouldn't accept value because it is a true/false input
+        $this->assertTrue($definition->hasOption('without-signals'));
+        $this->assertFalse($definition->getOption('without-signals')->acceptValue()); // It shouldn't accept value because it is a true/false input
 
-        $this->assertTrue($this->command->getDefinition()->hasOption('debug'));
-        $this->assertFalse($this->command->getDefinition()->getOption('debug')->acceptValue()); // It shouldn't accept value because it is a true/false input
+        $this->assertTrue($definition->hasOption('debug'));
+        $this->assertFalse($definition->getOption('debug')->acceptValue()); // It shouldn't accept value because it is a true/false input
     }
 }

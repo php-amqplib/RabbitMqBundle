@@ -8,8 +8,9 @@ use OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\TestCase;
 
-class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
+class MultipleConsumerTest extends TestCase
 {
     /**
      * Multiple consumer
@@ -110,6 +111,29 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
 
         $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
         $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
+    }
+
+    public function testQueuesPrivider()
+    {
+        $amqpConnection = $this->prepareAMQPConnection();
+        $amqpChannel = $this->prepareAMQPChannel();
+        $this->multipleConsumer->setContext('foo');
+
+        $queuesProvider = $this->prepareQueuesProvider();
+        $queuesProvider->expects($this->once())
+            ->method('getQueues')
+            ->will($this->returnValue(
+                array(
+                    'queue_foo' => array()
+                )
+            ));
+
+        $this->multipleConsumer->setQueuesProvider($queuesProvider);
+
+        $reflectionClass = new \ReflectionClass(get_class($this->multipleConsumer));
+        $reflectionMethod = $reflectionClass->getMethod('mergeQueues');
+        $reflectionMethod->setAccessible(true);
+        $reflectionMethod->invoke($this->multipleConsumer);
     }
 
     /**
@@ -245,4 +269,4 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
             return $processFlag;
         };
     }
-} 
+}
