@@ -2,27 +2,60 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Connection\AbstractConnection;
 
 abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 {
+    /** @var int */
     protected $target;
 
+    /** @var int */
     protected $consumed = 0;
 
+    /** @var callable */
     protected $callback;
 
+    /** @var bool */
     protected $forceStop = false;
 
+    /** @var int */
     protected $idleTimeout = 0;
 
+    /** @var int */
     protected $idleTimeoutExitCode;
 
+    protected $timeLimit;
+
+    protected $startDateTime = null;
+
+    public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
+    {
+        parent::__construct($conn, $ch, $consumerTag);
+
+        $this->startDateTime = new \DateTime();
+    }
+
+    /**
+     * @param $callback
+     */
     public function setCallback($callback)
     {
         $this->callback = $callback;
     }
 
+    /**
+     * @return callable
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
+
+    /**
+     * @param int $msgAmount
+     */
     public function start($msgAmount = 0)
     {
         $this->target = $msgAmount;
@@ -34,9 +67,15 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         }
     }
 
+    /**
+     * Tell the server you are going to stop consuming.
+     *
+     * It will finish up the last message and not send you any more.
+     */
     public function stopConsuming()
     {
-        $this->getChannel()->basic_cancel($this->getConsumerTag());
+        // This gets stuck and will not exit without the last two parameters set.
+        $this->getChannel()->basic_cancel($this->getConsumerTag(), false, true);
     }
 
     protected function setupConsumer()
@@ -62,10 +101,8 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
             pcntl_signal_dispatch();
         }
 
-        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+        if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0) || $this->isTimeLimitExceeded()) {
             $this->stopConsuming();
-        } else {
-            return;
         }
     }
 
@@ -135,4 +172,30 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     {
         $this->consumed = 0;
     }
+
+    public function setTimeLimit($timeLimit)
+    {
+        $this->timeLimit = $timeLimit;
+    }
+
+    public function getTimeLimit()
+    {
+        return $this->timeLimit;
+    }
+
+    protected function isTimeLimitExceeded()
+    {
+        if( $this->timeLimit == 0 ){
+            return false;
+        }
+
+        $now = new \DateTime();
+
+        if ((int)$now->format('YmdHis') >= ((int)$this->startDateTime->format('YmdHis') + $this->timeLimit)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

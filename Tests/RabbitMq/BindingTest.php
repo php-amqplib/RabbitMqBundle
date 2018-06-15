@@ -2,10 +2,10 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
-
 use OldSound\RabbitMqBundle\RabbitMq\Binding;
+use PHPUnit\Framework\TestCase;
 
-class BindingTest extends \PHPUnit_Framework_TestCase
+class BindingTest extends TestCase
 {
 
     protected function getBinding($amqpConnection, $amqpChannel)

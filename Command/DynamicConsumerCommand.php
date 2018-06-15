@@ -17,7 +17,7 @@ class DynamicConsumerCommand extends BaseConsumerCommand
     protected function configure()
     {
         parent::configure();
-        
+
         $this
             ->setName('rabbitmq:dynamic-consumer')
             ->setDescription('Executes context-aware consumer')
@@ -29,7 +29,7 @@ class DynamicConsumerCommand extends BaseConsumerCommand
     {
         return 'old_sound_rabbit_mq.%s_dynamic';
     }
-    
+
     protected function initConsumer($input)
     {
         parent::initConsumer($input);

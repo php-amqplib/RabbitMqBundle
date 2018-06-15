@@ -5,13 +5,14 @@ namespace OldSound\RabbitMqBundle\Tests\Event;
 use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class BeforeProcessingMessageEventTest
  *
  * @package OldSound\RabbitMqBundle\Tests\Event
  */
-class BeforeProcessingMessageEventTest extends \PHPUnit_Framework_TestCase
+class BeforeProcessingMessageEventTest extends TestCase
 {
     protected function getConsumer()
     {

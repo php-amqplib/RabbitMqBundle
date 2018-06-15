@@ -2,10 +2,13 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory;
 use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection;
+use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection;
+use PHPUnit\Framework\TestCase;
 
-class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
+class AMQPConnectionFactoryTest extends TestCase
 {
     public function testDefaultValues()
     {
@@ -31,6 +34,63 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             3,           // read write timeout
             null,        // context
             false,       // keepalive
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    public function testSocketConnection()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection',
+            array()
+        );
+
+        /** @var AMQPSocketConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('PhpAmqpLib\Connection\AMQPSocketConnection', $instance);
+        $this->assertEquals(array(
+            'localhost', // host
+            5672,        // port
+            'guest',     // user
+            'guest',     // password
+            '/',         // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            3,           // read_timeout
+            false,       // keepalive
+            3,           // write_timeout
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    public function testSocketConnectionWithParams()
+    {
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection',
+            array(
+                'read_timeout' => 31,
+                'write_timeout' => 32,
+            )
+        );
+
+        /** @var AMQPSocketConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('PhpAmqpLib\Connection\AMQPSocketConnection', $instance);
+        $this->assertEquals(array(
+            'localhost', // host
+            5672,        // port
+            'guest',     // user
+            'guest',     // password
+            '/',         // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            31,           // read_timeout
+            false,       // keepalive
+            32,           // write_timeout
             0,           // heartbeat
         ), $instance->constructParams);
     }
@@ -207,5 +267,79 @@ class AMQPConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             false,       // keepalive
             0,           // heartbeat
         ), $instance->constructParams);
+    }
+
+    public function testConnectionsParametersProviderWithConstructorArgs()
+    {
+        $connectionParametersProvider = $this->prepareConnectionParametersProvider();
+        $connectionParametersProvider->expects($this->once())
+            ->method('getConnectionParameters')
+            ->will($this->returnValue(
+                array(
+                    'constructor_args' => array(1,2,3,4)
+                )
+            ));
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(),
+            $connectionParametersProvider
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(1,2,3,4), $instance->constructParams);
+    }
+
+    public function testConnectionsParametersProvider()
+    {
+        $connectionParametersProvider = $this->prepareConnectionParametersProvider();
+        $connectionParametersProvider->expects($this->once())
+            ->method('getConnectionParameters')
+            ->will($this->returnValue(
+                array(
+                    'host' => '1.2.3.4',
+                    'port' => 5678,
+                    'user' => 'admin',
+                    'password' => 'admin',
+                    'vhost' => 'foo',
+                )
+            ));
+        $factory = new AMQPConnectionFactory(
+            'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
+            array(),
+            $connectionParametersProvider
+        );
+
+        /** @var AMQPConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf('OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection', $instance);
+        $this->assertEquals(array(
+            '1.2.3.4',   // host
+            5678,        // port
+            'admin',     // user
+            'admin',     // password
+            'foo',       // vhost
+            false,       // insist
+            "AMQPLAIN",  // login method
+            null,        // login response
+            "en_US",     // locale
+            3,           // connection timeout
+            3,           // read write timeout
+            null,        // context
+            false,       // keepalive
+            0,           // heartbeat
+        ), $instance->constructParams);
+    }
+
+    /**
+     * Preparing ConnectionParametersProviderInterface instance
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionParametersProviderInterface
+     */
+    private function prepareConnectionParametersProvider()
+    {
+        return $this->getMockBuilder('OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface')
+            ->getMock();
     }
 }

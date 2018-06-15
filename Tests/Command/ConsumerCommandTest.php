@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\Tests\Command;
 
 use OldSound\RabbitMqBundle\Command\ConsumerCommand;
-
 use Symfony\Component\Console\Input\InputOption;
 
 class ConsumerCommandTest extends BaseCommandTest

@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RpcServerCommand extends BaseRabbitMqCommand
 {
-
     protected function configure()
     {
         parent::configure();

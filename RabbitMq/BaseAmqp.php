@@ -5,7 +5,6 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -64,7 +63,7 @@ abstract class BaseAmqp
         $this->conn = $conn;
         $this->ch = $ch;
 
-        if (!($conn instanceof AMQPLazyConnection)) {
+        if ($conn->connectOnConstruct()) {
             $this->getChannel();
         }
 

@@ -5,19 +5,41 @@ namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
-use PhpAmqpLib\Connection\AMQPLazyConnection;
+use PHPUnit\Framework\TestCase;
 
-class BaseAmqpTest extends \PHPUnit_Framework_TestCase
+class BaseAmqpTest extends TestCase
 {
-    /**
-     * @expectedException \ErrorException
-     */
+
     public function testLazyConnection()
     {
-        $amqpLazyConnection = new AMQPLazyConnection('localhost', 123, 'lazy_user', 'lazy_password');
+        $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $consumer = new Consumer($amqpLazyConnection, null);
-        $consumer->getChannel();
+        $connection
+            ->method('connectOnConstruct')
+            ->willReturn(false);
+        $connection
+            ->expects(static::never())
+            ->method('channel');
+
+        new Consumer($connection, null);
+    }
+
+    public function testNotLazyConnection()
+    {
+        $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $connection
+            ->method('connectOnConstruct')
+            ->willReturn(true);
+        $connection
+            ->expects(static::once())
+            ->method('channel');
+
+        new Consumer($connection, null);
     }
 
     public function testDispatchEvent()
@@ -26,7 +48,7 @@ class BaseAmqpTest extends \PHPUnit_Framework_TestCase
         $baseAmqpConsumer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\BaseAmqp')
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $baseAmqpConsumer->expects($this->atLeastOnce())

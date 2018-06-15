@@ -2,10 +2,10 @@
 
 namespace OldSound\RabbitMqBundle\Tests\Command;
 
-use OldSound\RabbitMqBundle\Command\DynamicConsumerCommand;
+use OldSound\RabbitMqBundle\Command\MultipleConsumerCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class DynamicConsumerCommandTest extends BaseCommandTest
+class MultipleConsumerCommandTest extends BaseCommandTest
 {
 
     protected function setUp()
@@ -22,7 +22,7 @@ class DynamicConsumerCommandTest extends BaseCommandTest
             ->method('getHelperSet')
             ->will($this->returnValue($this->helperSet));
 
-        $this->command = new DynamicConsumerCommand();
+        $this->command = new MultipleConsumerCommand();
         $this->command->setApplication($this->application);
     }
 
@@ -37,7 +37,7 @@ class DynamicConsumerCommandTest extends BaseCommandTest
         $this->assertTrue($definition->getArgument('name')->isRequired()); // Name is required to find the service
 
         $this->assertTrue($definition->hasArgument('context'));
-        $this->assertTrue($definition->getArgument('context')->isRequired()); // Context is required for the queue options provider
+        $this->assertFalse($definition->getArgument('context')->isRequired()); // Context is required for the queue options provider
 
         //check options
         $this->assertTrue($definition->hasOption('messages'));

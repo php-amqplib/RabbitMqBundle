@@ -10,6 +10,7 @@ class RpcClient extends BaseAmqp
     protected $replies = array();
     protected $expectSerializedResponse;
     protected $timeout = 0;
+    protected $notifyCallback;
 
     private $queueName;
     private $unserializer = 'unserialize';
@@ -80,6 +81,9 @@ class RpcClient extends BaseAmqp
         if ($this->expectSerializedResponse) {
             $messageBody = call_user_func($this->unserializer, $messageBody);
         }
+        if ($this->notifyCallback !== null) {
+            call_user_func($this->notifyCallback, $messageBody);
+        }
 
         $this->replies[$msg->get('correlation_id')] = $messageBody;
     }
@@ -98,8 +102,23 @@ class RpcClient extends BaseAmqp
         $this->unserializer = $unserializer;
     }
 
+    public function notify($callback)
+    {
+        if (is_callable($callback)) {
+            $this->notifyCallback = $callback;
+        } else {
+            throw new \InvalidArgumentException('First parameter expects to be callable');
+        }
+    }
+
     public function setDirectReplyTo($directReplyTo)
     {
         $this->directReplyTo = $directReplyTo;
+    }
+
+    public function reset()
+    {
+        $this->replies = array();
+        $this->requests = 0;
     }
 }
