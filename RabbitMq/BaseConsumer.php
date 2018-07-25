@@ -24,6 +24,9 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     /** @var int */
     protected $idleTimeoutExitCode;
 
+    /** @var array */
+    protected $qosOptions;
+
     /**
      * @param $callback
      */
@@ -69,6 +72,13 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
+        }
+        if ($this->qosOptions) {
+            $this->getChannel()->basic_qos(
+                $this->qosOptions['prefetch_size'],
+                $this->qosOptions['prefetch_count'],
+                $this->qosOptions['global']
+            );
         }
         $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
     }
@@ -118,7 +128,11 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
      */
     public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = false)
     {
-        $this->getChannel()->basic_qos($prefetchSize, $prefetchCount, $global);
+        $this->qosOptions = array(
+            'prefetch_size' => $prefetchSize,
+            'prefetch_count' => $prefetchCount,
+            'global' => $global
+        );
     }
 
     public function setIdleTimeout($idleTimeout)
