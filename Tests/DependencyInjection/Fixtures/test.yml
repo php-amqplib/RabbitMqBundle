@@ -86,6 +86,7 @@ old_sound_rabbit_mq:
     consumers:
         foo_consumer:
             connection:      foo_connection
+            timeout_wait:    3
             exchange_options:
                 name:        foo_exchange
                 type:        direct
@@ -134,6 +135,7 @@ old_sound_rabbit_mq:
     multiple_consumers:
         multi_test_consumer:
             connection: foo_connection
+            timeout_wait: 3
             exchange_options:
                 name:           foo_multiple_exchange
                 type:           direct

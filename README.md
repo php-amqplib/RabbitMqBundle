@@ -429,6 +429,23 @@ consumers:
         idle_timeout_exit_code: 0
 ```
 
+#### Timeout wait ####
+
+Set the `timeout_wait` in seconds.
+The `timeout_wait` specifies how long the consumer will wait without receiving a new message before ensuring the current connection is still valid.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+        idle_timeout:           60
+        idle_timeout_exit_code: 0
+        timeout_wait:           10
+```
+
 #### Graceful max execution timeout ####
 
 If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution.timeout` in seconds.

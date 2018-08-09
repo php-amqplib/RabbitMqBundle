@@ -213,6 +213,9 @@ class OldSoundRabbitMqExtension extends Extension
             if (isset($consumer['idle_timeout_exit_code'])) {
                 $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
+            if (isset($consumer['timeout_wait'])) {
+                $definition->addMethodCall('setTimeoutWait', array($consumer['timeout_wait']));
+            }
             if (isset($consumer['graceful_max_execution'])) {
                 $definition->addMethodCall(
                     'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
@@ -290,6 +293,9 @@ class OldSoundRabbitMqExtension extends Extension
             if (isset($consumer['idle_timeout_exit_code'])) {
                 $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
+            if (isset($consumer['timeout_wait'])) {
+                $definition->addMethodCall('setTimeoutWait', array($consumer['timeout_wait']));
+            }
             if (isset($consumer['graceful_max_execution'])) {
                 $definition->addMethodCall(
                     'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
@@ -362,6 +368,9 @@ class OldSoundRabbitMqExtension extends Extension
             }
             if (isset($consumer['idle_timeout_exit_code'])) {
                 $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
+            }
+            if (isset($consumer['timeout_wait'])) {
+                $definition->addMethodCall('setTimeoutWait', array($consumer['timeout_wait']));
             }
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
