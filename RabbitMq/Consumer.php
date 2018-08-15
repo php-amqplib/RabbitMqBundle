@@ -85,7 +85,7 @@ class Consumer extends BaseConsumer
              */
             $waitTimeout = $this->chooseWaitTimeout();
             if ($this->gracefulMaxExecutionDateTime
-                && $this->gracefulMaxExecutionDateTime <= new \DateTime()
+                && $waitTimeout < 1
             ) {
                 return $this->gracefulMaxExecutionTimeoutExitCode;
             }
