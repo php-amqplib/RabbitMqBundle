@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\MemoryChecker;
 
+use OldSound\RabbitMqBundle\Provider\MemoryUsageProviderInterface;
+
 /**
  * Help handling memory limits .
  *
@@ -9,15 +11,15 @@ namespace OldSound\RabbitMqBundle\MemoryChecker;
  */
 class MemoryConsumptionChecker
 {
-    /** @var NativeMemoryUsageProvider */
+    /** @var MemoryUsageProviderInterface */
     private $memoryUsageProvider;
 
     /**
      * MemoryManager constructor.
      *
-     * @param NativeMemoryUsageProvider $memoryUsageProvider
+     * @param MemoryUsageProviderInterface $memoryUsageProvider
      */
-    public function __construct(NativeMemoryUsageProvider $memoryUsageProvider) {
+    public function __construct(MemoryUsageProviderInterface $memoryUsageProvider) {
         $this->memoryUsageProvider = $memoryUsageProvider;
     }
 

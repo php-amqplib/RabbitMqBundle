@@ -2,12 +2,14 @@
 
 namespace OldSound\RabbitMqBundle\MemoryChecker;
 
+use OldSound\RabbitMqBundle\Provider\MemoryUsageProviderInterface;
+
 /**
  * Returns the current memory PHP is using (mainly used to allow mocking).
  *
  * @author Jonas Haouzi <jonas@viscaweb.com>
  */
-class NativeMemoryUsageProvider
+class NativeMemoryUsageProvider implements MemoryUsageProviderInterface
 {
     /**
      * @return int

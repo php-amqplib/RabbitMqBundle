@@ -19,7 +19,7 @@ class MemoryConsumptionCheckerTest extends TestCase
         $allowedConsumptionUntil = '2M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\Provider\\MemoryUsageProviderInterface')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
@@ -33,7 +33,7 @@ class MemoryConsumptionCheckerTest extends TestCase
         $allowedConsumptionUntil = '2M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\Provider\\MemoryUsageProviderInterface')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
@@ -46,7 +46,7 @@ class MemoryConsumptionCheckerTest extends TestCase
         $currentMemoryUsage = '7M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\Provider\\MemoryUsageProviderInterface')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
@@ -59,7 +59,7 @@ class MemoryConsumptionCheckerTest extends TestCase
         $currentMemoryUsage = '11M';
         $maxConsumptionAllowed = '10M';
 
-        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\MemoryChecker\\NativeMemoryUsageProvider')->getMock();
+        $memoryUsageProvider = $this->getMockBuilder('OldSound\\RabbitMqBundle\\Provider\\MemoryUsageProviderInterface')->getMock();
         $memoryUsageProvider->expects($this->any())->method('getMemoryUsage')->willReturn($currentMemoryUsage);
 
         $memoryManager = new MemoryConsumptionChecker($memoryUsageProvider);
