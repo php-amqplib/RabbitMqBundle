@@ -113,7 +113,7 @@ class MultipleConsumerTest extends TestCase
         $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
     }
 
-    public function testQueuesPrivider()
+    public function testQueuesProvider()
     {
         $amqpConnection = $this->prepareAMQPConnection();
         $amqpChannel = $this->prepareAMQPChannel();
