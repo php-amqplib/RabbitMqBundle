@@ -323,6 +323,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         }
 
         $this->getChannel()->basic_cancel($this->getConsumerTag());
+        exit;
     }
 
     /**
