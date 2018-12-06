@@ -30,6 +30,11 @@ class MessageDataCollector extends DataCollector
         }
     }
 
+    public function reset()
+    {
+        $this->data = array();
+    }
+
     public function getName()
     {
         return 'rabbit_mq';
