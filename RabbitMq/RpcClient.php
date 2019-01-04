@@ -22,7 +22,7 @@ class RpcClient extends BaseAmqp
         $this->expectSerializedResponse = $expectSerializedResponse;
     }
 
-    public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0)
+    public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0, $additionalProperties = array())
     {
         if (empty($requestId)) {
             throw new \InvalidArgumentException('You must provide a $requestId');
@@ -38,13 +38,15 @@ class RpcClient extends BaseAmqp
             }
         }
 
-        $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain',
-                                               'reply_to' => $this->directReplyTo
-                                                   ? 'amq.rabbitmq.reply-to' // On direct reply-to mode, use predefined queue name
-                                                   : $this->getQueueName(),
-                                               'delivery_mode' => 1, // non durable
-                                               'expiration' => $expiration*1000,
-                                               'correlation_id' => $requestId));
+        $basicProperties = array('content_type' => 'text/plain',
+            'reply_to' => $this->directReplyTo
+                ? 'amq.rabbitmq.reply-to' // On direct reply-to mode, use predefined queue name
+                : $this->getQueueName(),
+            'delivery_mode' => 1, // non durable
+            'expiration' => $expiration*1000,
+            'correlation_id' => $requestId);
+
+        $msg = new AMQPMessage($msgBody, array_merge($basicProperties, $additionalProperties));
 
         $this->getChannel()->basic_publish($msg, $server, $routingKey);
 
