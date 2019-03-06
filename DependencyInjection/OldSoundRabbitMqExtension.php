@@ -569,6 +569,13 @@ class OldSoundRabbitMqExtension extends Extension
             if (array_key_exists('queue_options', $server)) {
                 $definition->addMethodCall('setQueueOptions', array($server['queue_options']));
             }
+
+            if (isset($server['idle_timeout'])) {
+                $definition->addMethodCall('setIdleTimeout', array($server['idle_timeout']));
+            }
+            if (isset($server['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($server['idle_timeout_exit_code']));
+            }
             if (isset($server['graceful_max_execution'])) {
                 $definition->addMethodCall(
                     'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
