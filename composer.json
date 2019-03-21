@@ -47,7 +47,8 @@
 
 		"nette/tester": "~1.3@rc",
 		"mockery/mockery": "~0.9.1",
-		"kdyby/console": "~2.5@dev"
+		"kdyby/console": "~2.5@dev",
+		"jakub-onderka/php-parallel-lint": "~1.0@dev"
 	},
 	"support": {
 		"email": "filip@prochazka.su",
