@@ -7,39 +7,26 @@ cache:
         - $HOME/.composer/cache
 
 php:
-  - 5.6
-  - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 services:
   - rabbitmq
 
 env:
   matrix:
-    - NETTE=nette-2.4-dev
     - NETTE=nette-2.4
 
 matrix:
   include:
-    - php: 5.6
+    - php: 7.1
       env: NETTE=nette-2.4 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
-    - php: 7.0
+    - php: 7.3
       env: NETTE=nette-2.4 COVERAGE="--coverage ./coverage.xml --coverage-src ./src" TESTER_RUNTIME="phpdbg"
-  exclude:
-    - php: 7.1
-      env: NETTE=nette-2.4-dev
-    - php: 7.1
-      env: NETTE=nette-2.4
-    - php: 7.2
-      env: NETTE=nette-2.4-dev
-    - php: 7.2
-      env: NETTE=nette-2.4
 
 before_install:
   - travis_retry composer self-update
-  - wget -O /tmp/composer-nette https://raw.githubusercontent.com/Kdyby/TesterExtras/master/bin/composer-nette.php
-  - php /tmp/composer-nette
 
 install:
   - travis_retry composer update --no-interaction --prefer-dist $COMPOSER_EXTRA_ARGS
