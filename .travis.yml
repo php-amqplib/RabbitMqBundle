@@ -5,6 +5,7 @@ sudo: false
 cache:
     directories:
         - $HOME/.composer/cache
+        - $HOME/phpcs-cache
 
 php:
   - 7.1
@@ -16,28 +17,39 @@ services:
 
 env:
   matrix:
-    - NETTE=nette-2.4
+    - RUN_TESTS=1 # dev
+    - RUN_TESTS=1 COMPOSER_EXTRA_ARGS="" # after nette/di release add --prefer-stable
+    - RUN_TESTS=1 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
 
 matrix:
+  fast_finish: true
   include:
-    - php: 7.1
-      env: NETTE=nette-2.4 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
     - php: 7.3
-      env: NETTE=nette-2.4 COVERAGE="--coverage ./coverage.xml --coverage-src ./src" TESTER_RUNTIME="phpdbg"
+      env: COMPOSER_EXTRA_ARGS="" COVERAGE="--coverage ./coverage.xml --coverage-src ./src" TESTER_RUNTIME="phpdbg"
+    - php: 7.3
+      env: COMPOSER_EXTRA_ARGS="" PHPSTAN=1 RUN_TESTS=0
+    - php: 7.3
+      env: COMPOSER_EXTRA_ARGS="" CODING_STANDARD=1 RUN_TESTS=0
+  exclude:
+    - php: 7.3
+      env: COMPOSER_EXTRA_ARGS=""
+  allow_failures:
+    - env:
 
 before_install:
   - travis_retry composer self-update
 
 install:
-  - travis_retry composer update --no-interaction --prefer-dist $COMPOSER_EXTRA_ARGS
-  - travis_retry wget -O /tmp/coveralls.phar https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+  - travis_retry composer update --no-interaction --no-suggest --no-progress --prefer-dist $COMPOSER_EXTRA_ARGS # update because we may need --prefer-lowest option
 
 script:
-  - vendor/bin/tester $COVERAGE -s -p ${TESTER_RUNTIME:-php} -c ./tests/php.ini-unix ./tests/KdybyTests/
-  - vendor/bin/parallel-lint -e php,phpt --exclude vendor .
+  - if [ "$PHPSTAN" = "1" ]; then vendor/bin/phpstan analyse -l 2 -c phpstan.neon src tests/KdybyTests; fi
+  - if [ "$CODING_STANDARD" = "1" ]; then php vendor/bin/phpcs --standard=vendor/kdyby/coding-standard/ruleset.xml --cache=$HOME/phpcs-cache/.phpcs-cache --encoding=utf-8 -sp src tests/KdybyTests; fi
+  - if [ "$CODING_STANDARD" = "1" ]; then vendor/bin/parallel-lint -e php,phpt --exclude vendor .; fi
+  - if [ "$RUN_TESTS" = "1" ]; then vendor/bin/tester $COVERAGE -s -p ${TESTER_RUNTIME:-php} -c ./tests/php.ini-unix ./tests/KdybyTests/; fi
 
 after_script:
-  - if [ "$COVERAGE" != "" ]; then php /tmp/coveralls.phar --verbose --config tests/.coveralls.yml || true; fi
+  - if [ "$COVERAGE" != "" ]; then vendor/bin/php-coveralls --verbose --config tests/.coveralls.yml || true; fi
 
 after_failure:
   - 'for i in $(find ./tests -name \*.actual); do echo "--- $i"; cat $i; echo; echo; done'
