@@ -34,7 +34,7 @@ class Connection extends PhpAmqpLib\Connection\AMQPLazyConnection implements ICo
 
 	/**
 	 * @param string $name
-	 * @return BaseConsumer
+	 * @return \Kdyby\RabbitMq\Consumer
 	 */
 	public function getConsumer($name)
 	{
@@ -48,7 +48,7 @@ class Connection extends PhpAmqpLib\Connection\AMQPLazyConnection implements ICo
 
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 * @return Producer
 	 */
 	public function getProducer($name)
@@ -63,7 +63,7 @@ class Connection extends PhpAmqpLib\Connection\AMQPLazyConnection implements ICo
 
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 * @return RpcClient
 	 */
 	public function getRpcClient($name)
@@ -78,7 +78,7 @@ class Connection extends PhpAmqpLib\Connection\AMQPLazyConnection implements ICo
 
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 * @return RpcServer
 	 */
 	public function getRpcServer($name)
