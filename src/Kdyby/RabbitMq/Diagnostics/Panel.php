@@ -58,8 +58,8 @@ class Panel implements IBarPanel
 	public function getTab()
 	{
 		$img = Html::el('')->addHtml(file_get_contents(__DIR__ . '/rabbitmq-logo.svg'));
-		$tab = Html::el('span')->title('RabbitMq')->addHtml($img);
-		$title = Html::el('span')->class('tracy-label');
+		$tab = Html::el('span')->setAttribute('title', 'RabbitMq')->addHtml($img);
+		$title = Html::el('span')->setAttribute('class', 'tracy-label');
 
 		if ($this->messages) {
 			$title->setText(count($this->messages) . ' message' . (count($this->messages) > 1 ? 's' : ''));
@@ -124,7 +124,7 @@ class Panel implements IBarPanel
 
 
 	/**
-	 * @param $message
+	 * @param string $message
 	 * @return object
 	 */
 	public function published($message)
