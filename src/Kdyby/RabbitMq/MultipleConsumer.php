@@ -2,6 +2,9 @@
 
 namespace Kdyby\RabbitMq;
 
+use Kdyby\RabbitMq\Exception\InvalidArgumentException;
+use Kdyby\RabbitMq\Exception\QueueNotFoundException;
+use Kdyby\RabbitMq\Exception\TerminateException;
 use Nette\Utils\Callback;
 use PhpAmqpLib\Message\AMQPMessage;
 

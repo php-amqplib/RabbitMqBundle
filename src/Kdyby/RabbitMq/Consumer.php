@@ -2,6 +2,7 @@
 
 namespace Kdyby\RabbitMq;
 
+use Kdyby\RabbitMq\Exception\TerminateException;
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Exception\AMQPTimeoutException;

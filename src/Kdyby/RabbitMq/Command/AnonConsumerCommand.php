@@ -3,7 +3,7 @@
 namespace Kdyby\RabbitMq\Command;
 
 use Kdyby\RabbitMq\AnonymousConsumer;
-use Kdyby\RabbitMq\InvalidArgumentException;
+use Kdyby\RabbitMq\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

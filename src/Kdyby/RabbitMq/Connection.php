@@ -3,6 +3,7 @@
 namespace Kdyby\RabbitMq;
 
 use Kdyby;
+use Kdyby\RabbitMq\Exception\InvalidArgumentException;
 use Nette;
 use PhpAmqpLib;
 

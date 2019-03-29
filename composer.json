@@ -53,6 +53,11 @@
 	"extra": {
 		"branch-alias": {
 			"dev-master": "1.0-dev"
-		}
+		},
+        "typo3/class-alias-loader": {
+            "class-alias-maps": [
+                "src/Kdyby/RabbitMq/DI/ClassAliasMap.php"
+            ]
+        }
 	}
 }
