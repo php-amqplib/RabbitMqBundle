@@ -16,10 +16,6 @@ use Nette;
 use Tester;
 
 
-
-require_once __DIR__ . '/../bootstrap.php';
-require_once __DIR__ . '/mocks.php';
-
 /**
  * @author Filip Procházka <filip@prochazka.su>
  */

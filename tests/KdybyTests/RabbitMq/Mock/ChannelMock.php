@@ -1,36 +1,12 @@
-<?php
+<?php declare(strict_types = 1);
 
-/**
- * This file is part of the Kdyby (http://www.kdyby.org)
- *
- * Copyright (c) 2008 Filip Procházka (filip@prochazka.su)
- *
- * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
- */
-
-namespace KdybyTests\RabbitMq;
-
-use Kdyby;
+namespace KdybyTests\RabbitMq\Mock;
 
 
-
-class ConnectionMock extends Kdyby\RabbitMq\Connection
-{
-
-	protected function doCreateChannel($id)
-	{
-		return new ChannelMock($this, $id);
-	}
-
-}
-
-
-
-class ChannelMock extends Kdyby\RabbitMq\Channel
+class ChannelMock extends \Kdyby\RabbitMq\Channel
 {
 
 	public $calls = [];
-
 
 
 	protected function channel_alert($args)
@@ -40,7 +16,6 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
 	protected function channel_close($args)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
@@ -48,13 +23,11 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
 	protected function channel_flow($args)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::channel_flow($args);
 	}
-
 
 
 	public function exchange_declare(
@@ -67,12 +40,14 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 		$nowait = FALSE,
 		$arguments = NULL,
 		$ticket = NULL
-	) {
+	)
+	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
-		return parent::exchange_declare($exchange, $type, $passive, $durable, $auto_delete, $internal, $nowait, $arguments, $ticket);
+		return parent::exchange_declare(
+			$exchange, $type, $passive, $durable, $auto_delete, $internal, $nowait, $arguments, $ticket
+		);
 	}
-
 
 
 	public function exchange_delete(
@@ -80,12 +55,12 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 		$if_unused = FALSE,
 		$nowait = FALSE,
 		$ticket = NULL
-	) {
+	)
+	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
 		return parent::exchange_delete($exchange, $if_unused, $nowait, $ticket);
 	}
-
 
 
 	public function exchange_bind(
@@ -95,15 +70,21 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 		$nowait = FALSE,
 		$arguments = NULL,
 		$ticket = NULL
-	) {
+	)
+	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
 		return parent::exchange_bind($destination, $source, $routing_key, $nowait, $arguments, $ticket);
 	}
 
 
-
-	public function exchange_unbind($destination, $source, $routing_key = "", $arguments = NULL, $ticket = NULL)
+	public function exchange_unbind(
+		$destination,
+		$source,
+		$routing_key = "",
+		$arguments = NULL,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -111,8 +92,14 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function queue_bind($queue, $exchange, $routing_key = "", $nowait = FALSE, $arguments = NULL, $ticket = NULL)
+	public function queue_bind(
+		$queue,
+		$exchange,
+		$routing_key = "",
+		$nowait = FALSE,
+		$arguments = NULL,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -120,14 +107,18 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function queue_unbind($queue, $exchange, $routing_key = "", $arguments = NULL, $ticket = NULL)
+	public function queue_unbind(
+		$queue,
+		$exchange,
+		$routing_key = "",
+		$arguments = NULL,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
 		return parent::queue_unbind($queue, $exchange, $routing_key, $arguments, $ticket);
 	}
-
 
 
 	public function queue_declare(
@@ -139,15 +130,23 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 		$nowait = FALSE,
 		$arguments = NULL,
 		$ticket = NULL
-	) {
+	)
+	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
-		return parent::queue_declare($queue, $passive, $durable, $exclusive, $auto_delete, $nowait, $arguments, $ticket);
+		return parent::queue_declare(
+			$queue, $passive, $durable, $exclusive, $auto_delete, $nowait, $arguments, $ticket
+		);
 	}
 
 
-
-	public function queue_delete($queue = "", $if_unused = FALSE, $if_empty = FALSE, $nowait = FALSE, $ticket = NULL)
+	public function queue_delete(
+		$queue = "",
+		$if_unused = FALSE,
+		$if_empty = FALSE,
+		$nowait = FALSE,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -155,8 +154,11 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function queue_purge($queue = "", $nowait = FALSE, $ticket = NULL)
+	public function queue_purge(
+		$queue = "",
+		$nowait = FALSE,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -164,24 +166,32 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function basic_ack($delivery_tag, $multiple = FALSE)
+	public function basic_ack(
+		$delivery_tag,
+		$multiple = FALSE
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::basic_ack($delivery_tag, $multiple);
 	}
 
 
-
-	public function basic_nack($delivery_tag, $multiple = FALSE, $requeue = FALSE)
+	public function basic_nack(
+		$delivery_tag,
+		$multiple = FALSE,
+		$requeue = FALSE
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::basic_nack($delivery_tag, $multiple, $requeue);
 	}
 
 
-
-	public function basic_cancel($consumer_tag, $nowait = FALSE, $noreturn = false)
+	public function basic_cancel(
+		$consumer_tag,
+		$nowait = FALSE,
+		$noreturn = FALSE
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -189,7 +199,20 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
+	/**
+	 * Starts a queue consumer
+	 *
+	 * @param string $queue
+	 * @param string $consumer_tag
+	 * @param bool $no_local
+	 * @param bool $no_ack
+	 * @param bool $exclusive
+	 * @param bool $nowait
+	 * @param callable|null $callback
+	 * @param int|null $ticket
+	 * @param array $arguments
+	 * @return mixed|string
+	 */
 	public function basic_consume(
 		$queue = "",
 		$consumer_tag = "",
@@ -200,15 +223,21 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 		$callback = NULL,
 		$ticket = NULL,
 		$arguments = []
-	) {
+	)
+	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
-		return parent::basic_consume($queue, $consumer_tag, $no_local, $no_ack, $exclusive, $nowait, $callback, $ticket, $arguments);
+		return parent::basic_consume(
+			$queue, $consumer_tag, $no_local, $no_ack, $exclusive, $nowait, $callback, $ticket, $arguments
+		);
 	}
 
 
-
-	public function basic_get($queue = "", $no_ack = FALSE, $ticket = NULL)
+	public function basic_get(
+		$queue = "",
+		$no_ack = FALSE,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -216,14 +245,16 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function basic_qos($prefetch_size, $prefetch_count, $a_global)
+	public function basic_qos(
+		$prefetch_size,
+		$prefetch_count,
+		$a_global
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
 		return parent::basic_qos($prefetch_size, $prefetch_count, $a_global);
 	}
-
 
 
 	public function basic_recover($requeue = FALSE)
@@ -234,21 +265,24 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function basic_reject($delivery_tag, $requeue)
+	public function basic_reject(
+		$delivery_tag,
+		$requeue
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::basic_reject($delivery_tag, $requeue);
 	}
 
 
-
-	protected function basic_return($args, $msg)
+	protected function basic_return(
+		$args,
+		$msg
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::basic_return($args, $msg);
 	}
-
 
 
 	public function tx_commit()
@@ -259,14 +293,12 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
 	public function tx_rollback()
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
 		return parent::tx_rollback();
 	}
-
 
 
 	public function confirm_select($nowait = FALSE)
@@ -277,7 +309,6 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
 	public function tx_select()
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
@@ -286,8 +317,11 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function dispatch($method_sig, $args, $content)
+	public function dispatch(
+		$method_sig,
+		$args,
+		$content
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 
@@ -295,41 +329,17 @@ class ChannelMock extends Kdyby\RabbitMq\Channel
 	}
 
 
-
-	public function basic_publish($msg, $exchange = '', $routingKey = '', $mandatory = FALSE, $immediate = FALSE, $ticket = NULL)
+	public function basic_publish(
+		$msg,
+		$exchange = '',
+		$routingKey = '',
+		$mandatory = FALSE,
+		$immediate = FALSE,
+		$ticket = NULL
+	)
 	{
 		$this->calls[] = [__FUNCTION__] + get_defined_vars();
 		parent::basic_publish($msg, $exchange, $routingKey, $mandatory, $immediate, $ticket);
-	}
-
-}
-
-
-
-class Callback
-{
-
-	public static $accepted = [];
-
-
-
-	public function __invoke($message)
-	{
-		self::$accepted[] = func_get_args();
-	}
-
-
-
-	public function process($message)
-	{
-		self::$accepted[] = func_get_args();
-	}
-
-
-
-	public static function staticProcess($message)
-	{
-		self::$accepted[] = func_get_args();
 	}
 
 }

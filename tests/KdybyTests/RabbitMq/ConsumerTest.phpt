@@ -20,8 +20,7 @@ use Tester;
 use Tester\Assert;
 
 
-
-require_once __DIR__ . '/TestCase.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 class ConsumerTest extends TestCase
 {
@@ -81,4 +80,4 @@ class ConsumerTest extends TestCase
 
 }
 
-\run(new ConsumerTest());
+(new ConsumerTest())->run();

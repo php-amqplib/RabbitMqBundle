@@ -13,13 +13,11 @@ use Kdyby;
 use Kdyby\RabbitMq\Connection;
 use Kdyby\RabbitMq\Consumer;
 use KdybyTests;
-use Nette;
-use Tester;
 use Tester\Assert;
 
 
+require_once __DIR__ . '/../bootstrap.php';
 
-require_once __DIR__ . '/TestCase.php';
 
 class BaseAmqpTest extends TestCase
 {
@@ -31,9 +29,9 @@ class BaseAmqpTest extends TestCase
 
 		Assert::exception(function () use ($consumer) {
 			$consumer->getChannel();
-		}, 'PhpAmqpLib\Exception\AMQPRuntimeException', 'Error Connecting to server(111): Connection refused');
+		}, \PhpAmqpLib\Exception\AMQPRuntimeException::class, 'Error Connecting to server(111): Connection refused');
 	}
 
 }
 
-\run(new BaseAmqpTest());
+(new BaseAmqpTest())->run();
