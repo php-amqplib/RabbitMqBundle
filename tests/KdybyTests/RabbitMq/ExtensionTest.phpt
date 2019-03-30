@@ -1,41 +1,32 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Test: Kdyby\RabbitMq\Extension.
  *
  * @testCase KdybyTests\RabbitMq\ExtensionTest
- * @author Filip Procházka <filip@prochazka.su>
- * @package Kdyby\RabbitMq
  */
 
 namespace KdybyTests\RabbitMq;
 
 use Kdyby;
-use KdybyTests;
 use Nette;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use Tester;
 use Tester\Assert;
-
 
 require_once __DIR__ . '/../bootstrap.php';
 
 
 
-/**
- * @author Filip Procházka <filip@prochazka.su>
- */
-class ExtensionTest extends TestCase
+class ExtensionTest extends \KdybyTests\RabbitMq\TestCase
 {
 
-	/**
-	 * @return \Nette\DI\Container
-	 */
-	protected function createContainer()
+	protected function createContainer(): \Nette\DI\Container
 	{
 		$config = new Nette\Configurator();
 		$config->setTempDirectory(TEMP_DIR);
-		$config->onCompile[] = static function ($config, Nette\DI\Compiler $compiler) : void {
+		$config->onCompile[] = static function ($config, Nette\DI\Compiler $compiler): void {
 			$compiler->addExtension('rabbitmq', new Kdyby\RabbitMq\DI\RabbitMqExtension());
 		};
 		$config->addConfig(__DIR__ . '/files/nette-reset.neon');
@@ -44,9 +35,7 @@ class ExtensionTest extends TestCase
 		return $config->createContainer();
 	}
 
-
-
-	public function testFunctional()
+	public function testFunctional(): void
 	{
 		$dic = $this->createContainer();
 

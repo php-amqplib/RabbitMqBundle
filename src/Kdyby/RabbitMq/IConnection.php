@@ -1,46 +1,18 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
-use Kdyby;
-use Nette;
-
-
-
-/**
- * @author Filip Procházka <filip@prochazka.su>
- */
 interface IConnection
 {
 
-	/**
-	 * @param string $name
-	 * @return BaseConsumer
-	 */
-	function getConsumer($name);
+	public function getConsumer(string $name): \Kdyby\RabbitMq\Consumer;
 
+	public function getProducer(string $name): \Kdyby\RabbitMq\Producer;
 
+	public function getRpcClient(string $name): \Kdyby\RabbitMq\RpcClient;
 
-	/**
-	 * @param $name
-	 * @return Producer
-	 */
-	function getProducer($name);
-
-
-
-	/**
-	 * @param $name
-	 * @return RpcClient
-	 */
-	function getRpcClient($name);
-
-
-
-	/**
-	 * @param $name
-	 * @return RpcServer
-	 */
-	function getRpcServer($name);
+	public function getRpcServer(string $name): \Kdyby\RabbitMq\RpcServer;
 
 }

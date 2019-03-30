@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
@@ -10,19 +12,14 @@
 
 namespace Kdyby\RabbitMq\DI;
 
-use Kdyby;
-use Nette;
-
-/**
- * @author Jan Trejbal <jan.trejbal@gmail.com>
- */
 interface IRpcServersProvider
 {
 
 	/**
 	 * Returns array of name => array config.
 	 *
-	 * @return array
+	 * @return array<string, array<mixed>>
 	 */
-	function getRabbitRpcServers();
+	public function getRabbitRpcServers(): array;
+
 }

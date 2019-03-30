@@ -1,16 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
 use PhpAmqpLib\Message\AMQPMessage;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class RpcClient extends AmqpMember
+class RpcClient extends \Kdyby\RabbitMq\AmqpMember
 {
 
 	/**
@@ -38,24 +34,27 @@ class RpcClient extends AmqpMember
 	 */
 	protected $timeout = 0;
 
-
-
-	public function initClient($expectSerializedResponse = true)
+	public function initClient(bool $expectSerializedResponse = TRUE): void
 	{
-		list($this->queueName,,) = $this->getChannel()->queue_declare(
-			"",
-			$passive = false,
-			$durable = false,
-			$exclusive = true,
-			$autoDelete = true
+		[$this->queueName] = $this->getChannel()->queue_declare(
+			'',
+			$passive = FALSE,
+			$durable = FALSE,
+			$exclusive = TRUE,
+			$autoDelete = TRUE
 		);
 
 		$this->expectSerializedResponse = $expectSerializedResponse;
 	}
 
-
-
-	public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0)
+	/**
+	 * @param string $msgBody
+	 * @param string $server
+	 * @param mixed $requestId
+	 * @param string $routingKey
+	 * @param int $expiration
+	 */
+	public function addRequest(string $msgBody, string $server, $requestId = NULL, string $routingKey = '', int $expiration = 0): void
 	{
 		if (empty($requestId)) {
 			throw new \InvalidArgumentException('You must provide a $requestId');
@@ -66,7 +65,7 @@ class RpcClient extends AmqpMember
 			'reply_to' => $this->queueName,
 			'delivery_mode' => 1, // non durable
 			'expiration' => $expiration * 1000,
-			'correlation_id' => $requestId
+			'correlation_id' => $requestId,
 		]);
 
 		$this->getChannel()->basic_publish($msg, $server, $routingKey);
@@ -78,15 +77,16 @@ class RpcClient extends AmqpMember
 		}
 	}
 
-
-
-	public function getReplies()
+	/**
+	 * @return array<mixed>
+	 */
+	public function getReplies(): array
 	{
 		$this->replies = [];
-		$this->getChannel()->basic_consume($this->queueName, '', false, true, false, false, [$this, 'processMessage']);
+		$this->getChannel()->basic_consume($this->queueName, '', FALSE, TRUE, FALSE, FALSE, [$this, 'processMessage']);
 
-		while (count($this->replies) < $this->requests) {
-			$this->getChannel()->wait(null, false, $this->timeout);
+		while (\count($this->replies) < $this->requests) {
+			$this->getChannel()->wait(NULL, FALSE, $this->timeout);
 		}
 
 		$this->getChannel()->basic_cancel($this->queueName);
@@ -96,13 +96,11 @@ class RpcClient extends AmqpMember
 		return $this->replies;
 	}
 
-
-
-	public function processMessage(AMQPMessage $msg)
+	public function processMessage(AMQPMessage $msg): void
 	{
 		$messageBody = $msg->body;
 		if ($this->expectSerializedResponse) {
-			$messageBody = unserialize($messageBody);
+			$messageBody = \unserialize($messageBody);
 		}
 
 		$this->replies[$msg->get('correlation_id')] = $messageBody;

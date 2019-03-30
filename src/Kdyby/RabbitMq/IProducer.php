@@ -1,28 +1,33 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
-use Kdyby;
-use Nette;
-
-
-
-/**
- * @author Filip Procházka <filip@prochazka.su>
- */
 interface IProducer
 {
 
-	function setExchangeOptions(array $options = []);
+	/**
+	 * @param array<mixed> $options
+	 */
+	public function setExchangeOptions(array $options = []): void;
 
-	function setQueueOptions(array $options = []);
+	/**
+	 * @param array<mixed> $options
+	 */
+	public function setQueueOptions(array $options = []): void;
 
-	function setRoutingKey($routingKey);
+	public function setRoutingKey(string $routingKey): void;
 
-	function setContentType($contentType);
+	public function setContentType(string $contentType): IProducer;
 
-	function setDeliveryMode($deliveryMode);
+	public function setDeliveryMode(int $deliveryMode): IProducer;
 
-	function publish($msgBody, $routingKey = '', $additionalProperties = []);
+	/**
+	 * @param string $msgBody
+	 * @param string|NULL $routingKey
+	 * @param array<mixed> $additionalProperties
+	 */
+	public function publish(string $msgBody, ?string $routingKey = '', array $additionalProperties = []): void;
 
 }

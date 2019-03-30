@@ -1,12 +1,11 @@
 <?php
 
-namespace Kdyby\RabbitMq\Exception;
+declare(strict_types = 1);
 
+namespace Kdyby\RabbitMq\Exception;
 
 /**
  * Common interface for caching github exceptions
- *
- * @author Filip Procházka <filip@prochazka.com>
  */
 interface Exception
 {

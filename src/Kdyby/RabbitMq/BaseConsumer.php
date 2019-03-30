@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
 use Nette\Utils\Callback;
 
-
-
 /**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- *
- * @method onStop(BaseConsumer $self)
+ * @method onStop(\Kdyby\RabbitMq\BaseConsumer $self)
  */
-abstract class BaseConsumer extends AmqpMember
+abstract class BaseConsumer extends \Kdyby\RabbitMq\AmqpMember
 {
 
 	/**
@@ -51,7 +48,7 @@ abstract class BaseConsumer extends AmqpMember
 	protected $qosOptions = [
 		'prefetchSize' => 0,
 		'prefetchCount' => 0,
-		'global' => FALSE
+		'global' => FALSE,
 	];
 
 	/**
@@ -59,25 +56,19 @@ abstract class BaseConsumer extends AmqpMember
 	 */
 	protected $qosDeclared = FALSE;
 
-
-
-	public function setCallback($callback)
+	public function setCallback(callable $callback): void
 	{
 		Callback::check($callback);
 		$this->callback = $callback;
 	}
 
-
-
-	public function stopConsuming()
+	public function stopConsuming(): void
 	{
 		$this->getChannel()->basic_cancel($this->getConsumerTag());
 		$this->onStop($this);
 	}
 
-
-
-	protected function setupConsumer()
+	protected function setupConsumer(): void
 	{
 		if ($this->autoSetupFabric) {
 			$this->setupFabric();
@@ -98,19 +89,17 @@ abstract class BaseConsumer extends AmqpMember
 		);
 	}
 
-
-
-	protected function maybeStopConsumer()
+	protected function maybeStopConsumer(): void
 	{
-		if (extension_loaded('pcntl') && (defined('AMQP_WITHOUT_SIGNALS') ? !AMQP_WITHOUT_SIGNALS : true)) {
-			if (!function_exists('pcntl_signal_dispatch')) {
+		if (\extension_loaded('pcntl') && (\defined('AMQP_WITHOUT_SIGNALS') ? !AMQP_WITHOUT_SIGNALS : TRUE)) {
+			if (!\function_exists('pcntl_signal_dispatch')) {
 				throw new \BadFunctionCallException("Function 'pcntl_signal_dispatch' is referenced in the php.ini 'disable_functions' and can't be called.");
 			}
 
-			pcntl_signal_dispatch();
+			\pcntl_signal_dispatch();
 		}
 
-		if ($this->forceStop || ($this->consumed == $this->target && $this->target > 0)) {
+		if ($this->forceStop || ($this->consumed === $this->target && $this->target > 0)) {
 			$this->stopConsuming();
 
 		} else {
@@ -118,28 +107,20 @@ abstract class BaseConsumer extends AmqpMember
 		}
 	}
 
-
-
-	public function setConsumerTag($tag)
+	public function setConsumerTag(string $tag): void
 	{
 		$this->consumerTag = $tag;
 	}
 
-
-
-	public function getConsumerTag()
+	public function getConsumerTag(): string
 	{
 		return $this->consumerTag;
 	}
 
-
-
-	public function forceStopConsumer()
+	public function forceStopConsumer(): void
 	{
 		$this->forceStop = TRUE;
 	}
-
-
 
 	/**
 	 * Sets the qos settings for the current channel
@@ -149,7 +130,7 @@ abstract class BaseConsumer extends AmqpMember
 	 * @param int $prefetchCount
 	 * @param bool $global
 	 */
-	public function setQosOptions($prefetchSize = 0, $prefetchCount = 0, $global = FALSE)
+	public function setQosOptions(int $prefetchSize = 0, int $prefetchCount = 0, bool $global = FALSE): void
 	{
 		$this->qosOptions = [
 			'prefetchSize' => $prefetchSize,
@@ -158,11 +139,9 @@ abstract class BaseConsumer extends AmqpMember
 		];
 	}
 
-
-
-	protected function qosDeclare()
+	protected function qosDeclare(): void
 	{
-		if (!array_filter($this->qosOptions)) {
+		if (!\array_filter($this->qosOptions)) {
 			return;
 		}
 
@@ -175,16 +154,12 @@ abstract class BaseConsumer extends AmqpMember
 		$this->qosDeclared = TRUE;
 	}
 
-
-
-	public function setIdleTimeout($seconds)
+	public function setIdleTimeout(int $seconds): void
 	{
 		$this->idleTimeout = $seconds;
 	}
 
-
-
-	public function getIdleTimeout()
+	public function getIdleTimeout(): int
 	{
 		return $this->idleTimeout;
 	}

@@ -1,47 +1,36 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
-use Kdyby\RabbitMq\Exception\InvalidArgumentException;
-use Kdyby\RabbitMq\Exception\QueueNotFoundException;
-use Kdyby\RabbitMq\Exception\TerminateException;
 use Nette\Utils\Callback;
 use PhpAmqpLib\Message\AMQPMessage;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class MultipleConsumer extends Consumer
+class MultipleConsumer extends \Kdyby\RabbitMq\Consumer
 {
-
-	/**
-	 * @var array
-	 */
-	public $onConsume = [];
 
 	/**
 	 * @var array[]|callable[][]
 	 */
 	protected $queues = [];
 
-
-
-	public function getQueueConsumerTag($queue)
+	public function getQueueConsumerTag(string $queue): string
 	{
-		return sprintf('%s-%s', $this->getConsumerTag(), $queue);
+		return \sprintf('%s-%s', $this->getConsumerTag(), $queue);
 	}
 
-
-
-	public function setQueues(array $queues)
+	/**
+	 * @param array<string, callable> $queues
+	 */
+	public function setQueues(array $queues): void
 	{
 		$this->queues = [];
 		foreach ($queues as $name => $queue) {
 			if (!isset($queue['callback'])) {
-				throw new InvalidArgumentException("The queue '$name' is missing a callback.");
+				throw new \Kdyby\RabbitMq\Exception\InvalidArgumentException(
+					\sprintf("The queue '%s' is missing a callback.", $name)
+				);
 			}
 
 			Callback::check($queue['callback']);
@@ -49,19 +38,15 @@ class MultipleConsumer extends Consumer
 		}
 	}
 
-
-
 	/**
-	 * @return \array[]|\callable[][]
+	 * @return array<mixed>
 	 */
-	public function getQueues()
+	public function getQueues(): array
 	{
 		return $this->queues;
 	}
 
-
-
-	protected function setupConsumer()
+	protected function setupConsumer(): void
 	{
 		if ($this->autoSetupFabric) {
 			$this->setupFabric();
@@ -71,45 +56,42 @@ class MultipleConsumer extends Consumer
 			$this->qosDeclare();
 		}
 
-		foreach ($this->queues as $name => $options) {
+		foreach (\array_keys($this->queues) as $name) {
 			$self = $this;
-			$this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use ($self, $name) {
+			$this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), FALSE, FALSE, FALSE, FALSE, static function (AMQPMessage $msg) use ($self, $name): void {
 				$self->processQueueMessage($name, $msg);
 			});
 		}
 	}
 
-
-
-	protected function queueDeclare()
+	protected function queueDeclare(): void
 	{
 		foreach ($this->queues as $name => $options) {
 			$this->doQueueDeclare($name, $options);
 		}
 
-		$this->queueDeclared = true;
+		$this->queueDeclared = TRUE;
 	}
 
-
-
-	public function processQueueMessage($queueName, AMQPMessage $msg)
+	public function processQueueMessage(string $queueName, AMQPMessage $msg): void
 	{
 		if (!isset($this->queues[$queueName])) {
-			throw new QueueNotFoundException();
+			throw new \Kdyby\RabbitMq\Exception\QueueNotFoundException();
 		}
 
 		$this->onConsume($this, $msg);
 		try {
-			$processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
+			$processFlag = \call_user_func($this->queues[$queueName]['callback'], $msg);
 			$this->handleProcessMessage($msg, $processFlag);
 
-		} catch (TerminateException $e) {
+		} catch (\Kdyby\RabbitMq\Exception\TerminateException $e) {
 			$this->handleProcessMessage($msg, $e->getResponse());
 			throw $e;
 
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$this->onReject($this, $msg, IConsumer::MSG_REJECT_REQUEUE);
 			throw $e;
 		}
 	}
+
 }

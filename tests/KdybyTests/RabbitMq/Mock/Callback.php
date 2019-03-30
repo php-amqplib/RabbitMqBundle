@@ -1,29 +1,39 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
 
 namespace KdybyTests\RabbitMq\Mock;
-
 
 class Callback
 {
 
+	/**
+	 * @var array<mixed>
+	 */
 	public static $accepted = [];
 
-
-	public function __invoke($message)
+	/**
+	 * @param mixed $message
+	 */
+	public function __invoke($message): void
 	{
-		self::$accepted[] = func_get_args();
+		self::$accepted[] = \func_get_args();
 	}
 
-
-	public function process($message)
+	/**
+	 * @param mixed $message
+	 */
+	public function process($message): void
 	{
-		self::$accepted[] = func_get_args();
+		self::$accepted[] = \func_get_args();
 	}
 
-
-	public static function staticProcess($message)
+	/**
+	 * @param mixed $message
+	 */
+	public static function staticProcess($message): void
 	{
-		self::$accepted[] = func_get_args();
+		self::$accepted[] = \func_get_args();
 	}
 
 }

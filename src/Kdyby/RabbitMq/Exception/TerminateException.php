@@ -1,19 +1,18 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
 
 namespace Kdyby\RabbitMq\Exception;
-
 
 class TerminateException extends \RuntimeException implements \Kdyby\RabbitMq\Exception\Exception
 {
 
+	/**
+	 * @var int
+	 */
 	private $response = \Kdyby\RabbitMq\IConsumer::MSG_REJECT_REQUEUE;
 
-
-	/**
-	 * @param int $response
-	 * @return TerminateException
-	 */
-	public static function withResponse($response)
+	public static function withResponse(int $response): \Kdyby\RabbitMq\Exception\TerminateException
 	{
 		$e = new self();
 		$e->response = $response;
@@ -21,11 +20,7 @@ class TerminateException extends \RuntimeException implements \Kdyby\RabbitMq\Ex
 		return $e;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getResponse()
+	public function getResponse(): int
 	{
 		return $this->response;
 	}

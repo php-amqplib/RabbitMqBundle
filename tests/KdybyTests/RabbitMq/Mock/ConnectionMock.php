@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
@@ -10,14 +12,10 @@
 
 namespace KdybyTests\RabbitMq\Mock;
 
-use Kdyby;
-
-
-
-class ConnectionMock extends Kdyby\RabbitMq\Connection
+class ConnectionMock extends \Kdyby\RabbitMq\Connection
 {
 
-	protected function doCreateChannel($id)
+	protected function doCreateChannel(string $id): \Kdyby\RabbitMq\Channel
 	{
 		return new ChannelMock($this, $id);
 	}

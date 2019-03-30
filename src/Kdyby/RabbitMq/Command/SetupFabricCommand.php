@@ -1,21 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq\Command;
 
-use Kdyby\RabbitMq\AmqpMember;
 use Kdyby\RabbitMq\DI\RabbitMqExtension;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class SetupFabricCommand extends Command
+class SetupFabricCommand extends \Symfony\Component\Console\Command\Command
 {
 
 	/**
@@ -24,9 +18,7 @@ class SetupFabricCommand extends Command
 	 */
 	public $container;
 
-
-
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
 			->setName('rabbitmq:setup-fabric')
@@ -34,12 +26,10 @@ class SetupFabricCommand extends Command
 			->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging');
 	}
 
-
-
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
-		if (defined('AMQP_DEBUG') === false) {
-			define('AMQP_DEBUG', (bool) $input->getOption('debug'));
+		if (\defined('AMQP_DEBUG') === FALSE) {
+			\define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 		}
 
 		$output->writeln('Setting up the Rabbit MQ fabric');
@@ -48,10 +38,10 @@ class SetupFabricCommand extends Command
 			RabbitMqExtension::TAG_PRODUCER,
 			RabbitMqExtension::TAG_CONSUMER,
 			RabbitMqExtension::TAG_RPC_CLIENT,
-			RabbitMqExtension::TAG_RPC_SERVER
+			RabbitMqExtension::TAG_RPC_SERVER,
 		] as $tag) {
-			foreach ($this->container->findByTag($tag) as $serviceId => $meta) {
-				/** @var AmqpMember $service */
+			foreach (\array_keys($this->container->findByTag($tag)) as $serviceId) {
+				/** @var \Kdyby\RabbitMq\AmqpMember $service */
 				$service = $this->container->getService($serviceId);
 				$service->setupFabric();
 			}

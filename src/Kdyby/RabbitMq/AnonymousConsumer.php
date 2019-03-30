@@ -1,15 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
-
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class AnonymousConsumer extends Consumer
+class AnonymousConsumer extends \Kdyby\RabbitMq\Consumer
 {
 
 	public function __construct(Connection $conn)
@@ -18,13 +13,13 @@ class AnonymousConsumer extends Consumer
 
 		$this->setQueueOptions([
 			'name' => '',
-			'passive' => false,
-			'durable' => false,
-			'exclusive' => true,
-			'autoDelete' => true,
-			'nowait' => false,
-			'arguments' => null,
-			'ticket' => null
+			'passive' => FALSE,
+			'durable' => FALSE,
+			'exclusive' => TRUE,
+			'autoDelete' => TRUE,
+			'nowait' => FALSE,
+			'arguments' => NULL,
+			'ticket' => NULL,
 		]);
 	}
 

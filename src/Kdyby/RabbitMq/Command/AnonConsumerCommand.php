@@ -1,22 +1,17 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq\Command;
 
 use Kdyby\RabbitMq\AnonymousConsumer;
-use Kdyby\RabbitMq\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class AnonConsumerCommand extends BaseConsumerCommand
+class AnonConsumerCommand extends \Kdyby\RabbitMq\Command\BaseConsumerCommand
 {
 
-	protected function configure()
+	protected function configure(): void
 	{
 		parent::configure();
 
@@ -27,16 +22,14 @@ class AnonConsumerCommand extends BaseConsumerCommand
 		$this->getDefinition()->getOption('route')->setDefault('#');
 	}
 
-
-
-	protected function initialize(InputInterface $input, OutputInterface $output)
+	protected function initialize(InputInterface $input, OutputInterface $output): void
 	{
 		parent::initialize($input, $output);
 
 		if (!$this->consumer instanceof AnonymousConsumer) {
-			throw new InvalidArgumentException(
+			throw new \Kdyby\RabbitMq\Exception\InvalidArgumentException(
 				'Expected instance of Kdyby\RabbitMq\AnonymousConsumer, ' .
-				'but consumer ' . $input->getArgument('name'). ' is ' . get_class($this->consumer)
+				'but consumer ' . $input->getArgument('name') . ' is ' . \get_class($this->consumer)
 			);
 		}
 	}

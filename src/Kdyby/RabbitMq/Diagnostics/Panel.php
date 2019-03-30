@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
@@ -11,24 +13,18 @@
 namespace Kdyby\RabbitMq\Diagnostics;
 
 use Kdyby\RabbitMq\Connection;
-use Nette;
 use Nette\Utils\Html;
 use Tracy\Debugger;
-use Tracy\IBarPanel;
-
-
 
 /**
- * @author Filip Procházka <filip@prochazka.su>
- *
  * @property callable $begin
  * @property callable $failure
  * @property callable $success
  */
-class Panel implements IBarPanel
+class Panel implements \Tracy\IBarPanel
 {
-	use Nette\SmartObject;
 
+	use \Nette\SmartObject;
 
 	/**
 	 * @var array
@@ -40,9 +36,11 @@ class Panel implements IBarPanel
 	 */
 	private $serviceMap = [];
 
-
-
-	public function injectServiceMap(array $consumers, array $rpcServers)
+	/**
+	 * @param array<mixed> $consumers
+	 * @param array<mixed> $rpcServers
+	 */
+	public function injectServiceMap(array $consumers, array $rpcServers): void
 	{
 		$this->serviceMap = [
 			'consumer' => $consumers,
@@ -50,49 +48,40 @@ class Panel implements IBarPanel
 		];
 	}
 
-
-
-	/**
-	 * @return string
-	 */
-	public function getTab()
+	public function getTab(): string
 	{
-		$img = Html::el('')->addHtml(file_get_contents(__DIR__ . '/rabbitmq-logo.svg'));
+		$img = Html::el('')->addHtml(\file_get_contents(__DIR__ . '/rabbitmq-logo.svg'));
 		$tab = Html::el('span')->setAttribute('title', 'RabbitMq')->addHtml($img);
 		$title = Html::el('span')->setAttribute('class', 'tracy-label');
 
 		if ($this->messages) {
-			$title->setText(count($this->messages) . ' message' . (count($this->messages) > 1 ? 's' : ''));
+			$title->setText(\count($this->messages) . ' message' . (\count($this->messages) > 1 ? 's' : ''));
 		}
 
 		return (string) $tab->addHtml($title);
 	}
 
-
-
-	/**
-	 * @return string
-	 */
-	public function getPanel()
+	public function getPanel(): string
 	{
-		$isRunning = function ($type, $name) {
-			if (strncasecmp(PHP_OS, 'WIN', 3) == 0) {
+		$isRunning = static function ($type, $name) {
+			if (\strncasecmp(PHP_OS, 'WIN', 3) === 0) {
 				return FALSE; // sry, I don't know how to do this
 			}
 
-			$command = sprintf('ps aux |grep %s |grep %s',
+			$command = \sprintf(
+				'ps aux |grep %s |grep %s',
 				($type === 'consumer' ? 'rabbitmq:consumer' : 'rabbitmq:rpc-server'),
-				escapeshellarg($name)
+				\escapeshellarg($name)
 			);
 
-			if (!@exec($command, $output)) {
+			if (!@\exec($command, $output)) {
 				return FALSE;
 			}
 
 			$instances = 0;
 			foreach ($output as $line) {
-				if (stripos($line, '|grep') === FALSE) {
-					$instances += 1;
+				if (\stripos($line, '|grep') === FALSE) {
+					$instances++;
 				}
 			}
 
@@ -102,43 +91,37 @@ class Panel implements IBarPanel
 		$workers = [];
 		$runningWorkers = $configuredWorkers = 0;
 		foreach ($this->serviceMap as $type => $services) {
-			foreach ($services as $name => $serviceId) {
+			foreach (\array_keys($services) as $name) {
 				$workers[$key = $type . '/' . $name] = $isRunning($type, $name);
+				// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 				$runningWorkers += (int) $workers[$key];
+				// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 				$configuredWorkers++;
 			}
 		}
 
-		ob_start();
-		$esc = class_exists('Nette\Templating\Helpers')
+		\ob_start();
+		// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
+		$esc = \class_exists('Nette\Templating\Helpers')
 			? ['Nette\Templating\Helpers', 'escapeHtml']
 			: ['Latte\Runtime\Filters', 'escapeHtml'];
-		$click = class_exists('\Tracy\Dumper')
-			? function ($o, $c = FALSE) { return \Tracy\Dumper::toHtml($o, ['collapse' => $c]); }
+		// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
+		$click = \class_exists('\Tracy\Dumper')
+			? static function ($o, $c = FALSE) {
+				return \Tracy\Dumper::toHtml($o, ['collapse' => $c]);
+			}
 			: ['Tracy\Helpers', 'clickableDump'];
 
 		require __DIR__ . '/panel.phtml';
-		return ob_get_clean();
+		return \ob_get_clean();
 	}
 
-
-
-	/**
-	 * @param string $message
-	 * @return object
-	 */
-	public function published($message)
+	public function published(string $message): void
 	{
 		$this->messages[] = $message;
 	}
 
-
-
-	/**
-	 * @param Connection $connection
-	 * @return Panel
-	 */
-	public function register(Connection $connection)
+	public function register(Connection $connection): Panel
 	{
 		Debugger::getBar()->addPanel($this);
 		return $this;
