@@ -59,7 +59,7 @@ rabbitmq:
 				routing_keys:
 					- 'android.#.upload'
 					- 'iphone.upload'
-			callback: KdybyTests\RabbitMq\Callback()
+			callback: KdybyTests\RabbitMq\Mock\Callback()
 
 		default_consumer:
 			exchange:
@@ -67,7 +67,7 @@ rabbitmq:
 				type: direct
 			queue:
 				name: default_queue
-			callback: [KdybyTests\RabbitMq\Callback, staticProcess]
+			callback: [KdybyTests\RabbitMq\Mock\Callback, staticProcess]
 
 		qos_test_consumer:
 			connection: foo_connection
@@ -90,7 +90,7 @@ rabbitmq:
 			queues:
 				multi-test-1:
 					name: multi_test_1
-					callback: [@KdybyTests\RabbitMq\Callback, process]
+					callback: [@KdybyTests\RabbitMq\Mock\Callback, process]
 				multi-test-2:
 					name: foo_bar_2
 					passive: true
@@ -103,7 +103,7 @@ rabbitmq:
 					routing_keys:
 						- 'android.upload'
 						- 'iphone.upload'
-					callback: KdybyTests\RabbitMq\Callback()
+					callback: KdybyTests\RabbitMq\Mock\Callback()
 
 		foo_anon_consumer:
 			connection: foo_connection
@@ -117,13 +117,13 @@ rabbitmq:
 				nowait: true
 				arguments: null
 				ticket: null
-			callback: KdybyTests\RabbitMq\Callback()
+			callback: KdybyTests\RabbitMq\Mock\Callback()
 
 		default_anon_consumer:
 			exchange:
 				name: default_anon_exchange
 				type: direct
-			callback: KdybyTests\RabbitMq\Callback()
+			callback: KdybyTests\RabbitMq\Mock\Callback()
 
 
 	rpcClients:
@@ -136,11 +136,11 @@ rabbitmq:
 	rpcServers:
 		foo_server:
 			connection: foo_connection
-			callback: KdybyTests\RabbitMq\Callback()
+			callback: KdybyTests\RabbitMq\Mock\Callback()
 
 		default_server:
-			callback: KdybyTests\RabbitMq\Callback()
+			callback: KdybyTests\RabbitMq\Mock\Callback()
 
 
 services:
-	collecting_callback: KdybyTests\RabbitMq\Callback
+	collecting_callback: KdybyTests\RabbitMq\Mock\Callback

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -8,12 +10,13 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
 {
+
 	/**
 	 * Check if the message is requeued or not correctly.
 	 *
 	 * @dataProvider processMessageProvider
 	 */
-	public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = null)
+	public function testProcessMessage($processFlag, $expectedMethod, $expectedRequeue = NULL): void
 	{
 		$amqpConnection = $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
 			->disableOriginalConstructor()
@@ -24,11 +27,11 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
 			->getMock();
 
 		$consumer = new MultipleConsumer($amqpConnection, $amqpChannel);
-		$callback = function($msg) use (&$lastQueue, $processFlag) {
+		$callback = static function ($msg) use ($processFlag) {
 			return $processFlag;
 		};
 
-		$consumer->setQueues(['test-1' => ['callback' => $callback], 'test-2'  => ['callback' => $callback]]);
+		$consumer->setQueues(['test-1' => ['callback' => $callback], 'test-2' => ['callback' => $callback]]);
 
 		// Create a default message
 		$amqpMessage = new AMQPMessage('foo body');
@@ -36,14 +39,14 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
 		$amqpMessage->delivery_info['delivery_tag'] = 0;
 		$amqpChannel->expects($this->any())
 			->method('basic_reject')
-			->will($this->returnCallback(function($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
+			->will($this->returnCallback(static function ($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue): void {
 				\PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
 				\PHPUnit_Framework_Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
 			}));
 
 		$amqpChannel->expects($this->any())
 			->method('basic_ack')
-			->will($this->returnCallback(function($delivery_tag) use ($expectedMethod) {
+			->will($this->returnCallback(static function ($delivery_tag) use ($expectedMethod): void {
 				\PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
 			}));
 
@@ -54,12 +57,13 @@ class MultipleConsumerTest extends \PHPUnit_Framework_TestCase
 	public function processMessageProvider()
 	{
 		return [
-			[null, 'basic_ack'], // Remove message from queue only if callback return not false
-			[true, 'basic_ack'], // Remove message from queue only if callback return not false
-			[false, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+			[NULL, 'basic_ack'], // Remove message from queue only if callback return not false
+			[TRUE, 'basic_ack'], // Remove message from queue only if callback return not false
+			[FALSE, 'basic_reject', TRUE], // Reject and requeue message to RabbitMQ
 			[ConsumerInterface::MSG_ACK, 'basic_ack'], // Remove message from queue only if callback return not false
-			[ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true], // Reject and requeue message to RabbitMQ
-			[ConsumerInterface::MSG_REJECT, 'basic_reject', false], // Reject and drop
+			[ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', TRUE], // Reject and requeue message to RabbitMQ
+			[ConsumerInterface::MSG_REJECT, 'basic_reject', FALSE], // Reject and drop
 		];
 	}
+
 }

@@ -126,7 +126,7 @@ class Connection extends \PhpAmqpLib\Connection\AMQPLazyConnection implements \K
 		$this->connect();
 		$id = $id ?: $this->get_free_channel_id();
 
-		return $this->channels[$id] = $this->doCreateChannel($id);
+		return $this->channels[$id] = $this->doCreateChannel((string) $id);
 	}
 
 	protected function doCreateChannel(string $id): Channel
