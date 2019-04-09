@@ -18,7 +18,7 @@ services:
 env:
   matrix:
     - RUN_TESTS=1 # dev
-    - RUN_TESTS=1 COMPOSER_EXTRA_ARGS="" # after nette/di release add --prefer-stable
+    - RUN_TESTS=1 COMPOSER_EXTRA_ARGS="--prefer-stable"
     - RUN_TESTS=1 COMPOSER_EXTRA_ARGS="--prefer-lowest --prefer-stable"
 
 matrix:

@@ -32,7 +32,7 @@
 		"kdyby/coding-standard": "dev-master",
 		"php-coveralls/php-coveralls": "^2.1",
 		"nette/tester": "~2.2",
-		"mockery/mockery": "~0.9.1",
+		"mockery/mockery": "~0.9.11",
 		"jakub-onderka/php-parallel-lint": "^1.0",
 		"typo3/class-alias-loader": "^1.0",
 		"nette/caching": "^3.0"
@@ -51,6 +51,13 @@
 			"KdybyTests\\RabbitMq\\": "tests/KdybyTests/RabbitMq"
 		}
 	},
+	"minimum-stability": "dev",
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/VBoss/Console.git"
+		}
+	],
 	"extra": {
 		"branch-alias": {
 			"dev-master": "1.0-dev"
