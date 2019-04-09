@@ -34,7 +34,7 @@ matrix:
     - php: 7.3
       env: COMPOSER_EXTRA_ARGS=""
   allow_failures:
-    - env:
+    - env: RUN_TESTS=1
 
 before_install:
   - travis_retry composer self-update
@@ -44,7 +44,7 @@ install:
 
 script:
   - if [ "$PHPSTAN" = "1" ]; then vendor/bin/phpstan analyse -l 2 -c phpstan.neon src tests/KdybyTests; fi
-  - if [ "$CODING_STANDARD" = "1" ]; then php vendor/bin/phpcs --standard=vendor/kdyby/coding-standard/ruleset.xml --cache=$HOME/phpcs-cache/.phpcs-cache --encoding=utf-8 -sp src tests/KdybyTests; fi
+  - if [ "$CODING_STANDARD" = "1" ]; then php vendor/bin/phpcs --standard=ruleset.xml --cache=$HOME/phpcs-cache/.phpcs-cache --encoding=utf-8 -sp src tests/KdybyTests; fi
   - if [ "$CODING_STANDARD" = "1" ]; then vendor/bin/parallel-lint -e php,phpt --exclude vendor .; fi
   - if [ "$RUN_TESTS" = "1" ]; then vendor/bin/tester $COVERAGE -s -p ${TESTER_RUNTIME:-php} -c ./tests/php.ini-unix ./tests/KdybyTests/; fi
 
