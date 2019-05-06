@@ -140,6 +140,20 @@ class AMQPConnectionFactory
         if (isset($url['query'])) {
             $query = array();
             parse_str($url['query'], $query);
+            foreach ($query as $key => $param){
+                if (isset($query['connection_timeout'])) {
+                    $query['connection_timeout'] = (int)$query['connection_timeout'];
+                }
+                if (isset($query['read_write_timeout'])) {
+                    $query['read_write_timeout'] = (int)$query['read_write_timeout'];
+                }
+                if (isset($query['keepalive'])) {
+                    $query['keepalive'] = (bool)$query['keepalive'];
+                }
+                if (isset($query['heartbeat'])) {
+                    $query['heartbeat'] = (int)$query['heartbeat'];
+                }
+            }
             $parameters = array_merge($parameters, $query);
         }
 
