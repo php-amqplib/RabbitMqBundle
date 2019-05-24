@@ -24,6 +24,7 @@ class AMQPConnectionFactory
         'ssl_context'        => null,
         'keepalive'          => false,
         'heartbeat'          => 0,
+        'hosts'              => null,
     );
 
     /**
@@ -65,40 +66,34 @@ class AMQPConnectionFactory
             return $ref->newInstanceArgs($this->parameters['constructor_args']);
         }
 
-        if ($this->class == 'PhpAmqpLib\Connection\AMQPSocketConnection' || is_subclass_of($this->class , 'PhpAmqpLib\Connection\AMQPSocketConnection')) {
-            return new $this->class(
-                $this->parameters['host'],
-                $this->parameters['port'],
-                $this->parameters['user'],
-                $this->parameters['password'],
-                $this->parameters['vhost'],
-                false,      // insist
-                'AMQPLAIN', // login_method
-                null,       // login_response
-                'en_US',    // locale
-                isset($this->parameters['read_timeout']) ? $this->parameters['read_timeout'] : $this->parameters['read_write_timeout'],
-                $this->parameters['keepalive'],
-                isset($this->parameters['write_timeout']) ? $this->parameters['write_timeout'] : $this->parameters['read_write_timeout'],
-                $this->parameters['heartbeat']
-            );
-        } else {
-            return new $this->class(
-                $this->parameters['host'],
-                $this->parameters['port'],
-                $this->parameters['user'],
-                $this->parameters['password'],
-                $this->parameters['vhost'],
-                false,      // insist
-                'AMQPLAIN', // login_method
-                null,       // login_response
-                'en_US',    // locale
-                $this->parameters['connection_timeout'],
-                $this->parameters['read_write_timeout'],
-                $this->parameters['ssl_context'],
-                $this->parameters['keepalive'],
-                $this->parameters['heartbeat']
+        $readWriteTimeout = $this->getParameter('read_write_timeout');
+        if (!$readWriteTimeout) {
+            $readWriteTimeout = $this->getParameter(
+                'read_timeout',
+                $this->getParameter('write_timeout')
             );
         }
+        $options = array(
+            'ssl_options' => $this->parameters['ssl_context'],
+            'keepalive' => $this->parameters['keepalive'],
+            'read_timeout' => isset($this->parameters['read_timeout']) ? $this->parameters['read_timeout'] : $this->parameters['read_write_timeout'],
+            'write_timeout' => isset($this->parameters['write_timeout']) ? $this->parameters['write_timeout'] : $this->parameters['read_write_timeout'],
+            'read_write_timeout' => $readWriteTimeout,
+            'heartbeat' => $this->parameters['heartbeat'],
+        );
+        $hosts = isset($this->parameters['hosts']) ? $this->parameters['hosts'] : null;
+        if (!$hosts) {
+            $hosts = array(
+                array(
+                    'host' => $this->parameters['host'],
+                    'port' => $this->parameters['port'],
+                    'user' => $this->parameters['user'],
+                    'password' => $this->parameters['password'],
+                    'vhost' => $this->parameters['vhost'],
+                )
+            );
+        }
+        return call_user_func(array($this->class, 'create_connection'), $hosts, $options);
     }
 
     /**
@@ -146,5 +141,16 @@ class AMQPConnectionFactory
         unset($parameters['url']);
 
         return $parameters;
+    }
+
+    /**
+     * Try to get value from parameters.
+     * @param $name
+     * @param null $default
+     * @return mixed|null
+     */
+    private function getParameter($name, $default = null)
+    {
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : $default;
     }
 }

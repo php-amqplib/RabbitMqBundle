@@ -83,6 +83,18 @@ class Configuration implements ConfigurationInterface
                             ->booleanNode('keepalive')->defaultFalse()->info('requires php-amqplib v2.4.1+ and PHP5.4+')->end()
                             ->scalarNode('heartbeat')->defaultValue(0)->info('requires php-amqplib v2.4.1+')->end()
                             ->scalarNode('connection_parameters_provider')->end()
+                            ->arrayNode('hosts')
+                                ->canBeUnset()
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('host')->defaultValue('localhost')->end()
+                                        ->scalarNode('port')->defaultValue(5672)->end()
+                                        ->scalarNode('user')->defaultValue('guest')->end()
+                                        ->scalarNode('password')->defaultValue('guest')->end()
+                                        ->scalarNode('vhost')->defaultValue('/')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -216,7 +228,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
     }
-    
+
     protected function addDynamicConsumers(ArrayNodeDefinition $node)
     {
         $node

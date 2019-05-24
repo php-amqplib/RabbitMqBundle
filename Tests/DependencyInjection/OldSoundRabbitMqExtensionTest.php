@@ -36,6 +36,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => array(),
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -65,6 +66,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => array(),
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -92,6 +94,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => array(),
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -119,6 +122,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => array(),
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -860,6 +864,42 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $this->assertTrue(
             $definition->hasTag('monolog.logger'), 'service should be marked for logger'
         );
+    }
+
+    public function testClusterConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.cluster'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.connection.cluster');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.cluster'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.cluster');
+        $this->assertEquals(array('old_sound_rabbit_mq.connection_factory.cluster', 'createConnection'), $definition->getFactory());
+        $this->assertEquals(array(
+            'host' => 'localhost',
+            'port' => 5672,
+            'user' => 'guest',
+            'password' => 'guest',
+            'vhost' => '/',
+            'lazy' => false,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(),
+            'keepalive' => false,
+            'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
+            'hosts' => array(
+                array(
+                    'host' => 'foo_host',
+                    'port' => 123,
+                    'user' => 'foo_user',
+                    'password' => 'foo_password',
+                    'vhost' => '/foo',
+                )
+            ),
+        ), $factory->getArgument(1));
+        $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
     private function getContainer($file, $debug = false)

@@ -45,6 +45,15 @@ old_sound_rabbit_mq:
             lazy:       true
             use_socket: true
 
+        cluster:
+            hosts:
+                -
+                    host: foo_host
+                    port:     123
+                    user:     foo_user
+                    password: foo_password
+                    vhost:    /foo
+
         default:
 
     producers:
@@ -155,7 +164,7 @@ old_sound_rabbit_mq:
                       - 'iphone.upload'
                     callback:        foo.multiple_test2.callback
             queues_provider: foo.queues_provider
-            
+
     dynamic_consumers:
         foo_dyn_consumer:
             connection: foo_default

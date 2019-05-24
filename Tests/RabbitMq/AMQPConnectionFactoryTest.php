@@ -27,9 +27,9 @@ class AMQPConnectionFactoryTest extends TestCase
             'guest',     // password
             '/',         // vhost
             false,       // insist
-            "AMQPLAIN",  // login method
+            'AMQPLAIN',  // login method
             null,        // login response
-            "en_US",     // locale
+            'en_US',     // locale
             3,           // connection timeout
             3,           // read write timeout
             null,        // context
@@ -274,10 +274,8 @@ class AMQPConnectionFactoryTest extends TestCase
         $connectionParametersProvider = $this->prepareConnectionParametersProvider();
         $connectionParametersProvider->expects($this->once())
             ->method('getConnectionParameters')
-            ->will($this->returnValue(
-                array(
-                    'constructor_args' => array(1,2,3,4)
-                )
+            ->willReturn(array(
+                'constructor_args' => array(1, 2, 3, 4)
             ));
         $factory = new AMQPConnectionFactory(
             'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
@@ -296,14 +294,12 @@ class AMQPConnectionFactoryTest extends TestCase
         $connectionParametersProvider = $this->prepareConnectionParametersProvider();
         $connectionParametersProvider->expects($this->once())
             ->method('getConnectionParameters')
-            ->will($this->returnValue(
-                array(
-                    'host' => '1.2.3.4',
-                    'port' => 5678,
-                    'user' => 'admin',
-                    'password' => 'admin',
-                    'vhost' => 'foo',
-                )
+            ->willReturn(array(
+                'host' => '1.2.3.4',
+                'port' => 5678,
+                'user' => 'admin',
+                'password' => 'admin',
+                'vhost' => 'foo',
             ));
         $factory = new AMQPConnectionFactory(
             'OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection',
