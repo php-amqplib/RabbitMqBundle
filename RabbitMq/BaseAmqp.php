@@ -25,6 +25,10 @@ abstract class BaseAmqp
      */
     protected $logger;
 
+    protected $consumerOptions = array(
+        'auto_ack' => false,
+    );
+
     protected $exchangeOptions = array(
         'passive' => false,
         'durable' => true,
@@ -152,6 +156,15 @@ abstract class BaseAmqp
     public function setQueueOptions(array $options = array())
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
+    }
+
+    /**
+     * @param  array $options
+     * @return void
+     */
+    public function setConsumerOptions(array $options = array())
+    {
+        $this->consumerOptions = array_merge($this->consumerOptions, $options);
     }
 
     /**

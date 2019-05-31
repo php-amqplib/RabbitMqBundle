@@ -334,7 +334,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             $this->setupFabric();
         }
 
-        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, $this->consumerOptions['auto_ack'], false, false, array($this, 'processMessage'));
     }
 
     /**
