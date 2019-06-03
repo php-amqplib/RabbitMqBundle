@@ -226,8 +226,11 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
-            if (!$consumer['options']) {
-                $definition->addMethodCall('setConsumerOptions', array($this->normalizeArgumentKeys($consumer['options'])));
+            if (array_key_exists('options', $consumer)) {
+                $definition->addMethodCall('setConsumerOptions', array(
+                    $this->normalizeArgumentKeys($consumer['options']
+                    )
+                ));
             }
 
             $this->injectConnection($definition, $consumer['connection']);
