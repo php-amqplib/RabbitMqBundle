@@ -116,7 +116,7 @@ class Panel implements \Tracy\IBarPanel
 		return \ob_get_clean();
 	}
 
-	public function published(string $message): void
+	public function published(array $message): void
 	{
 		$this->messages[] = $message;
 	}

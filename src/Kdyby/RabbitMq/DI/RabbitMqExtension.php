@@ -206,7 +206,7 @@ class RabbitMqExtension extends \Nette\DI\CompilerExtension
 						$meta['consumers'],
 						$meta['rpcServers'],
 					])
-					->setInject(FALSE)
+					->addTag(\Nette\DI\Extensions\InjectExtension::TAG_INJECT, FALSE)
 					->setAutowired(FALSE);
 
 				$connection->addSetup('injectPanel', ['@' . $panelService]);
