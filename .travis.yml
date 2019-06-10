@@ -12,8 +12,10 @@ php:
   - 7.2
   - 7.3
 
-services:
-  - rabbitmq
+addons:
+  apt:
+    packages:
+      - rabbitmq-server
 
 env:
   matrix:
