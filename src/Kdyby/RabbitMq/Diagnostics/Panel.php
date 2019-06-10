@@ -116,6 +116,9 @@ class Panel implements \Tracy\IBarPanel
 		return \ob_get_clean();
 	}
 
+	/**
+	 * @param array<mixed> $message
+	 */
 	public function published(array $message): void
 	{
 		$this->messages[] = $message;
