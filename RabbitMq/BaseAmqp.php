@@ -269,8 +269,9 @@ abstract class BaseAmqp
     {
         if ($this->getEventDispatcher()) {
             $this->getEventDispatcher()->dispatch(
+                $event,
                 $eventName,
-                $event
+                
             );
         }
     }
