@@ -8,6 +8,7 @@ use PhpAmqpLib\Connection\AbstractConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 
 abstract class BaseAmqp
 {
@@ -256,7 +257,9 @@ abstract class BaseAmqp
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = class_exists('Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy') ?
+            LegacyEventDispatcherProxy::decorate($eventDispatcher) :
+            $eventDispatcher;
 
         return $this;
     }
