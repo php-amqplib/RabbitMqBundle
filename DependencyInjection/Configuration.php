@@ -76,6 +76,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('read_write_timeout')->defaultValue(3)->end()
                             ->booleanNode('use_socket')->defaultValue(false)->end()
                             ->arrayNode('ssl_context')
+                                ->performNoDeepMerging()
                                 ->useAttributeAsKey('key')
                                 ->canBeUnset()
                                 ->prototype('variable')->end()
