@@ -1,3 +1,7 @@
+- 2019-08-01
+    * Replaced Symfony\Component\EventDispatcher\Event with Symfony\Contracts\EventDispatcher\Event
+        for compatibility with Symfony >=4.3
+
 - 2017-01-22
     * Add `graceful_max_execution_timeout`
 

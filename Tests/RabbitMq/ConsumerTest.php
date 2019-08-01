@@ -77,8 +77,8 @@ class ConsumerTest extends TestCase
         $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->withConsecutive(
-                array(BeforeProcessingMessageEvent::NAME, new BeforeProcessingMessageEvent($consumer, $amqpMessage)),
-                array(AfterProcessingMessageEvent::NAME, new AfterProcessingMessageEvent($consumer, $amqpMessage))
+                array(new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME),
+                array(new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME)
             )
             ->willReturn(true);
         $consumer->processMessage($amqpMessage);
@@ -174,7 +174,7 @@ class ConsumerTest extends TestCase
 
         $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
             ->method('dispatch')
-            ->with(OnConsumeEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'))
+            ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'), OnConsumeEvent::NAME)
             ->willReturn(true);
 
         $consumer->setEventDispatcher($eventDispatcher);
@@ -247,14 +247,14 @@ class ConsumerTest extends TestCase
 
         $eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-            ->willReturnCallback(function($eventName, OnIdleEvent $event) {
+            ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
+            ->willReturnCallback(function(OnIdleEvent $event, $eventName) {
                 $event->setForceStop(false);
             });
         $eventDispatcher->expects($this->at(3))
             ->method('dispatch')
-            ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-            ->willReturn(function($eventName, OnIdleEvent $event) {
+            ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
+            ->willReturn(function(OnIdleEvent $event, $eventName) {
                 $event->setForceStop(true);
         });
 
