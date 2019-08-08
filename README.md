@@ -515,6 +515,8 @@ Keep in mind that your callbacks _need to be registered_ as normal Symfony servi
 
 See [https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
 
+To stop the consumer, callback can throw ```StopConsumerException``` (the last consumed message _will not_ be ack) or ```AckStopConsumerException``` (the message _will_ be ack). If using demonized, ex: supervisor, the consumer will actually restart.
+
 ### Recap ###
 
 This seems to be quite a lot of work for just sending messages, let's recap to have a better overview. This is what we need to produce/consume messages:
