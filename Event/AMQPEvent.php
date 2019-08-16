@@ -4,68 +4,135 @@ namespace OldSound\RabbitMqBundle\Event;
 
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event as ContactsEvent;
+use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class AMQPEvent
- *
- * @package OldSound\RabbitMqBundle\Event
- * @codeCoverageIgnore
- */
-class AMQPEvent extends Event
-{
-    const ON_CONSUME                = 'on_consume';
-    const ON_IDLE                   = 'on_idle';
-    const BEFORE_PROCESSING_MESSAGE = 'before_processing';
-    const AFTER_PROCESSING_MESSAGE  = 'after_processing';
-
+if (class_exists('Symfony\Contracts\EventDispatcher\Event')) {
     /**
-     * @var AMQPMessage
-     */
-    protected $AMQPMessage;
-
-    /**
-     * @var Consumer
-     */
-    protected $consumer;
-
-    /**
-     * @return AMQPMessage
-     */
-    public function getAMQPMessage()
-    {
-        return $this->AMQPMessage;
-    }
-
-    /**
-     * @param AMQPMessage $AMQPMessage
+     * Class AMQPEvent
      *
-     * @return AMQPEvent
+     * @package OldSound\RabbitMqBundle\Event
+     * @codeCoverageIgnore
      */
-    public function setAMQPMessage(AMQPMessage $AMQPMessage)
+    class AMQPEvent extends ContactsEvent
     {
-        $this->AMQPMessage = $AMQPMessage;
+        const ON_CONSUME = 'on_consume';
+        const ON_IDLE = 'on_idle';
+        const BEFORE_PROCESSING_MESSAGE = 'before_processing';
+        const AFTER_PROCESSING_MESSAGE = 'after_processing';
 
-        return $this;
+        /**
+         * @var AMQPMessage
+         */
+        protected $AMQPMessage;
+
+        /**
+         * @var Consumer
+         */
+        protected $consumer;
+
+        /**
+         * @return AMQPMessage
+         */
+        public function getAMQPMessage()
+        {
+            return $this->AMQPMessage;
+        }
+
+        /**
+         * @param AMQPMessage $AMQPMessage
+         *
+         * @return AMQPEvent
+         */
+        public function setAMQPMessage(AMQPMessage $AMQPMessage)
+        {
+            $this->AMQPMessage = $AMQPMessage;
+
+            return $this;
+        }
+
+        /**
+         * @return Consumer
+         */
+        public function getConsumer()
+        {
+            return $this->consumer;
+        }
+
+        /**
+         * @param Consumer $consumer
+         *
+         * @return AMQPEvent
+         */
+        public function setConsumer(Consumer $consumer)
+        {
+            $this->consumer = $consumer;
+
+            return $this;
+        }
     }
-
+} else {
     /**
-     * @return Consumer
-     */
-    public function getConsumer()
-    {
-        return $this->consumer;
-    }
-
-    /**
-     * @param Consumer $consumer
+     * Class AMQPEvent
      *
-     * @return AMQPEvent
+     * @package OldSound\RabbitMqBundle\Event
+     * @codeCoverageIgnore
      */
-    public function setConsumer(Consumer $consumer)
+    class AMQPEvent extends Event
     {
-        $this->consumer = $consumer;
+        const ON_CONSUME = 'on_consume';
+        const ON_IDLE = 'on_idle';
+        const BEFORE_PROCESSING_MESSAGE = 'before_processing';
+        const AFTER_PROCESSING_MESSAGE = 'after_processing';
 
-        return $this;
+        /**
+         * @var AMQPMessage
+         */
+        protected $AMQPMessage;
+
+        /**
+         * @var Consumer
+         */
+        protected $consumer;
+
+        /**
+         * @return AMQPMessage
+         */
+        public function getAMQPMessage()
+        {
+            return $this->AMQPMessage;
+        }
+
+        /**
+         * @param AMQPMessage $AMQPMessage
+         *
+         * @return AMQPEvent
+         */
+        public function setAMQPMessage(AMQPMessage $AMQPMessage)
+        {
+            $this->AMQPMessage = $AMQPMessage;
+
+            return $this;
+        }
+
+        /**
+         * @return Consumer
+         */
+        public function getConsumer()
+        {
+            return $this->consumer;
+        }
+
+        /**
+         * @param Consumer $consumer
+         *
+         * @return AMQPEvent
+         */
+        public function setConsumer(Consumer $consumer)
+        {
+            $this->consumer = $consumer;
+
+            return $this;
+        }
     }
 }
