@@ -261,6 +261,10 @@ If you need to use a custom class for a producer (which should inherit from `Old
     ...
 ```
 
+#### Producer Events ####
+
+TODO
+
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 

@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Event;
 
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use OldSound\RabbitMqBundle\RabbitMq\Producer;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -18,6 +19,8 @@ class AMQPEvent extends Event
     const ON_IDLE                   = 'on_idle';
     const BEFORE_PROCESSING_MESSAGE = 'before_processing';
     const AFTER_PROCESSING_MESSAGE  = 'after_processing';
+    const BEFORE_PUBLISHING_MESSAGE = 'before_publishing';
+    const AFTER_PUBLISHING_MESSAGE  = 'after_publishing';
 
     /**
      * @var AMQPMessage
@@ -28,6 +31,11 @@ class AMQPEvent extends Event
      * @var Consumer
      */
     protected $consumer;
+
+    /**
+     * @var Producer
+     */
+    protected $producer;
 
     /**
      * @return AMQPMessage
@@ -65,6 +73,26 @@ class AMQPEvent extends Event
     public function setConsumer(Consumer $consumer)
     {
         $this->consumer = $consumer;
+
+        return $this;
+    }
+
+    /**
+     * @return Producer
+     */
+    public function getProducer()
+    {
+        return $this->producer;
+    }
+
+    /**
+     * @param Producer $producer
+     *
+     * @return AMQPEvent
+     */
+    public function setProducer(Producer $producer)
+    {
+        $this->producer = $producer;
 
         return $this;
     }
