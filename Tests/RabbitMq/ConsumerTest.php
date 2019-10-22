@@ -70,8 +70,13 @@ class ConsumerTest extends TestCase
             $amqpChannel->expects($this->never())->method('basic_ack');
             $amqpChannel->expects($this->never())->method('basic_nack');
         }
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->getMock();
+
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+            $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
+        } else {
+            $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+        }
+        $eventDispatcher = $this->getMockBuilder($eventDispatcherClassName)->getMock();
         $consumer->setEventDispatcher($eventDispatcher);
 
         if ($eventDispatcher instanceof ContactsEventDispatcherInterface) {
@@ -178,7 +183,12 @@ class ConsumerTest extends TestCase
             );
 
         // set up event dispatcher
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+            $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
+        } else {
+            $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+        }
+        $eventDispatcher = $this->getMockBuilder($eventDispatcherClassName)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -258,7 +268,12 @@ class ConsumerTest extends TestCase
             ->willThrowException(new AMQPTimeoutException());
 
         // set up event dispatcher
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+            $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
+        } else {
+            $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+        }
+        $eventDispatcher = $this->getMockBuilder($eventDispatcherClassName)
             ->disableOriginalConstructor()
             ->getMock();
 
