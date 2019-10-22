@@ -6,6 +6,7 @@ use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 class BaseAmqpTest extends TestCase
 {
@@ -55,10 +56,17 @@ class BaseAmqpTest extends TestCase
             ->method('getEventDispatcher')
             ->willReturn($eventDispatcher);
 
-        $eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(AMQPEvent::ON_CONSUME, new AMQPEvent())
-            ->willReturn(true);
+        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
+            $eventDispatcher->expects($this->once())
+                ->method('dispatch')
+                ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
+                ->willReturn(true);
+        } else {
+            $eventDispatcher->expects($this->once())
+                ->method('dispatch')
+                ->with(AMQPEvent::ON_CONSUME, new AMQPEvent())
+                ->willReturn(true);
+        }
         $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
     }
 
