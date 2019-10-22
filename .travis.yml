@@ -19,10 +19,14 @@ matrix:
   include:
     - dist: precise
       php: 5.3
-      env: SYMFONY_VERSION=2.7.*
+      env:
+        - SYMFONY_VERSION=2.7.*
+        - INCREASE_MEMORY=yes
     - dist: precise
       php: 5.3
-      env: SYMFONY_VERSION=2.8.*
+      env:
+        - SYMFONY_VERSION=2.8.*
+        - INCREASE_MEMORY=yes
 
     - php: 5.6
       env: COMPOSER_FLAGS="--prefer-lowest --prefer-stable"
@@ -33,6 +37,8 @@ matrix:
       env: SYMFONY_VERSION=2.8.*
     - php: 7.0
       env: SYMFONY_VERSION=3.0.*
+    - php: 7.1
+      env: SYMFONY_VERSION=4.3.*
     - php: 7.1
       env: DEPENDENCIES=beta
     - php: 7.2
@@ -47,6 +53,7 @@ env:
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available";
+  - if [ "$INCREASE_MEMORY" = "yes" ]; then echo "memory_limit = 2048M" > travis.php.ini && phpenv config-add travis.php.ini; fi;
   - if [ "$DEPENDENCIES" = "beta" ]; then perl -pi -e 's/^}$/,"minimum-stability":"beta"}/' composer.json; fi;
   - if [ "$SYMFONY_VERSION" != "" ]; then composer require --no-update symfony/framework-bundle "$SYMFONY_VERSION"; fi
   - if [ "$COMPOSER_FLAGS" != "" ]; then composer update --prefer-dist --no-interaction --no-scripts $COMPOSER_FLAGS; fi;
