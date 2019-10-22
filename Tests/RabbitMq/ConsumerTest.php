@@ -76,10 +76,12 @@ class ConsumerTest extends TestCase
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
         }
+        echo '$eventDispatcherClassName = ' . $eventDispatcherClassName;
         $eventDispatcher = $this->getMockBuilder($eventDispatcherClassName)->getMock();
         $consumer->setEventDispatcher($eventDispatcher);
 
         if ($eventDispatcher instanceof ContactsEventDispatcherInterface) {
+            echo '*** NEW DispatcherInterface';
             $eventDispatcher->expects($this->atLeastOnce())
                 ->method('dispatch')
                 ->withConsecutive(
@@ -88,6 +90,7 @@ class ConsumerTest extends TestCase
                 )
                 ->willReturn(true);
         } else {
+            echo '*** OLD DispatcherInterface';
             $eventDispatcher->expects($this->atLeastOnce())
                 ->method('dispatch')
                 ->withConsecutive(
