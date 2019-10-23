@@ -71,7 +71,7 @@ class ConsumerTest extends TestCase
             $amqpChannel->expects($this->never())->method('basic_nack');
         }
 
-        if (interface_exists(PsrEventDispatcherInterface::class)) {
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
@@ -182,7 +182,7 @@ class ConsumerTest extends TestCase
             );
 
         // set up event dispatcher
-        if (interface_exists(PsrEventDispatcherInterface::class)) {
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
@@ -267,7 +267,7 @@ class ConsumerTest extends TestCase
             ->willThrowException(new AMQPTimeoutException());
 
         // set up event dispatcher
-        if (interface_exists(PsrEventDispatcherInterface::class)) {
+        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
