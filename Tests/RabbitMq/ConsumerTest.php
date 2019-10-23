@@ -71,17 +71,14 @@ class ConsumerTest extends TestCase
             $amqpChannel->expects($this->never())->method('basic_nack');
         }
 
-        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+        if (interface_exists(PsrEventDispatcherInterface::class)) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
         }
-        echo '$eventDispatcherClassName = ' . $eventDispatcherClassName;
         $eventDispatcher = $this->getMockBuilder($eventDispatcherClassName)->getMock();
         $consumer->setEventDispatcher($eventDispatcher);
-
         if ($eventDispatcher instanceof ContactsEventDispatcherInterface) {
-            echo '*** NEW DispatcherInterface';
             $eventDispatcher->expects($this->atLeastOnce())
                 ->method('dispatch')
                 ->withConsecutive(
@@ -90,7 +87,6 @@ class ConsumerTest extends TestCase
                 )
                 ->willReturn(true);
         } else {
-            echo '*** OLD DispatcherInterface';
             $eventDispatcher->expects($this->atLeastOnce())
                 ->method('dispatch')
                 ->withConsecutive(
@@ -186,7 +182,7 @@ class ConsumerTest extends TestCase
             );
 
         // set up event dispatcher
-        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+        if (interface_exists(PsrEventDispatcherInterface::class)) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
@@ -271,7 +267,7 @@ class ConsumerTest extends TestCase
             ->willThrowException(new AMQPTimeoutException());
 
         // set up event dispatcher
-        if (interface_exists('Psr\EventDispatcher\EventDispatcherInterface')) {
+        if (interface_exists(PsrEventDispatcherInterface::class)) {
             $eventDispatcherClassName = 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface';
         } else {
             $eventDispatcherClassName = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
