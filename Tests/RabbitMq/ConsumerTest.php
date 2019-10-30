@@ -196,12 +196,12 @@ class ConsumerTest extends TestCase
         }
 
         if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
-            $eventDispatcher->expects($this->exactly(count($consumerCallBacks))
+            $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
                 ->method('dispatch')
                 ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'), OnConsumeEvent::NAME)
                 ->willReturn(true);
         } else {
-            $eventDispatcher->expects($this->exactly(count($consumerCallBacks))
+            $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
                 ->method('dispatch')
                 ->with(OnConsumeEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'))
                 ->willReturn(true);
