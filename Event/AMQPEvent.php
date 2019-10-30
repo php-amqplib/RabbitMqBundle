@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\Event;
  * @package OldSound\RabbitMqBundle\Event
  * @codeCoverageIgnore
  */
-class AMQPEvent extends Event
+class AMQPEvent extends AbstractAMQPEvent
 {
     const ON_CONSUME                = 'on_consume';
     const ON_IDLE                   = 'on_idle';
