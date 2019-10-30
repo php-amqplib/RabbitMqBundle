@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
@@ -48,17 +49,29 @@ class BaseAmqpTest extends TestCase
         $baseAmqpConsumer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\BaseAmqp')
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        if (is_subclass_of('AMQPEvent', 'ContractsBaseEvent')) {
+            $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
+                ->disableOriginalConstructor()
+                ->getMock();
+        } else {
+            $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+                ->disableOriginalConstructor()
+                ->getMock();
+        }
         $baseAmqpConsumer->expects($this->atLeastOnce())
             ->method('getEventDispatcher')
             ->willReturn($eventDispatcher);
-
-        $eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
-            ->willReturn(true);
+        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
+            $eventDispatcher->expects($this->once())
+                ->method('dispatch')
+                ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
+                ->willReturn(true);
+        } else {
+            $eventDispatcher->expects($this->once())
+                ->method('dispatch')
+                ->with(AMQPEvent::ON_CONSUME, new AMQPEvent())
+                ->willReturn(true);
+        }
         $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
     }
 
