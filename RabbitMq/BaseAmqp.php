@@ -8,6 +8,7 @@ use PhpAmqpLib\Connection\AbstractConnection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 abstract class BaseAmqp
 {
@@ -268,10 +269,17 @@ abstract class BaseAmqp
     protected function dispatchEvent($eventName, AMQPEvent $event)
     {
         if ($this->getEventDispatcher()) {
-            $this->getEventDispatcher()->dispatch(
-                $eventName,
-                $event
-            );
+            if ($this->getEventDispatcher() instanceof ContractsEventDispatcherInterface) {
+                $this->getEventDispatcher()->dispatch(
+                    $event,
+                    $eventName
+                );
+            } else {
+                $this->getEventDispatcher()->dispatch(
+                    $eventName,
+                    $event
+                );
+            }
         }
     }
 
