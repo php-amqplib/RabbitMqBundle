@@ -67,7 +67,7 @@ abstract class BaseConsumerCommand extends \Symfony\Component\Console\Command\Co
 			\define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 		}
 
-		$this->amount = $input->getOption('messages');
+		$this->amount = (int) $input->getOption('messages');
 		if ($this->amount < 0) {
 			throw new \InvalidArgumentException('The -m option should be null or greater than 0');
 		}
