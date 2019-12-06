@@ -27,7 +27,7 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 ## Installation ##
 
-### For Symfony Framework >= 2.3 ###
+### For Symfony Framework >= 4.3 ###
 
 Require the bundle and its dependencies with composer:
 
@@ -173,7 +173,7 @@ queue_options:
 
 ### Important notice - Lazy Connections ###
 
-In a Symfony environment all services are fully bootstrapped for each request, from version >= 2.3 you can declare
+In a Symfony environment all services are fully bootstrapped for each request, from version >= 4.3 you can declare
 a service as lazy ([Lazy Services](http://symfony.com/doc/master/components/dependency_injection/lazy_services.html)).
 This bundle still doesn't support new Lazy Services feature but you can set `lazy: true` in your connection
 configuration to avoid unnecessary connections to your message broker in every request.

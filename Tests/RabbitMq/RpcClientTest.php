@@ -26,7 +26,7 @@ class RpcClientTest extends TestCase
         $serializer->expects($this->once())->method('deserialize')->with('message', 'json', null);
         $client->initClient(true);
         $client->setUnserializer(function($data) use ($serializer) {
-            $serializer->deserialize($data, 'json', null);
+            $serializer->deserialize($data, 'json','');
         });
         $client->processMessage($message);
     }
