@@ -52,7 +52,7 @@ before_install:
   - if [ "$COMPOSER_FLAGS" != "" ]; then composer update --prefer-dist --no-interaction --no-scripts $COMPOSER_FLAGS; fi;
 
 install:
-  - composer install --prefer-dist
-
+  - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction
+  
 script:
   - vendor/bin/phpunit
