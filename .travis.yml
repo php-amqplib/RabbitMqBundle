@@ -37,6 +37,10 @@ matrix:
       env: SYMFONY_VERSION=3.0.*
     - php: 7.3
       env: SYMFONY_VERSION=3.0.*
+    - php: 7.2
+      env: SYMFONY_VERSION=^5.0
+    - php: 7.3
+      env: SYMFONY_VERSION=^5.0
 
   allow_failures:
     - php: nightly
