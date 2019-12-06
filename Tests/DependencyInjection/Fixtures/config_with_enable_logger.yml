@@ -24,4 +24,5 @@ services:
     logger:
         class: \stdClass
     default.callback:
+        class: \stdClass
 

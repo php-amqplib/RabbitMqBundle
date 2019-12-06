@@ -23,3 +23,4 @@ old_sound_rabbit_mq:
             callback:       consumer.callback
 services:
     consumer.callback:
+        class: \stdClass
