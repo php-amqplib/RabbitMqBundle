@@ -3,8 +3,6 @@ language: php
 sudo: false
 
 php:
-  - 7.2
-  - 7.1
   - 7.0
   - 5.6
   - 5.6
@@ -34,9 +32,13 @@ matrix:
     - php: 7.0
       env: SYMFONY_VERSION=3.0.*
     - php: 7.1
-      env: DEPENDENCIES=beta
+      env: SYMFONY_VERSION=3.0.*
     - php: 7.2
-      env: DEPENDENCIES=beta
+      env: SYMFONY_VERSION=3.0.*
+    - php: 7.3
+      env: SYMFONY_VERSION=3.0.*
+    - php: 7.1
+      env: SYMFONY_VERSION=^4.0
 
   allow_failures:
     - php: nightly
@@ -52,7 +54,7 @@ before_install:
   - if [ "$COMPOSER_FLAGS" != "" ]; then composer update --prefer-dist --no-interaction --no-scripts $COMPOSER_FLAGS; fi;
 
 install:
-  - composer install --prefer-dist
-
+  - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction
+  
 script:
   - vendor/bin/phpunit

@@ -46,6 +46,9 @@ old_sound_rabbit_mq:
             use_socket: true
 
         default:
+        default2:
+        foo_default:
+        bar_default:
 
     producers:
         foo_producer:
@@ -222,3 +225,34 @@ old_sound_rabbit_mq:
             exchange_options:
                 name: exchange
                 type: topic
+services:
+    foo.callback:
+        class: \stdClass
+    default.callback:
+        class: \stdClass
+    foo.multiple_test1.callback:
+        class: \stdClass
+    foo.multiple_test2.callback:
+        class: \stdClass
+    foo.queues_provider:
+        class: \stdClass
+    foo.dynamic.callback:
+        class: \stdClass
+    foo.dynamic.provider:
+        class: \stdClass
+    bar.dynamic.provider:
+        class: \stdClass
+    bar.dynamic.callback:
+        class: \stdClass
+    foo_anon.callback:
+        class: \stdClass
+    default_anon.callback:
+        class: \stdClass
+    foo_server.callback:
+        class: \stdClass
+    default_server.callback:
+        class: \stdClass
+    server_with_queue_options.callback:
+        class: \stdClass
+    server_with_exchange_options.callback:
+        class: \stdClass
