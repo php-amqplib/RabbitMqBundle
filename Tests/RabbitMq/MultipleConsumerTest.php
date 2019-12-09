@@ -8,6 +8,7 @@ use OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class MultipleConsumerTest extends TestCase
@@ -246,14 +247,14 @@ class MultipleConsumerTest extends TestCase
         $this->amqpChannel->expects($this->any())
             ->method('basic_reject')
             ->will($this->returnCallback(function($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
-                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
-                \PHPUnit_Framework_Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
+                Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
+                Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
             }));
 
         $this->amqpChannel->expects($this->any())
             ->method('basic_ack')
             ->will($this->returnCallback(function($delivery_tag) use ($expectedMethod) {
-                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
+                Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
             }));
     }
 

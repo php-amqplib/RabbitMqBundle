@@ -10,6 +10,7 @@ use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
@@ -23,15 +24,15 @@ class ConsumerTest extends TestCase
     protected function prepareAMQPConnection()
     {
         return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
-                        ->disableOriginalConstructor()
-                        ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     protected function prepareAMQPChannel()
     {
         return $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
-                        ->disableOriginalConstructor()
-                        ->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -45,7 +46,9 @@ class ConsumerTest extends TestCase
         $amqpChannel = $this->prepareAMQPChannel();
         $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
 
-        $callbackFunction = function() use ($processFlag) { return $processFlag; }; // Create a callback function with a return value set by the data provider.
+        $callbackFunction = function () use ($processFlag) {
+            return $processFlag;
+        }; // Create a callback function with a return value set by the data provider.
         $consumer->setCallback($callbackFunction);
 
         // Create a default message
@@ -57,14 +60,14 @@ class ConsumerTest extends TestCase
             $amqpChannel->expects($this->any())
                 ->method('basic_reject')
                 ->will($this->returnCallback(function ($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
-                    \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
-                    \PHPUnit_Framework_Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
+                    Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
+                    Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
                 }));
 
             $amqpChannel->expects($this->any())
                 ->method('basic_ack')
                 ->will($this->returnCallback(function ($delivery_tag) use ($expectedMethod) {
-                    \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
+                    Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
                 }));
         } else {
             $amqpChannel->expects($this->never())->method('basic_reject');
@@ -89,7 +92,10 @@ class ConsumerTest extends TestCase
                     array(new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME),
                     array(new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME)
                 )
-                ->willReturn(true);
+                ->willReturnOnConsecutiveCalls(
+                    new BeforeProcessingMessageEvent($consumer, $amqpMessage),
+                    new AfterProcessingMessageEvent($consumer, $amqpMessage)
+                );
         } else {
             $eventDispatcher->expects($this->atLeastOnce())
                 ->method('dispatch')
@@ -120,7 +126,7 @@ class ConsumerTest extends TestCase
      */
     public function consumeProvider()
     {
-        $testCases[ "All ok 4 callbacks"] =  array(
+        $testCases["All ok 4 callbacks"] = array(
             array(
                 "messages" => array(
                     "msgCallback1",
@@ -131,10 +137,9 @@ class ConsumerTest extends TestCase
             )
         );
 
-        $testCases[ "No callbacks"] =  array(
+        $testCases["No callbacks"] = array(
             array(
-                "messages" => array(
-                )
+                "messages" => array()
             )
         );
 
@@ -199,7 +204,7 @@ class ConsumerTest extends TestCase
             $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
                 ->method('dispatch')
                 ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'), OnConsumeEvent::NAME)
-                ->willReturn(true);
+                ->willReturn($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'));
         } else {
             $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
                 ->method('dispatch')
@@ -284,35 +289,39 @@ class ConsumerTest extends TestCase
             $eventDispatcher->expects($this->at(1))
                 ->method('dispatch')
                 ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
-                ->willReturnCallback(function(OnIdleEvent $event, $eventName) {
+                ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
                     $event->setForceStop(false);
+
+                    return $event;
                 });
 
             $eventDispatcher->expects($this->at(3))
                 ->method('dispatch')
                 ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
-                ->willReturn(function(OnIdleEvent $event, $eventName) {
+                ->willReturn(function (OnIdleEvent $event, $eventName) {
                     $event->setForceStop(true);
+
+                    return $event;
                 });
         } else {
             $eventDispatcher->expects($this->at(1))
                 ->method('dispatch')
                 ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-                ->willReturnCallback(function($eventName, OnIdleEvent $event) {
+                ->willReturnCallback(function ($eventName, OnIdleEvent $event) {
                     $event->setForceStop(false);
                 });
 
             $eventDispatcher->expects($this->at(3))
                 ->method('dispatch')
                 ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-                ->willReturn(function($eventName, OnIdleEvent $event) {
+                ->willReturn(function ($eventName, OnIdleEvent $event) {
                     $event->setForceStop(true);
                 });
         }
 
         $consumer->setEventDispatcher($eventDispatcher);
 
-        $this->setExpectedException('PhpAmqpLib\Exception\AMQPTimeoutException');
+        $this->expectException('PhpAmqpLib\Exception\AMQPTimeoutException');
         $consumer->consume(10);
     }
 

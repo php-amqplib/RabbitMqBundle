@@ -23,3 +23,5 @@ old_sound_rabbit_mq:
 services:
     logger:
         class: \stdClass
+    default.callback:
+

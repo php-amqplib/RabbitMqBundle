@@ -65,7 +65,7 @@ class BaseAmqpTest extends TestCase
             $eventDispatcher->expects($this->once())
                 ->method('dispatch')
                 ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
-                ->willReturn(true);
+                ->willReturn(new AMQPEvent());
         } else {
             $eventDispatcher->expects($this->once())
                 ->method('dispatch')
