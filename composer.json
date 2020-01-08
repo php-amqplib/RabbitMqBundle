@@ -10,17 +10,17 @@
     "require": {
         "php":                          "^5.3.9|^7.0",
 
-        "symfony/dependency-injection": "^2.7|^3.0|^4.0",
-        "symfony/event-dispatcher":     "^2.7|^3.0|^4.0",
-        "symfony/config":               "^2.7|^3.0|^4.0",
-        "symfony/yaml":                 "^2.7|^3.0|^4.0",
-        "symfony/console":              "^2.7|^3.0|^4.0",
+        "symfony/dependency-injection": "^2.7|^3.0|^4.0|^5.0",
+        "symfony/event-dispatcher":     "^2.7|^3.0|^4.0|^5.0",
+        "symfony/config":               "^2.7|^3.0|^4.0|^5.0",
+        "symfony/yaml":                 "^2.7|^3.0|^4.0|^5.0",
+        "symfony/console":              "^2.7|^3.0|^4.0|^5.0",
         "php-amqplib/php-amqplib":      "^2.6",
         "psr/log":                      "^1.0"
     },
     "require-dev": {
-        "symfony/serializer":           "^2.7|^3.0|^4.0",
-        "symfony/debug":                "^2.7|^3.0|^4.0",
+        "symfony/serializer":           "^2.7|^3.0|^4.0|^5.0",
+        "symfony/debug":                "^2.7|^3.0|^4.0|^5.0",
         "phpunit/phpunit":              "^4.8.35|^5.4.3"
     },
     "replace": {
