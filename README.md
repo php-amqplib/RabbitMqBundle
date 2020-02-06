@@ -23,7 +23,7 @@ All the examples expect a running RabbitMQ server.
 
 This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference. See the slides [here](http://www.slideshare.net/old_sound/theres-a-rabbit-on-my-symfony).
 
-[![Build Status](https://secure.travis-ci.org/php-amqplib/RabbitMqBundle.png?branch=master)](http://travis-ci.org/php-amqplib/RabbitMqBundle)
+[![Build Status](https://travis-ci.org/eMAGTechLabs/RabbitMqBundle.svg?branch=master)](https://travis-ci.org/eMAGTechLabs/RabbitMqBundle)
 
 ## Installation ##
 
