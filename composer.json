@@ -1,7 +1,7 @@
 {
-    "name": "php-amqplib/rabbitmq-bundle",
+    "name": "emag-tech-labs/rabbitmq-bundle",
     "type": "symfony-bundle",
-    "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly oldsound/rabbitmq-bundle.",
+    "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly php-amqplib/rabbitmq-bundle, oldsound/rabbitmq-bundle.",
     "keywords": ["symfony", "symfony4", "symfony5", "rabbitmq", "message", "queue", "amqp"],
     "license": "MIT",
     "authors": [{
