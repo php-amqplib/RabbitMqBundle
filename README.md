@@ -25,6 +25,10 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 [![Build Status](https://travis-ci.org/eMAGTechLabs/RabbitMqBundle.svg?branch=master)](https://travis-ci.org/eMAGTechLabs/RabbitMqBundle)
 
+## Version 2 ##
+Due to the breaking changes happened caused by Symfony >=4.4, a new tag was released, making the bundle compatible with Symfony >=4.4.
+Also it eliminates a lot notices caused by symfony event dispatcher in Symfony 4.3.
+
 ## Installation ##
 
 ### For Symfony Framework >= 4.3 ###
@@ -60,7 +64,7 @@ Require the bundle in your composer.json file:
 ```
 {
     "require": {
-        "php-amqplib/rabbitmq-bundle": "~1.6",
+        "php-amqplib/rabbitmq-bundle": "^2.0",
     }
 }
 ```
