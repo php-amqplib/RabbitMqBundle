@@ -23,7 +23,8 @@
         "phpunit/phpunit":              "^6.4"
     },
     "replace": {
-        "oldsound/rabbitmq-bundle": "self.version"
+        "oldsound/rabbitmq-bundle": "self.version",
+        "php-amqplib/rabbitmq-bundle": "self.version"
     },
     "suggest": {
         "symfony/framework-bundle": "To use this lib as a full Symfony Bundle and to use the profiler data collector"
