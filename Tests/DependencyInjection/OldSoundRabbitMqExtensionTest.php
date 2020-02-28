@@ -442,7 +442,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             }
         }
 
-        $this->assertInternalType('array', $setQosParameters);
+        $this->assertIsArray($setQosParameters);
         $this->assertEquals(
             array(
                 1024,

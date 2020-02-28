@@ -10,9 +10,9 @@ class BaseConsumerTest extends TestCase
     /** @var BaseConsumer */
     protected $consumer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $amqpConnection =  $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        $amqpConnection = $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
             ->disableOriginalConstructor()
             ->getMock();
 

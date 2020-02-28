@@ -39,7 +39,7 @@ class MultipleConsumerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->amqpConnection = $this->prepareAMQPConnection();
         $this->amqpChannel = $this->prepareAMQPChannel();
@@ -246,14 +246,14 @@ class MultipleConsumerTest extends TestCase
     {
         $this->amqpChannel->expects($this->any())
             ->method('basic_reject')
-            ->will($this->returnCallback(function($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
+            ->will($this->returnCallback(function ($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
                 Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
                 Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
             }));
 
         $this->amqpChannel->expects($this->any())
             ->method('basic_ack')
-            ->will($this->returnCallback(function($delivery_tag) use ($expectedMethod) {
+            ->will($this->returnCallback(function ($delivery_tag) use ($expectedMethod) {
                 Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
             }));
     }
@@ -266,7 +266,7 @@ class MultipleConsumerTest extends TestCase
      */
     private function prepareCallback($processFlag)
     {
-        return function($msg) use (&$lastQueue, $processFlag) {
+        return function ($msg) use (&$lastQueue, $processFlag) {
             return $processFlag;
         };
     }

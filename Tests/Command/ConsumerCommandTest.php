@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ConsumerCommandTest extends BaseCommandTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->definition->expects($this->any())
