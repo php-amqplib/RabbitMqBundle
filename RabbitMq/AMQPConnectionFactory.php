@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use PhpAmqpLib\Connection\AbstractConnection;
+use PhpAmqpLib\Connection\AMQPSocketConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class AMQPConnectionFactory
@@ -60,29 +61,31 @@ class AMQPConnectionFactory
      */
     public function createConnection()
     {
+        $ref = new \ReflectionClass($this->class);
+
         if (isset($this->parameters['constructor_args']) && is_array($this->parameters['constructor_args'])) {
-            $ref = new \ReflectionClass($this->class);
             return $ref->newInstanceArgs($this->parameters['constructor_args']);
         }
 
-        if ($this->class == 'PhpAmqpLib\Connection\AMQPSocketConnection' || is_subclass_of($this->class , 'PhpAmqpLib\Connection\AMQPSocketConnection')) {
-            return new $this->class(
-                $this->parameters['host'],
-                $this->parameters['port'],
-                $this->parameters['user'],
-                $this->parameters['password'],
-                $this->parameters['vhost'],
-                false,      // insist
-                'AMQPLAIN', // login_method
-                null,       // login_response
-                'en_US',    // locale
-                isset($this->parameters['read_timeout']) ? $this->parameters['read_timeout'] : $this->parameters['read_write_timeout'],
-                $this->parameters['keepalive'],
-                isset($this->parameters['write_timeout']) ? $this->parameters['write_timeout'] : $this->parameters['read_write_timeout'],
-                $this->parameters['heartbeat']
+        if ($this->class == 'PhpAmqpLib\Connection\AMQPSocketConnection' || is_subclass_of($this->class, 'PhpAmqpLib\Connection\AMQPSocketConnection')) {
+            return $ref->newInstanceArgs([
+                    $this->parameters['host'],
+                    $this->parameters['port'],
+                    $this->parameters['user'],
+                    $this->parameters['password'],
+                    $this->parameters['vhost'],
+                    false,      // insist
+                    'AMQPLAIN', // login_method
+                    null,       // login_response
+                    'en_US',    // locale
+                    isset($this->parameters['read_timeout']) ? $this->parameters['read_timeout'] : $this->parameters['read_write_timeout'],
+                    $this->parameters['keepalive'],
+                    isset($this->parameters['write_timeout']) ? $this->parameters['write_timeout'] : $this->parameters['read_write_timeout'],
+                    $this->parameters['heartbeat']
+                ]
             );
         } else {
-            return new $this->class(
+            return $ref->newInstanceArgs([
                 $this->parameters['host'],
                 $this->parameters['port'],
                 $this->parameters['user'],
@@ -97,7 +100,7 @@ class AMQPConnectionFactory
                 $this->parameters['ssl_context'],
                 $this->parameters['keepalive'],
                 $this->parameters['heartbeat']
-            );
+            ]);
         }
     }
 

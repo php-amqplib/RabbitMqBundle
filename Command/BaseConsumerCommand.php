@@ -82,7 +82,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
         $this->amount = $input->getOption('messages');
 
-        if (0 > $this->amount) {
+        if (0 > (int) $this->amount) {
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
         $this->initConsumer($input);

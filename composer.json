@@ -20,7 +20,8 @@
     },
     "require-dev": {
         "symfony/serializer":           "^4.3|^5.0",
-        "phpunit/phpunit":              "^7.5|^8.5"
+        "phpunit/phpunit":              "^7.5|^8.5",
+        "phpstan/phpstan":              "^0.12.11"
     },
     "replace": {
         "oldsound/rabbitmq-bundle": "self.version",

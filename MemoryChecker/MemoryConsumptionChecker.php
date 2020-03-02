@@ -45,7 +45,7 @@ class MemoryConsumptionChecker
     {
         $numerical = $humanUnit;
         if (!is_numeric($humanUnit)) {
-            $numerical = substr($numerical, 0, -1);
+            $numerical = (int) substr($numerical, 0, -1);
             switch (substr($humanUnit, -1)) {
                 case 'G':
                     $numerical *= pow(1024, 3);

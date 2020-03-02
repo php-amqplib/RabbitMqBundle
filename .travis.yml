@@ -1,5 +1,9 @@
 language: php
 
+env:
+  global:
+    - SYMFONY_VERSION="^4.3"
+
 php:
   - 7.1
   - 7.2
@@ -22,10 +26,6 @@ matrix:
   allow_failures:
     - php: nightly
 
-env:
-  global:
-    - SYMFONY_VERSION=""
-
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available";
   - if [ "$SYMFONY_VERSION" != "" ]; then composer require --no-update symfony/framework-bundle "$SYMFONY_VERSION"; fi
@@ -36,3 +36,4 @@ install:
   
 script:
   - vendor/bin/phpunit
+  - vendor/bin/phpstan analyse

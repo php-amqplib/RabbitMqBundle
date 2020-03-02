@@ -114,7 +114,7 @@ class MultipleConsumer extends Consumer
         if ($this->queuesProvider) {
             $this->queues = array_merge(
                 $this->queues,
-                $this->queuesProvider->getQueues($this->context)
+                $this->queuesProvider->getQueues()
             );
         }
     }

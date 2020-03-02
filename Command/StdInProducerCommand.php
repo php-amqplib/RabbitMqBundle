@@ -60,5 +60,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
         }
 
         $producer->publish($data, $route);
+
+        return 0;
     }
 }

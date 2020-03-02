@@ -266,7 +266,7 @@ class MultipleConsumerTest extends TestCase
      */
     private function prepareCallback($processFlag)
     {
-        return function ($msg) use (&$lastQueue, $processFlag) {
+        return function ($msg) use ($processFlag) {
             return $processFlag;
         };
     }

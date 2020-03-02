@@ -149,9 +149,9 @@ class ConsumerTest extends TestCase
     /**
      * @dataProvider consumeProvider
      *
-     * @param $data
+     * @param array $data
      */
-    public function testConsume($data)
+    public function testConsume(array $data)
     {
         $consumerCallBacks = $data['messages'];
 

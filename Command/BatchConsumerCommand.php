@@ -89,7 +89,7 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
 
         if (null !== $input->getOption('memory-limit') &&
             ctype_digit((string) $input->getOption('memory-limit')) &&
-            $input->getOption('memory-limit') > 0
+            (int) $input->getOption('memory-limit') > 0
         ) {
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }
