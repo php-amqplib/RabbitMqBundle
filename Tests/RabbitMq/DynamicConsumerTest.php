@@ -2,7 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use OldSound\RabbitMqBundle\Provider\QueueOptionsProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\DynamicConsumer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DynamicConsumerTest extends ConsumerTest
 {
@@ -14,7 +16,7 @@ class DynamicConsumerTest extends ConsumerTest
     /**
      * Preparing QueueOptionsProviderInterface instance
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|QueueOptionsProviderInterface
+     * @return MockObject|QueueOptionsProviderInterface
      */
     private function prepareQueueOptionsProvider()
     {

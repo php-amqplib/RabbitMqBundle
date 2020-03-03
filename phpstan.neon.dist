@@ -1,3 +1,6 @@
+includes:
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+	- vendor/phpstan/phpstan-phpunit/rules.neon
 parameters:
     level: 1
     paths:

@@ -6,6 +6,7 @@ use OldSound\RabbitMqBundle\Provider\ConnectionParametersProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory;
 use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPConnection;
 use OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures\AMQPSocketConnection;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AMQPConnectionFactoryTest extends TestCase
@@ -335,7 +336,7 @@ class AMQPConnectionFactoryTest extends TestCase
     /**
      * Preparing ConnectionParametersProviderInterface instance
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionParametersProviderInterface
+     * @return MockObject
      */
     private function prepareConnectionParametersProvider()
     {

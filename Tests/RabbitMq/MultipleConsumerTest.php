@@ -9,6 +9,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MultipleConsumerTest extends TestCase
@@ -23,14 +24,14 @@ class MultipleConsumerTest extends TestCase
     /**
      * AMQP channel
      *
-     * @var \PHPUnit_Framework_MockObject_MockObject|AMQPChannel
+     * @var MockObject|AMQPChannel
      */
     private $amqpChannel;
 
     /**
      * AMQP connection
      *
-     * @var \PHPUnit_Framework_MockObject_MockObject|AMQPConnection
+     * @var MockObject|AMQPConnection
      */
     private $amqpConnection;
 
@@ -202,7 +203,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Connection
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|AMQPConnection
+     * @return MockObject|AMQPConnection
      */
     private function prepareAMQPConnection()
     {
@@ -214,7 +215,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Connection
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|AMQPChannel
+     * @return MockObject|AMQPChannel
      */
     private function prepareAMQPChannel()
     {
@@ -226,7 +227,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing QueuesProviderInterface instance
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|QueuesProviderInterface
+     * @return MockObject|QueuesProviderInterface
      */
     private function prepareQueuesProvider()
     {
@@ -237,8 +238,8 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Channel Expectations
      *
-     * @param $expectedMethod
-     * @param $expectedRequeue
+     * @param mixed $expectedMethod
+     * @param string $expectedRequeue
      *
      * @return void
      */
@@ -261,7 +262,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Prepare callback
      *
-     * @param $processFlag
+     * @param bool $processFlag
      * @return callable
      */
     private function prepareCallback($processFlag)
