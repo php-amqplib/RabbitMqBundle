@@ -16,13 +16,13 @@
         "symfony/yaml":                 "^4.3|^5.0",
         "symfony/console":              "^4.3|^5.0",
         "php-amqplib/php-amqplib":      "^2.6",
-        "psr/log":                      "^1.0",
-        "phpstan/phpstan-phpunit": "^0.12.6"
+        "psr/log":                      "^1.0"
     },
     "require-dev": {
         "symfony/serializer":           "^4.3|^5.0",
         "phpunit/phpunit":              "^7.5|^8.5",
-        "phpstan/phpstan":              "^0.12.11"
+        "phpstan/phpstan":              "^0.12.11",
+        "phpstan/phpstan-phpunit": "^0.12.6"
     },
     "replace": {
         "oldsound/rabbitmq-bundle": "self.version",
