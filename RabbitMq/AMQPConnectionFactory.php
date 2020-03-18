@@ -119,7 +119,7 @@ class AMQPConnectionFactory
 
         $url = parse_url($parameters['url']);
 
-        if ($url === false || !isset($url['scheme']) || $url['scheme'] !== 'amqp') {
+        if ($url === false || !isset($url['scheme']) || !in_array($url['scheme'], ['amqp', 'amqps'], true)) {
             throw new InvalidConfigurationException('Malformed parameter "url".');
         }
 
