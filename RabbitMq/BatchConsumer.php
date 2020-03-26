@@ -126,6 +126,8 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
                 }
             }
         }
+
+        return 0;
     }
 
     private function batchConsume()

@@ -26,7 +26,7 @@ class DeleteCommand extends ConsumerCommand
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -51,5 +51,7 @@ class DeleteCommand extends ConsumerCommand
         $this->consumer = $this->getContainer()
             ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
         $this->consumer->delete();
+
+        return 0;
     }
 }
