@@ -708,7 +708,7 @@ Be aware that queues providers are responsible for the proper calls to `setDeque
 
 ### Arbitrary Bindings ###
 
-You may find that your application has a complex workflow and you you need to have arbitrary binding. Arbitrary
+You may find that your application has a complex workflow and you need to have arbitrary binding. Arbitrary
 binding scenarios might include exchange to exchange bindings via `destination_is_exchange` property.
 
 ```yaml
