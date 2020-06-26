@@ -336,7 +336,7 @@ class AMQPConnectionFactoryTest extends TestCase
     /**
      * Preparing ConnectionParametersProviderInterface instance
      *
-     * @return MockObject
+     * @return ConnectionParametersProviderInterface|MockObject
      */
     private function prepareConnectionParametersProvider()
     {

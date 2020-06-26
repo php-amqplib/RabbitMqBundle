@@ -17,7 +17,7 @@ class Consumer extends BaseConsumer
     const TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION = 'graceful-max-execution';
 
     /**
-     * @var int $memoryLimit
+     * @var int|null $memoryLimit
      */
     protected $memoryLimit = null;
 
@@ -45,7 +45,7 @@ class Consumer extends BaseConsumer
     /**
      * Get the memory limit
      *
-     * @return int
+     * @return int|null
      */
     public function getMemoryLimit()
     {

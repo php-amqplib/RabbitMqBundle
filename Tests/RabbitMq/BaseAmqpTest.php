@@ -50,29 +50,20 @@ class BaseAmqpTest extends TestCase
         $baseAmqpConsumer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\BaseAmqp')
             ->disableOriginalConstructor()
             ->getMock();
-        if (is_subclass_of('AMQPEvent', 'ContractsBaseEvent')) {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        } else {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $baseAmqpConsumer->expects($this->atLeastOnce())
             ->method('getEventDispatcher')
             ->willReturn($eventDispatcher);
-        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
-            $eventDispatcher->expects($this->once())
-                ->method('dispatch')
-                ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
-                ->willReturn(new AMQPEvent());
-        } else {
-            $eventDispatcher->expects($this->once())
-                ->method('dispatch')
-                ->with(AMQPEvent::ON_CONSUME, new AMQPEvent())
-                ->willReturn(true);
-        }
+
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
+            ->willReturn(new AMQPEvent());
+
         $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
     }
 

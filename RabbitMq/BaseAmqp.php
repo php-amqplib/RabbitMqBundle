@@ -50,9 +50,9 @@ abstract class BaseAmqp
     );
 
     /**
-     * @var EventDispatcherInterface
+     * @var EventDispatcherInterface|null
      */
-    protected $eventDispatcher;
+    protected $eventDispatcher = null;
 
     /**
      * @param AbstractConnection   $conn
@@ -268,23 +268,16 @@ abstract class BaseAmqp
      */
     protected function dispatchEvent($eventName, AMQPEvent $event)
     {
-        if ($this->getEventDispatcher()) {
-            if ($this->getEventDispatcher() instanceof ContractsEventDispatcherInterface) {
-                $this->getEventDispatcher()->dispatch(
-                    $event,
-                    $eventName
-                );
-            } else {
-                $this->getEventDispatcher()->dispatch(
-                    $eventName,
-                    $event
-                );
-            }
+        if ($this->getEventDispatcher() instanceof ContractsEventDispatcherInterface) {
+            $this->getEventDispatcher()->dispatch(
+                $event,
+                $eventName
+            );
         }
     }
 
     /**
-     * @return EventDispatcherInterface
+     * @return EventDispatcherInterface|null
      */
     public function getEventDispatcher()
     {

@@ -59,7 +59,7 @@ class Binding extends BaseAmqp
     }
 
     /**
-     * @param bool $destination
+     * @param string $destination
      */
     public function setDestination($destination)
     {
@@ -75,7 +75,7 @@ class Binding extends BaseAmqp
     }
 
     /**
-     * @param string $destinationIsExchange
+     * @param bool $destinationIsExchange
      */
     public function setDestinationIsExchange($destinationIsExchange)
     {

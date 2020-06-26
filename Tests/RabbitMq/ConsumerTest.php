@@ -7,11 +7,14 @@ use OldSound\RabbitMqBundle\Event\BeforeProcessingMessageEvent;
 use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\Event\OnIdleEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 class ConsumerTest extends TestCase
@@ -23,14 +26,14 @@ class ConsumerTest extends TestCase
 
     protected function prepareAMQPConnection()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        return $this->getMockBuilder(AMQPConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     protected function prepareAMQPChannel()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+        return $this->getMockBuilder(AMQPChannel::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -74,37 +77,24 @@ class ConsumerTest extends TestCase
             $amqpChannel->expects($this->never())->method('basic_ack');
             $amqpChannel->expects($this->never())->method('basic_nack');
         }
-        if (is_subclass_of('AMQPEvent', 'ContractsBaseEvent')) {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        } else {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
+
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $consumer->setEventDispatcher($eventDispatcher);
 
-        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
-            $eventDispatcher->expects($this->atLeastOnce())
-                ->method('dispatch')
-                ->withConsecutive(
-                    array(new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME),
-                    array(new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME)
-                )
-                ->willReturnOnConsecutiveCalls(
-                    new BeforeProcessingMessageEvent($consumer, $amqpMessage),
-                    new AfterProcessingMessageEvent($consumer, $amqpMessage)
-                );
-        } else {
-            $eventDispatcher->expects($this->atLeastOnce())
-                ->method('dispatch')
-                ->withConsecutive(
-                    array(BeforeProcessingMessageEvent::NAME, new BeforeProcessingMessageEvent($consumer, $amqpMessage)),
-                    array(AfterProcessingMessageEvent::NAME, new AfterProcessingMessageEvent($consumer, $amqpMessage))
-                )
-                ->willReturn(true);
-        }
+        $eventDispatcher->expects($this->atLeastOnce())
+            ->method('dispatch')
+            ->withConsecutive(
+                array(new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME),
+                array(new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME)
+            )
+            ->willReturnOnConsecutiveCalls(
+                new BeforeProcessingMessageEvent($consumer, $amqpMessage),
+                new AfterProcessingMessageEvent($consumer, $amqpMessage)
+            );
+
         $consumer->processMessage($amqpMessage);
     }
 
@@ -190,27 +180,14 @@ class ConsumerTest extends TestCase
                     })
             );
 
-        if (is_subclass_of('AMQPEvent', 'ContractsBaseEvent')) {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        } else {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
-            $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
-                ->method('dispatch')
-                ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'), OnConsumeEvent::NAME)
-                ->willReturn($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'));
-        } else {
-            $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
-                ->method('dispatch')
-                ->with(OnConsumeEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnConsumeEvent'))
-                ->willReturn(true);
-        }
+        $eventDispatcher->expects($this->exactly(count($consumerCallBacks)))
+            ->method('dispatch')
+            ->with($this->isInstanceOf(OnConsumeEvent::class), OnConsumeEvent::NAME)
+            ->willReturn($this->isInstanceOf(OnConsumeEvent::class));
 
         $consumer->setEventDispatcher($eventDispatcher);
         $consumer->consume(1);
@@ -275,53 +252,31 @@ class ConsumerTest extends TestCase
             ->with(null, false, $consumer->getIdleTimeout())
             ->willThrowException(new AMQPTimeoutException());
 
-        if (is_subclass_of('AMQPEvent', 'ContractsBaseEvent')) {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        } else {
-            $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
+        $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        if ($eventDispatcher instanceof ContractsEventDispatcherInterface) {
-            $eventDispatcher->expects($this->at(1))
-                ->method('dispatch')
-                ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
-                ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
-                    $event->setForceStop(false);
+        $eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with($this->isInstanceOf(OnIdleEvent::class), OnIdleEvent::NAME)
+            ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
+                $event->setForceStop(false);
 
-                    return $event;
-                });
+                return $event;
+            });
 
-            $eventDispatcher->expects($this->at(3))
-                ->method('dispatch')
-                ->with($this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'), OnIdleEvent::NAME)
-                ->willReturn(function (OnIdleEvent $event, $eventName) {
-                    $event->setForceStop(true);
+        $eventDispatcher->expects($this->at(3))
+            ->method('dispatch')
+            ->with($this->isInstanceOf(OnIdleEvent::class), OnIdleEvent::NAME)
+            ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
+                $event->setForceStop(true);
 
-                    return $event;
-                });
-        } else {
-            $eventDispatcher->expects($this->at(1))
-                ->method('dispatch')
-                ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-                ->willReturnCallback(function ($eventName, OnIdleEvent $event) {
-                    $event->setForceStop(false);
-                });
-
-            $eventDispatcher->expects($this->at(3))
-                ->method('dispatch')
-                ->with(OnIdleEvent::NAME, $this->isInstanceOf('OldSound\RabbitMqBundle\Event\OnIdleEvent'))
-                ->willReturn(function ($eventName, OnIdleEvent $event) {
-                    $event->setForceStop(true);
-                });
-        }
+                return $event;
+            });
 
         $consumer->setEventDispatcher($eventDispatcher);
 
-        $this->expectException('PhpAmqpLib\Exception\AMQPTimeoutException');
+        $this->expectException(AMQPTimeoutException::class);
         $consumer->consume(10);
     }
 

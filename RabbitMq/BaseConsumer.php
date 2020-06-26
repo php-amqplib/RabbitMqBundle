@@ -24,9 +24,6 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     /** @var int */
     protected $idleTimeoutExitCode;
 
-    /**
-     * @param $callback
-     */
     public function setCallback($callback)
     {
         $this->callback = $callback;
@@ -42,6 +39,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     /**
      * @param int $msgAmount
+     * @throws \ErrorException
      */
     public function start($msgAmount = 0)
     {

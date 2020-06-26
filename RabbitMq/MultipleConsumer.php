@@ -13,7 +13,7 @@ class MultipleConsumer extends Consumer
     /**
      * Queues provider
      *
-     * @var QueuesProviderInterface
+     * @var QueuesProviderInterface|null
      */
     protected $queuesProvider = null;
     
