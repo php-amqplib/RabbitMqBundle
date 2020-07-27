@@ -38,7 +38,7 @@ Also it eliminates a lot notices caused by symfony event dispatcher in Symfony 4
 Require the bundle and its dependencies with composer:
 
 ```bash
-$ composer require php-amqplib/rabbitmq-bundle
+$ composer require emag-tech-labs/rabbitmq-bundle
 ```
 
 Register the bundle:
