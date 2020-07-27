@@ -66,7 +66,7 @@ Require the bundle in your composer.json file:
 ```
 {
     "require": {
-        "php-amqplib/rabbitmq-bundle": "^2.0",
+        "emag-tech-labs/rabbitmq-bundle": "^2.0",
     }
 }
 ```
