@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
 
@@ -67,5 +68,32 @@ class RpcClientTest extends TestCase
             ->getMock();
 
         $client->notify('not a callable');
+    }
+
+    /**
+     * @expectedException \PhpAmqpLib\Exception\AMQPTimeoutException
+     */
+    public function testChannelCancelOnGetRepliesException()
+    {
+        $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $channel = $this->createMock('\PhpAmqpLib\Channel\AMQPChannel');
+        $channel->expects($this->any())
+            ->method('getChannelId')
+            ->willReturn('test');
+        $channel->expects($this->once())
+            ->method('wait')
+            ->willThrowException(new AMQPTimeoutException());
+
+        $channel->expects($this->once())
+            ->method('basic_cancel');
+
+        $client->setChannel($channel);
+        $client->addRequest('a', 'b', 'c');
+
+        $client->getReplies();
     }
 }
