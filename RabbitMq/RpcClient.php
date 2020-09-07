@@ -63,11 +63,14 @@ class RpcClient extends BaseAmqp
             $consumer_tag = $this->getChannel()->basic_consume($this->getQueueName(), '', false, true, false, false, array($this, 'processMessage'));
         }
 
-        while (count($this->replies) < $this->requests) {
-            $this->getChannel()->wait(null, false, $this->timeout);
+        try {
+            while (count($this->replies) < $this->requests) {
+                $this->getChannel()->wait(null, false, $this->timeout);
+            }
+        } finally {
+            $this->getChannel()->basic_cancel($consumer_tag);
         }
 
-        $this->getChannel()->basic_cancel($consumer_tag);
         $this->directConsumerTag = null;
         $this->requests = 0;
         $this->timeout = 0;
@@ -87,7 +90,7 @@ class RpcClient extends BaseAmqp
 
         $this->replies[$msg->get('correlation_id')] = $messageBody;
     }
-    
+
     protected function getQueueName()
     {
         if (null === $this->queueName) {

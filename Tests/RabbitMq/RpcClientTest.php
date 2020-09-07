@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
 
@@ -55,9 +56,6 @@ class RpcClientTest extends TestCase
         $this->assertSame($expectedNotify, $notified);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidParameterOnNotify()
     {
         /** @var RpcClient $client */
@@ -66,6 +64,34 @@ class RpcClientTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->expectException('\InvalidArgumentException');
+
         $client->notify('not a callable');
+    }
+
+    public function testChannelCancelOnGetRepliesException()
+    {
+        $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
+            ->setMethods(null)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $channel = $this->createMock('\PhpAmqpLib\Channel\AMQPChannel');
+        $channel->expects($this->any())
+            ->method('getChannelId')
+            ->willReturn('test');
+        $channel->expects($this->once())
+            ->method('wait')
+            ->willThrowException(new AMQPTimeoutException());
+
+        $this->expectException('\PhpAmqpLib\Exception\AMQPTimeoutException');
+
+        $channel->expects($this->once())
+            ->method('basic_cancel');
+
+        $client->setChannel($channel);
+        $client->addRequest('a', 'b', 'c');
+
+        $client->getReplies();
     }
 }
