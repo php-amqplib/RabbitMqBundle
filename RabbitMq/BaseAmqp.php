@@ -225,10 +225,10 @@ abstract class BaseAmqp
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {
-                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey);
+                    $this->queueBind($queueName, $this->exchangeOptions['name'], $routingKey, $this->queueOptions['arguments'] ?? []);
                 }
             } else {
-                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                $this->queueBind($queueName, $this->exchangeOptions['name'], $this->routingKey, $this->queueOptions['arguments'] ?? []);
             }
 
             $this->queueDeclared = true;
@@ -242,11 +242,11 @@ abstract class BaseAmqp
      * @param string $exchange
      * @param string $routing_key
      */
-    protected function queueBind($queue, $exchange, $routing_key)
+    protected function queueBind($queue, $exchange, $routing_key, array $arguments = array())
     {
         // queue binding is not permitted on the default exchange
         if ('' !== $exchange) {
-            $this->getChannel()->queue_bind($queue, $exchange, $routing_key);
+            $this->getChannel()->queue_bind($queue, $exchange, $routing_key, false, $arguments);
         }
     }
 
