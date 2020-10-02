@@ -201,6 +201,58 @@ class MultipleConsumerTest extends TestCase
     }
 
     /**
+     * @dataProvider queueBindingRoutingKeyProvider
+     */
+    public function testShouldConsiderQueueArgumentsOnQueueDeclaration($routingKeysOption, $expectedRoutingKey)
+    {
+        $queueName = 'test-queue-name';
+        $exchangeName = 'test-exchange-name';
+        $expectedArgs = ['test-argument' => ['S', 'test-value']];
+
+        $this->amqpChannel->expects($this->any())
+            ->method('getChannelId')->willReturn(0);
+
+        $this->amqpChannel->expects($this->any())
+            ->method('queue_declare')
+            ->willReturn([$queueName, 5, 0]);
+
+
+        $this->multipleConsumer->setExchangeOptions([
+            'declare' => false,
+            'name' => $exchangeName,
+            'type' => 'topic']);
+
+        $this->multipleConsumer->setQueues([
+            $queueName => [
+                'passive' => true,
+                'durable' => true,
+                'exclusive' => true,
+                'auto_delete' => true,
+                'nowait' => true,
+                'arguments' => $expectedArgs,
+                'ticket' => null,
+                'routing_keys' => $routingKeysOption]
+        ]);
+
+        $this->multipleConsumer->setRoutingKey('test-routing-key');
+
+        // we assert that arguments are passed to the bind method
+        $this->amqpChannel->expects($this->once())
+            ->method('queue_bind')
+            ->with($queueName, $exchangeName, $expectedRoutingKey, false, $expectedArgs);
+
+        $this->multipleConsumer->setupFabric();
+    }
+
+    public function queueBindingRoutingKeyProvider()
+    {
+        return array(
+            array(array(), 'test-routing-key'),
+            array(array('test-routing-key-2'), 'test-routing-key-2'),
+        );
+    }
+
+    /**
      * Preparing AMQP Connection
      *
      * @return MockObject|AMQPConnection
