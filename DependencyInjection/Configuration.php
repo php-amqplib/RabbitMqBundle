@@ -155,6 +155,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('timeout_wait')->end()
                             ->arrayNode('graceful_max_execution')
                                 ->canBeUnset()
                                 ->children()
@@ -193,6 +194,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('connection')->defaultValue('default')->end()
                         ->scalarNode('idle_timeout')->end()
                         ->scalarNode('idle_timeout_exit_code')->end()
+                        ->scalarNode('timeout_wait')->end()
                         ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
                         ->arrayNode('graceful_max_execution')
                             ->canBeUnset()
@@ -217,7 +219,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
     }
-    
+
     protected function addDynamicConsumers(ArrayNodeDefinition $node)
     {
         $node
@@ -233,6 +235,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
+                            ->scalarNode('timeout_wait')->end()
                             ->arrayNode('graceful_max_execution')
                                 ->canBeUnset()
                                 ->children()
