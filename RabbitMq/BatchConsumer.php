@@ -62,6 +62,11 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     /**
      * @var int
      */
+    protected $batchAmount = 0;
+
+    /**
+     * @var int
+     */
     protected $consumed = 0;
 
     /**
@@ -69,6 +74,9 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
      *      any currently running consumption will not be interrupted.
      */
     protected $gracefulMaxExecutionDateTime;
+
+    /** @var int */
+    private $target;
 
     /**
      * @param \DateTime|null $dateTime
@@ -98,8 +106,10 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         return $this;
     }
 
-    public function consume()
+    public function consume(int $batchAmount = 0)
     {
+        $this->target = $batchAmount;
+
         $this->setupConsumer();
 
         while (count($this->getChannel()->callbacks)) {
@@ -117,6 +127,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             } catch (AMQPTimeoutException $e) {
                 if (!$this->isEmptyBatch()) {
                     $this->batchConsume();
+                    $this->maybeStopConsumer();
                 } elseif ($this->keepAlive === true) {
                     continue;
                 } elseif (null !== $this->getIdleTimeoutExitCode()) {
@@ -174,6 +185,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             throw $e;
         }
 
+        $this->batchAmount++;
         $this->resetBatch();
     }
 
@@ -211,6 +223,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             // Remove message from queue only if callback return not false
             $this->getMessageChannel($deliveryTag)->basic_ack($deliveryTag);
         }
+
     }
 
     /**
@@ -359,7 +372,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             pcntl_signal_dispatch();
         }
 
-        if ($this->forceStop) {
+        if ($this->forceStop || ($this->batchAmount == $this->target && $this->target > 0)) {
             $this->stopConsuming();
         }
 
