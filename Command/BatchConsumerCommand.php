@@ -16,9 +16,6 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
      */
     protected $consumer;
 
-    /** @var int */
-    protected $amount;
-
     public function stopConsumer()
     {
         if ($this->consumer instanceof BatchConsumer) {
@@ -78,15 +75,15 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
-        $this->amount = (int) $input->getOption('batches');
+        $batchAmountTarget = (int) $input->getOption('batches');
 
-        if (0 > $this->amount) {
-            throw new \InvalidArgumentException("The -b option should be null or greater than 0");
+        if (0 > $batchAmountTarget) {
+            throw new \InvalidArgumentException("The -b option should be greater than 0");
         }
 
         $this->initConsumer($input);
 
-        return $this->consumer->consume($this->amount);
+        return $this->consumer->consume($batchAmountTarget);
     }
 
     /**
