@@ -6,7 +6,7 @@ use OldSound\RabbitMqBundle\Provider\QueuesProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -31,7 +31,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * AMQP connection
      *
-     * @var MockObject|AMQPConnection
+     * @var MockObject|AMQPStreamConnection
      */
     private $amqpConnection;
 
@@ -255,11 +255,11 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Connection
      *
-     * @return MockObject|AMQPConnection
+     * @return MockObject|AMQPStreamConnection
      */
     private function prepareAMQPConnection()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
     }

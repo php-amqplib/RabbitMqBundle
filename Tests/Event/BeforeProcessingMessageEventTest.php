@@ -17,7 +17,7 @@ class BeforeProcessingMessageEventTest extends TestCase
     protected function getConsumer()
     {
         return new Consumer(
-            $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+            $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
                 ->disableOriginalConstructor()
                 ->getMock(),
             $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')

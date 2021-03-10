@@ -8,7 +8,7 @@ use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\Event\OnIdleEvent;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -26,7 +26,7 @@ class ConsumerTest extends TestCase
 
     protected function prepareAMQPConnection()
     {
-        return $this->getMockBuilder(AMQPConnection::class)
+        return $this->getMockBuilder(AMQPStreamConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

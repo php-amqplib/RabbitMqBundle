@@ -22,12 +22,15 @@ matrix:
       env: SYMFONY_VERSION=^5.0
     - php: 7.4
       env: SYMFONY_VERSION=^5.0
+    - php: 8.0
+      env: SYMFONY_VERSION=^5.0 MINIMUM_STABILITY=RC
 
   allow_failures:
     - php: nightly
 
 before_install:
   - if [ "$SYMFONY_VERSION" != "" ]; then composer require --no-update symfony/framework-bundle "$SYMFONY_VERSION"; fi
+  - if [ "$MINIMUM_STABILITY" != "" ]; then composer config minimum-stability "$MINIMUM_STABILITY"; fi
   - if [ "$COMPOSER_FLAGS" != "" ]; then composer update --prefer-dist --no-interaction --no-scripts $COMPOSER_FLAGS; fi;
 
 install:

@@ -1,4 +1,7 @@
 build:
+    dependencies:
+        before:
+            - composer config minimum-stability RC
     nodes:
         analysis:
             tests:

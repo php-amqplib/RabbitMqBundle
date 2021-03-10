@@ -20,7 +20,7 @@ class BindingTest extends TestCase
      */
     protected function prepareAMQPConnection()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
     }
