@@ -1,7 +1,7 @@
 # RabbitMqBundle #
 
 [![Latest Version](http://img.shields.io/packagist/v/emag-tech-labs/rabbitmq-bundle.svg?style=flat-square)](https://github.com/eMAGTechLabs/RabbitMqBundle/releases)
-[![Build Status](https://travis-ci.com/eMAGTechLabs/RabbitMqBundle.svg?branch=master)](https://travis-ci.com/eMAGTechLabs/RabbitMqBundle)
+[![Test](https://github.com/eMAGTechLabs/RabbitMqBundle/actions/workflows/test.yaml/badge.svg)](https://github.com/eMAGTechLabs/RabbitMqBundle/actions/workflows/test.yaml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/?branch=master)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
