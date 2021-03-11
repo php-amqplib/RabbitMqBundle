@@ -1,0 +1,102 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+    test:
+        name: PHP ${{ matrix.php-version }} + Symfony ${{ matrix.symfony-version }}
+
+        runs-on: ubuntu-18.04
+
+        continue-on-error: ${{ matrix.experimental }}
+
+        strategy:
+            matrix:
+                include:
+                    - php-version: '7.1'
+                      symfony-version: '^4.3'
+                      composer-version: v1
+                      stability: stable
+                      coverage: none
+                      experimental: false
+                    - php-version: '7.2'
+                      symfony-version: '^4.3'
+                      composer-version: v1
+                      stability: stable
+                      coverage: none
+                      experimental: false
+                    - php-version: '7.2'
+                      symfony-version: '^5.0'
+                      composer-version: v1
+                      stability: stable
+                      coverage: none
+                      experimental: false
+                    - php-version: '7.3'
+                      symfony-version: '^5.0'
+                      composer-version: v1
+                      stability: stable
+                      coverage: none
+                      experimental: false
+                    - php-version: '7.4'
+                      symfony-version: '^5.0'
+                      composer-version: v2
+                      stability: stable
+                      coverage: xdebug
+                      experimental: false
+                    - php-version: '8.0'
+                      symfony-version: '^5.0'
+                      composer-version: v2
+                      stability: RC
+                      coverage: none
+                      experimental: false
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  coverage: ${{ matrix.coverage }}
+                  ini-values: "memory_limit=-1"
+                  php-version: ${{ matrix.php-version }}
+                  tools: composer:${{ matrix.composer-version }}
+
+            - name: Validate composer.json
+              run: composer validate --no-check-lock
+
+            - name: Configure Symfony version
+              run: composer require --no-update symfony/framework-bundle "${{ matrix.symfony-version }}"
+
+            - name: Configure composer stability
+              if: matrix.stability != 'stable'
+              run: composer config minimum-stability "${{ matrix.stability }}"
+
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@v1
+              with:
+                  composer-options: "--prefer-dist"
+
+            - name: Setup problem matchers for PHP
+              run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+            - name: Setup problem matchers for PHPUnit
+              run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+            - name: Run PHPUnit
+              if: matrix.coverage == 'none'
+              run: vendor/bin/phpunit
+
+            - name: Run PHPUnit with coverage
+              if: matrix.coverage != 'none'
+              run: vendor/bin/phpunit --coverage-clover=coverage.clover
+
+            - name: Run PHPStan
+              run: vendor/bin/phpstan analyse
+
+            - name: Upload Scrutinizer coverage
+              if: matrix.coverage != 'none'
+              continue-on-error: true
+              uses: sudo-bot/action-scrutinizer@latest
+              with:
+                  cli-args: "--format=php-clover coverage.clover"
