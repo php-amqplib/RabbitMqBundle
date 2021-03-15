@@ -1,7 +1,7 @@
 # RabbitMqBundle #
 
-[![Latest Version](http://img.shields.io/packagist/v/emag-tech-labs/rabbitmq-bundle.svg?style=flat-square)](https://github.com/eMAGTechLabs/RabbitMqBundle/releases)
-[![Test](https://github.com/eMAGTechLabs/RabbitMqBundle/actions/workflows/test.yaml/badge.svg)](https://github.com/eMAGTechLabs/RabbitMqBundle/actions/workflows/test.yaml)
+[![Latest Version](http://img.shields.io/packagist/v/emag-tech-labs/rabbitmq-bundle.svg?style=flat-square)](https://github.com/php-amqplib/RabbitMqBundle/releases)
+[![Test](https://github.com/php-amqplib/RabbitMqBundle/actions/workflows/test.yaml/badge.svg)](https://github.com/php-amqplib/RabbitMqBundle/actions/workflows/test.yaml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/eMAGTechLabs/RabbitMqBundle/?branch=master)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
@@ -38,7 +38,7 @@ Also it eliminates a lot notices caused by symfony event dispatcher in Symfony 4
 Require the bundle and its dependencies with composer:
 
 ```bash
-$ composer require emag-tech-labs/rabbitmq-bundle
+$ composer require php-amqplib/rabbitmq-bundle
 ```
 
 Register the bundle:
@@ -66,7 +66,7 @@ Require the bundle in your composer.json file:
 ```
 {
     "require": {
-        "emag-tech-labs/rabbitmq-bundle": "^2.0",
+        "php-amqplib/rabbitmq-bundle": "^2.0",
     }
 }
 ```
