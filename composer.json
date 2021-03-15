@@ -1,7 +1,7 @@
 {
-    "name": "emag-tech-labs/rabbitmq-bundle",
+    "name": "php-amqplib/rabbitmq-bundle",
     "type": "symfony-bundle",
-    "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly php-amqplib/rabbitmq-bundle, oldsound/rabbitmq-bundle.",
+    "description": "Integrates php-amqplib with Symfony & RabbitMq. Formerly emag-tech-labs/rabbitmq-bundle, oldsound/rabbitmq-bundle.",
     "keywords": ["symfony", "symfony4", "symfony5", "rabbitmq", "message", "queue", "amqp"],
     "license": "MIT",
     "authors": [{
@@ -28,7 +28,7 @@
     },
     "replace": {
         "oldsound/rabbitmq-bundle": "self.version",
-        "php-amqplib/rabbitmq-bundle": "self.version"
+        "emag-tech-labs/rabbitmq-bundle": "self.version"
     },
     "suggest": {
         "symfony/framework-bundle": "To use this lib as a full Symfony Bundle and to use the profiler data collector"
