@@ -115,29 +115,6 @@ class MultipleConsumerTest extends TestCase
         $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
     }
 
-    public function testQueuesProvider()
-    {
-        $amqpConnection = $this->prepareAMQPConnection();
-        $amqpChannel = $this->prepareAMQPChannel();
-        $this->multipleConsumer->setContext('foo');
-
-        $queuesProvider = $this->prepareQueuesProvider();
-        $queuesProvider->expects($this->once())
-            ->method('getQueues')
-            ->will($this->returnValue(
-                array(
-                    'queue_foo' => array()
-                )
-            ));
-
-        $this->multipleConsumer->setQueuesProvider($queuesProvider);
-
-        $reflectionClass = new \ReflectionClass(get_class($this->multipleConsumer));
-        $reflectionMethod = $reflectionClass->getMethod('mergeQueues');
-        $reflectionMethod->setAccessible(true);
-        $reflectionMethod->invoke($this->multipleConsumer);
-    }
-
     /**
      * Check queues provider works well with static queues together
      *
