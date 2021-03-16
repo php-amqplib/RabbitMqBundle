@@ -687,6 +687,38 @@ To enable [direct reply-to clients](https://www.rabbitmq.com/direct-reply-to.htm
 
 This option will use pseudo-queue __amq.rabbitmq.reply-to__ when doing RPC calls. On the RPC server there is no modification needed.
 
+### Priority queue ###
+
+RabbitMQ has priority queue implementation in the core as of version 3.5.0. Any queue can be turned into a priority one using client-provided optional arguments (but, unlike other features that use optional arguments, not policies).
+The implementation supports a limited number of priorities: 255. Values between 1 and 10 are recommended. [Check documentation](https://www.rabbitmq.com/priority.html)
+
+here is how you can declare a priority queue 
+
+```yml
+    consumers:
+        upload_picture:
+            connection:       default
+            exchange_options: {name: 'upload-picture', type: direct}
+            queue_options:    {name: 'upload-picture', arguments: {'x-max-priority': ['I', 10]} }
+            callback:         upload_picture_service
+
+```
+
+if `upload-picture` queue exist before you must delete this queue before you run `rabbitmq:setup-fabric` command
+
+
+Now let's say you want to make a message with high priority, you have to publish the message with this additional information 
+
+```php
+public function indexAction()
+{    
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $additionalProperties = ['priority' => 10] ; 
+    $routing_key = '';
+    $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg), $routing_key , $additionalProperties );
+}
+```
+
 ### Multiple Consumers ###
 
 It's a good practice to have a lot of queues for logic separation. With a simple consumer you will have to create one worker (consumer) per queue and it can be hard to manage when dealing
