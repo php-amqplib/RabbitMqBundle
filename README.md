@@ -631,12 +631,12 @@ rpc_clients:
         expect_serialized_response: false
 ```
 
-You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
+You can also set a expiration for request in milliseconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
 
 ```php
 public function indexAction($name)
 {
-    $expiration = 5; // seconds
+    $expiration = 5000; // milliseconds
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest($body, $server, $requestId, $routingKey, $expiration);
     try {
