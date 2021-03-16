@@ -1,14 +1,10 @@
-name: Mark stale issues and pull requests
-
+name: stale
 on:
   schedule:
-  - cron: "* * * * *"
-
+    - cron: '* * * * *'
 jobs:
   stale:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/stale@v3
       with:
