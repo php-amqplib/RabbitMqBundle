@@ -3,7 +3,7 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\Provider\QueuesProviderInterface;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ReceiverInterface;
 use OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -194,9 +194,9 @@ class MultipleConsumerTest extends TestCase
             array(null, 'basic_ack'), // Remove message from queue only if callback return not false
             array(true, 'basic_ack'), // Remove message from queue only if callback return not false
             array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
+            array(ReceiverInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
+            array(ReceiverInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
+            array(ReceiverInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
         );
     }
 

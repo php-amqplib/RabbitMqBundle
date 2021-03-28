@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\DataCollector;
 
+use OldSound\RabbitMqBundle\RabbitMq\TraceableAMQPChannel;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,18 +14,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class MessageDataCollector extends DataCollector
 {
+    /** @var TraceableAMQPChannel[] */
     private $channels;
 
-    public function __construct($channels)
+    public function __construct(iterable $channels)
     {
         $this->channels = $channels;
-        $this->data = array();
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         foreach ($this->channels as $channel) {
-            foreach ($channel->getBasicPublishLog() as $log) {
+            foreach ($channel->getTracedPublications() as $log) {
                 $this->data[] = $log;
             }
         }

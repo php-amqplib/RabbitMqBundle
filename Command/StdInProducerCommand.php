@@ -2,13 +2,19 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
+use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class StdInProducerCommand extends BaseRabbitMqCommand
+class StdInProducerCommand extends Command
 {
+    use ContainerAwareTrait;
+
     const FORMAT_PHP = 'php';
     const FORMAT_RAW = 'raw';
 
@@ -38,7 +44,15 @@ class StdInProducerCommand extends BaseRabbitMqCommand
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
-        $producer = $this->getContainer()->get(sprintf('old_sound_rabbit_mq.%s_producer', $input->getArgument('name')));
+        $producerName = $input->getArgument('name');
+        $alias = sprintf('old_sound_rabbit_mq.producer.%s', $producerName);
+        if (!$this->container->has($alias)) {
+            $producerNames = []; // TODO $this->container->getParameter('old_sound_rabbit_mq.allowed_producer_names');
+            throw new InvalidArgumentException(sprintf('Producer %s is undefined. Allowed ones: %s', $producerName, join(', ', $producerNames)));
+        }
+
+        /** @var Producer $producer */
+        $producer = $this->container->get($alias);
 
         $data = '';
         while (!feof(STDIN)) {

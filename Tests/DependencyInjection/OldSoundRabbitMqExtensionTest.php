@@ -812,6 +812,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $this->assertEquals(array(
                 new Reference('old_sound_rabbit_mq.channel.default_producer'),
                 new Reference('old_sound_rabbit_mq.channel.default_consumer'),
+                new Reference('old_sound_rabbit_mq.channel.default_group_consumer'),
             ),
             $definition->getArgument(0)
         );

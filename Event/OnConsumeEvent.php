@@ -9,17 +9,7 @@ use OldSound\RabbitMqBundle\RabbitMq\Consumer;
  *
  * @package OldSound\RabbitMqBundle\Command
  */
-class OnConsumeEvent extends AMQPEvent
+class OnConsumeEvent extends AbstractAMQPEvent
 {
-    const NAME = AMQPEvent::ON_CONSUME;
-
-    /**
-     * OnConsumeEvent constructor.
-     *
-     * @param Consumer $consumer
-     */
-    public function __construct(Consumer $consumer)
-    {
-        $this->setConsumer($consumer);
-    }
+    const NAME = 'old_sound_rabbit_mq.on_consume';
 }

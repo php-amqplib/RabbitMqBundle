@@ -11,7 +11,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
-use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ReceiverInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -104,10 +104,10 @@ class ConsumerTest extends TestCase
             array(null, 'basic_ack'), // Remove message from queue only if callback return not false
             array(true, 'basic_ack'), // Remove message from queue only if callback return not false
             array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
-            array(ConsumerInterface::MSG_ACK_SENT), // ack not sent by the consumer but should be sent by the implementer of ConsumerInterface
+            array(ReceiverInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
+            array(ReceiverInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
+            array(ReceiverInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
+            array(ReceiverInterface::MSG_ACK_SENT), // ack not sent by the consumer but should be sent by the implementer of ConsumerInterface
         );
     }
 
@@ -190,7 +190,7 @@ class ConsumerTest extends TestCase
             ->willReturn($this->isInstanceOf(OnConsumeEvent::class));
 
         $consumer->setEventDispatcher($eventDispatcher);
-        $consumer->consume(1);
+        $consumer->startConsume(1);
     }
 
     public function testIdleTimeoutExitCode()
@@ -226,7 +226,7 @@ class ConsumerTest extends TestCase
                 throw new AMQPTimeoutException();
             });
 
-        $this->assertTrue(2 == $consumer->consume(1));
+        $this->assertTrue(2 == $consumer->startConsume(1));
     }
 
     public function testShouldAllowContinueConsumptionAfterIdleTimeout()
@@ -286,7 +286,7 @@ class ConsumerTest extends TestCase
         $consumer->setEventDispatcher($eventDispatcher);
 
         $this->expectException(AMQPTimeoutException::class);
-        $consumer->consume(10);
+        $consumer->startConsume(10);
     }
 
     public function testGracefulMaxExecutionTimeoutExitCode()
@@ -322,7 +322,7 @@ class ConsumerTest extends TestCase
                 throw new AMQPTimeoutException();
             });
 
-        $this->assertSame(10, $consumer->consume(1));
+        $this->assertSame(10, $consumer->startConsume(1));
     }
 
     public function testGracefulMaxExecutionWontWaitIfPastTheTimeout()
@@ -352,7 +352,7 @@ class ConsumerTest extends TestCase
         $amqpChannel->expects($this->never())
             ->method('wait');
 
-        $consumer->consume(1);
+        $consumer->startConsume(1);
     }
 
     public function testTimeoutWait()
@@ -394,7 +394,7 @@ class ConsumerTest extends TestCase
                 throw new AMQPTimeoutException();
             });
 
-        $consumer->consume(1);
+        $consumer->startConsume(1);
     }
 
     public function testTimeoutWaitWontWaitPastGracefulMaxExecutionTimeout()
@@ -431,7 +431,7 @@ class ConsumerTest extends TestCase
                 throw new AMQPTimeoutException();
             });
 
-        $consumer->consume(1);
+        $consumer->startConsume(1);
     }
 
     public function testTimeoutWaitWontWaitPastIdleTimeout()
@@ -469,6 +469,6 @@ class ConsumerTest extends TestCase
                 throw new AMQPTimeoutException();
             });
 
-        $this->assertEquals(2, $consumer->consume(1));
+        $this->assertEquals(2, $consumer->startConsume(1));
     }
 }
