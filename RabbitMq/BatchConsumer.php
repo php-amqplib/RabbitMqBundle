@@ -348,7 +348,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     /**
      * @return  void
      */
-    protected function setupConsumer()
+    public function setupConsumer()
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();

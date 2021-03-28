@@ -13,6 +13,7 @@
         <parameter key="old_sound_rabbit_mq.producer.class">OldSound\RabbitMqBundle\RabbitMq\Producer</parameter>
         <parameter key="old_sound_rabbit_mq.consumer.class">OldSound\RabbitMqBundle\RabbitMq\Consumer</parameter>
         <parameter key="old_sound_rabbit_mq.multi_consumer.class">OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer</parameter>
+        <parameter key="old_sound_rabbit_mq.group_consumer.class">OldSound\RabbitMqBundle\RabbitMq\GroupConsumer</parameter>
         <parameter key="old_sound_rabbit_mq.dynamic_consumer.class">OldSound\RabbitMqBundle\RabbitMq\DynamicConsumer</parameter>
         <parameter key="old_sound_rabbit_mq.batch_consumer.class">OldSound\RabbitMqBundle\RabbitMq\BatchConsumer</parameter>
         <parameter key="old_sound_rabbit_mq.anon_consumer.class">OldSound\RabbitMqBundle\RabbitMq\AnonConsumer</parameter>
@@ -38,6 +39,10 @@
 
         <service id="old_sound_rabbit_mq.batch_consumer_command" class="OldSound\RabbitMqBundle\Command\BatchConsumerCommand">
             <tag name="console.command" command="rabbitmq:batch:consumer" />
+        </service>
+
+        <service id="old_sound_rabbit_mq.group_consumer_command" class="OldSound\RabbitMqBundle\Command\GroupConsumerCommand">
+            <tag name="console.command" command="rabbitmq:group:consumer" />
         </service>
 
         <service id="old_sound_rabbit_mq.consumer_command" class="OldSound\RabbitMqBundle\Command\ConsumerCommand">

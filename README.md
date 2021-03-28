@@ -916,6 +916,46 @@ Important: BatchConsumers will not have the -m|messages option available
 Important: BatchConsumers can also have the -b|batches option available if you want to only consume a specific number of batches and then stop the consumer.
 ! Give the number of the batches only if you want the consumer to stop after those batch messages were consumed.! 
 
+### Group Consumer Command ###
+
+Consume multiple queues by one worker command for reduce complexity and simplify debugging.
+A lot of running php commands can consume significant memory size and would be not convinient in development and testing environment which no need parallel executation.
+
+You can consume all defined queues with default group
+```bash
+    $ ./bin/console rabbitmq:group:consumer default
+```
+
+Specify group and run together with one worker.
+```yaml
+consumers:
+    deposit:
+        connection:             default
+        exchange_options:       {name: 'deposit', type: direct}
+        queue_options:          {name: 'deposit'}
+        ...
+        groups:                 ['payment'] # without specify will be equals ['default']
+
+    withdraw:
+        connection:             default
+        exchange_options:       {name: 'withdraw', type: direct}
+        ...
+        groups:                 ['payment']
+
+group_consumer:
+    default:
+        #connection:             default
+        qos_options:
+            prefetch_size:      0
+            prefetch_count:     10
+    payment:
+        connection:             payment_connection
+        timeout_wait:       30
+```
+```bash
+    $ ./bin/console rabbitmq:group:consumer payment
+```
+
 ### STDIN Producer ###
 
 There's a Command that reads data from STDIN and publishes it to a RabbitMQ queue. To use it first you have to configure a `producer` service in your configuration file like this:
