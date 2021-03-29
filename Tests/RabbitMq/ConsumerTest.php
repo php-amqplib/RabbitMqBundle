@@ -56,8 +56,8 @@ class ConsumerTest extends TestCase
 
         // Create a default message
         $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
+        $amqpMessage->setChannel($amqpChannel);
+        $amqpMessage->setDeliveryTag(0);
 
         if ($expectedMethod) {
             $amqpChannel->expects($this->any())

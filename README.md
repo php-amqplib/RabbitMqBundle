@@ -922,7 +922,7 @@ class DevckBasicConsumer implements BatchConsumerInterface
         $result = [];
         /** @var AMQPMessage $message */
         foreach ($messages as $message) {
-            $result[(int)$message->delivery_info['delivery_tag']] = $this->executeSomeLogicPerMessage($message);
+            $result[$message->getDeliveryTag()] = $this->executeSomeLogicPerMessage($message);
         }
 
         // you ack only some messages that have return true

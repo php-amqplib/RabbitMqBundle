@@ -17,7 +17,7 @@ class RpcServer extends BaseConsumer
     public function processMessage(AMQPMessage $msg)
     {
         try {
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            $msg->ack();
             $result = call_user_func($this->callback, $msg);
             $result = call_user_func($this->serializer, $result);
             $this->sendReply($result, $msg->get('reply_to'), $msg->get('correlation_id'));

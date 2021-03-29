@@ -65,13 +65,8 @@ class MultipleConsumerTest extends TestCase
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
     }
 
     /**
@@ -106,13 +101,8 @@ class MultipleConsumerTest extends TestCase
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
     }
 
     /**
@@ -154,15 +144,10 @@ class MultipleConsumerTest extends TestCase
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-3', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-4', $amqpMessage);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-3', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-4', $this->createMessage());
     }
 
     public function processMessageProvider()
@@ -299,5 +284,14 @@ class MultipleConsumerTest extends TestCase
         return function ($msg) use ($processFlag) {
             return $processFlag;
         };
+    }
+
+    private function createMessage()
+    {
+        $amqpMessage = new AMQPMessage('foo body');
+        $amqpMessage->setChannel($this->amqpChannel);
+        $amqpMessage->setDeliveryTag(0);
+
+        return $amqpMessage;
     }
 }

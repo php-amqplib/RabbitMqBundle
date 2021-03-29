@@ -18,14 +18,14 @@ class RpcServerTest extends TestCase
         $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
             ->setMethods( array('get'))
             ->getMock();
-        $message->delivery_info = array(
-            'channel' => $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
+        $message->setChannel(
+            $this->getMockBuilder('\PhpAmqpLib\Channel\AMQPChannel')
                 ->setMethods(array())->setConstructorArgs(array())
                 ->setMockClassName('')
                 ->disableOriginalConstructor()
-                ->getMock(),
-            'delivery_tag' => null
+                ->getMock()
         );
+        $message->setDeliveryTag(0);
         $server->setCallback(function() {
             return 'message';
         });

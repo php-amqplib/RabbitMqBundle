@@ -197,16 +197,16 @@ class Consumer extends BaseConsumer
     {
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
+            $msg->reject();
         } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], false, true);
+            $msg->nack(true);
         } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+            $msg->reject(false);
         } else if ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
             // Remove message from queue only if callback return not false
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            $msg->ack();
         }
 
         $this->consumed++;

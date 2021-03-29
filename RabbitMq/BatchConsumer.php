@@ -300,7 +300,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     private function addMessage(AMQPMessage $message)
     {
         $this->batchCounter++;
-        $this->messages[(int)$message->delivery_info['delivery_tag']] = $message;
+        $this->messages[$message->getDeliveryTag()] = $message;
     }
 
     /**
@@ -330,7 +330,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             throw new AMQPRuntimeException(sprintf('Unknown delivery_tag %d!', $deliveryTag));
         }
 
-        return $message->delivery_info['channel'];
+        return $message->getChannel();
     }
 
     /**
