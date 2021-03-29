@@ -13,6 +13,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 {
     protected $consumer;
 
+    /** @var int */
     protected $amount;
 
     abstract protected function getConsumerService();
@@ -41,12 +42,20 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
-            ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
+            ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', '0')
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
         ;
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->amount = (int)$input->getOption('messages');
+        if (0 > $this->amount) {
+            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
+        }
     }
 
     /**
@@ -80,23 +89,21 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
-        $this->amount = $input->getOption('messages');
-
-        if (0 > (int) $this->amount) {
-            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
-        }
         $this->initConsumer($input);
 
         return $this->consumer->consume($this->amount);
     }
 
-    protected function initConsumer($input)
+    protected function initConsumer(InputInterface $input)
     {
         $this->consumer = $this->getContainer()
                 ->get(sprintf($this->getConsumerService(), $input->getArgument('name')));
 
-        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string) $input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
-            $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
+        if ($input->hasOption('memory-limit')) {
+            $memoryLimit = (int)$input->getOption('memory-limit');
+            if ($memoryLimit > 0) {
+                $this->consumer->setMemoryLimit($memoryLimit);
+            }
         }
         $this->consumer->setRoutingKey($input->getOption('route'));
     }

@@ -10,7 +10,7 @@ class AnonConsumerCommand extends BaseConsumerCommand
 
         $this->setName('rabbitmq:anon-consumer');
         $this->setDescription('Executes an anonymous consumer');
-        $this->getDefinition()->getOption('messages')->setDefault(1);
+        $this->getDefinition()->getOption('messages')->setDefault('1');
         $this->getDefinition()->getOption('route')->setDefault('#');
 
     }

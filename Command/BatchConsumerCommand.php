@@ -36,7 +36,7 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
         $this
             ->setName('rabbitmq:batch:consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
-            ->addOption('batches', 'b', InputOption::VALUE_OPTIONAL, 'Number of batches to consume', 0)
+            ->addOption('batches', 'b', InputOption::VALUE_OPTIONAL, 'Number of batches to consume', '0')
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
@@ -75,8 +75,7 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
-        $batchAmountTarget = (int) $input->getOption('batches');
-
+        $batchAmountTarget = (int)$input->getOption('batches');
         if (0 > $batchAmountTarget) {
             throw new \InvalidArgumentException("The -b option should be greater than 0");
         }
