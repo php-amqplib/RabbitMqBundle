@@ -44,11 +44,4 @@ class BaseConsumerTest extends TestCase
         $this->consumer->setIdleTimeoutExitCode(43);
         $this->assertEquals(43, $this->consumer->getIdleTimeoutExitCode());
     }
-
-    public function testForceStopConsumer()
-    {
-        $this->assertAttributeEquals(false, 'forceStop', $this->consumer);
-        $this->consumer->forceStopConsumer();
-        $this->assertAttributeEquals(true, 'forceStop', $this->consumer);
-    }
 }
