@@ -192,6 +192,9 @@ by default to avoid possible breaks in applications already using this bundle.
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
 
+Please bear in mind, that you can expect problems, if your tasks are generally running longer than the heartbeat period, to which there are no good solutions ([link](https://github.com/php-amqplib/RabbitMqBundle/issues/301)). 
+Consider using either a big value for the heartbeat or leave the heartbeat disabled in favour of the tcp's `keepalive` (both on the client and server side) and the `graceful_max_execution_timeout` feature. 
+
 ### Dynamic Connection Parameters ###
 
 Sometimes your connection information may need to be dynamic. Dynamic connection parameters allow you to supply or
