@@ -33,7 +33,7 @@ interface ConsumerInterface
 
     /**
      * @param AMQPMessage $msg The message
-     * @return mixed false to reject and requeue, any other value to acknowledge
+     * @return int One of ConsumerInterface::MSG_* constants according to callback outcome.
      */
     public function execute(AMQPMessage $msg);
 }
