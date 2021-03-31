@@ -17,6 +17,6 @@ jobs:
         days-before-close: 14
         stale-issue-label: 'no-issue-activity'
         stale-pr-label: 'no-pr-activity'
-        exempt-issue-labels: 'awaiting-approval,work-in-progress,pinned,security'
+        exempt-issue-labels: 'Bug,awaiting-approval,work-in-progress,pinned,security'
         exempt-pr-labels: 'awaiting-approval,work-in-progress,requires-major-increase'
         ascending: true
