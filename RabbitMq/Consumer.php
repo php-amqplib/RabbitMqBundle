@@ -75,7 +75,7 @@ class Consumer extends BaseConsumer
         $this->setupConsumer();
 
         $this->setLastActivityDateTime(new \DateTime());
-        while (count($this->getChannel()->callbacks)) {
+        while ($this->getChannel()->is_consuming()) {
             $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
 

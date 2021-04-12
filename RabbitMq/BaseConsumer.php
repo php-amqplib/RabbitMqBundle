@@ -47,7 +47,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
         $this->setupConsumer();
 
-        while (count($this->getChannel()->callbacks)) {
+        while ($this->getChannel()->is_consuming()) {
             $this->getChannel()->wait();
         }
     }
