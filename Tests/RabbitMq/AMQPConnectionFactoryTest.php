@@ -532,6 +532,83 @@ class AMQPConnectionFactoryTest extends TestCase
         );
     }
 
+    public function testSocketClusterConnectionParameters()
+    {
+        $factory = new AMQPConnectionFactory(
+            AMQPSocketConnection::class,
+            [
+                'hosts' => [
+                    [
+                        'host' => 'cluster_host',
+                        'port' => 123,
+                        'user' => 'cluster_user',
+                        'password' => 'cluster_password',
+                        'vhost' => '/cluster_vhost',
+                    ],
+                    [
+                        'url' => 'amqp://user:pass@host:321/vhost',
+                    ]
+                ]
+            ]
+        );
+
+        /** @var AMQPSocketConnection $instance */
+        $instance = $factory->createConnection();
+        $this->assertInstanceOf(AMQPSocketConnection::class, $instance);
+        $this->assertEquals([
+            'cluster_host',     // host
+            123,                // port
+            'cluster_user',     // user
+            'cluster_password', // password
+            '/cluster_vhost',   // vhost
+            false,              // insist
+            "AMQPLAIN",         // login method
+            null,               // login response
+            "en_US",            // locale
+            3,                  // read_timeout
+            false,              // keepalive
+            3,                  // write_timeout
+            0,                  // heartbeat
+        ], $instance->constructParams);
+
+        $this->assertEquals(
+            [
+                [
+                    [
+                        'host' => 'cluster_host',
+                        'port' => 123,
+                        'user' => 'cluster_user',
+                        'password' => 'cluster_password',
+                        'vhost' => '/cluster_vhost',
+                    ],
+                    [
+                        'host' => 'host',
+                        'port' => 321,
+                        'user' => 'user',
+                        'password' => 'pass',
+                        'vhost' => 'vhost',
+                    ]
+                ],
+                [
+                    'url'                => '',
+                    'host'               => 'localhost',
+                    'port'               => 5672,
+                    'user'               => 'guest',
+                    'password'           => 'guest',
+                    'vhost'              => '/',
+                    'ssl_context'        => null,
+                    'keepalive'          => false,
+                    'heartbeat'          => 0,
+                    'connection_timeout' => 3,
+                    'read_write_timeout' => 3,
+                    'read_timeout'       => 3,
+                    'write_timeout'      => 3
+                ]
+            ],
+            $instance::$createConnectionParams
+        );
+    }
+
     public function testConnectionsParametersProviderWithConstructorArgs()
     {
         $connectionParametersProvider = $this->prepareConnectionParametersProvider();
