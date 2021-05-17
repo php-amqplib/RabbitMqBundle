@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -64,7 +65,7 @@ class RpcClientTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
 
         $client->notify('not a callable');
     }
@@ -84,7 +85,7 @@ class RpcClientTest extends TestCase
             ->method('wait')
             ->willThrowException(new AMQPTimeoutException());
 
-        $this->expectException('\PhpAmqpLib\Exception\AMQPTimeoutException');
+        $this->expectException(AMQPTimeoutException::class);
 
         $channel->expects($this->once())
             ->method('basic_cancel');

@@ -1,3 +1,6 @@
+- 2021-05-15
+    * Add possibility to use multiple RabbitMQ hosts
+
 - 2017-01-22
     * Add `graceful_max_execution_timeout`
 
