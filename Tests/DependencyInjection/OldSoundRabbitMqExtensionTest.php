@@ -36,6 +36,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => [],
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -65,6 +66,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => [],
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -92,6 +94,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => [],
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -119,6 +122,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'heartbeat' => 0,
             'use_socket' => false,
             'url' => '',
+            'hosts' => [],
         ), $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -139,6 +143,51 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definiton = $container->getDefinition('old_sound_rabbit_mq.connection.lazy_socket');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.lazy_socket'));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.socket_connection.class%', $definiton->getClass());
+    }
+
+    public function testClusterConnectionDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection.cluster_connection'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.connection.cluster_connection');
+        $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.cluster_connection'));
+        $factory = $container->getDefinition('old_sound_rabbit_mq.connection_factory.cluster_connection');
+        $this->assertEquals(['old_sound_rabbit_mq.connection_factory.cluster_connection', 'createConnection'], $definition->getFactory());
+        $this->assertEquals([
+            'hosts' => [
+                [
+                    'host' => 'cluster_host',
+                    'port' => 111,
+                    'user' => 'cluster_user',
+                    'password' => 'cluster_password',
+                    'vhost' => '/cluster',
+                    'url' => ''
+                ],
+                [
+                    'host' => 'localhost',
+                    'port' => 5672,
+                    'user' => 'guest',
+                    'password' => 'guest',
+                    'vhost' => '/',
+                    'url' => 'amqp://cluster_url_host:cluster_url_pass@host:10000/cluster_url_vhost'
+                ]
+            ],
+            'host' => 'localhost',
+            'port' => 5672,
+            'user' => 'guest',
+            'password' => 'guest',
+            'vhost' => '/',
+            'lazy' => false,
+            'connection_timeout' => 3,
+            'read_write_timeout' => 3,
+            'ssl_context' => array(),
+            'keepalive' => false,
+            'heartbeat' => 0,
+            'use_socket' => false,
+            'url' => '',
+        ], $factory->getArgument(1));
+        $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
 
     public function testFooBinding()

@@ -2,9 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq\Fixtures;
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AMQPSSLConnection as BaseAMQPSSLConnection;
 
-class AMQPConnection extends AMQPStreamConnection
+class AMQPSSLConnection extends BaseAMQPSSLConnection
 {
     public $constructParams;
 

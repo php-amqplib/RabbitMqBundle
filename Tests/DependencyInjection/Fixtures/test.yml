@@ -45,6 +45,15 @@ old_sound_rabbit_mq:
             lazy:       true
             use_socket: true
 
+        cluster_connection:
+            hosts:
+                - host: cluster_host
+                  port: 111
+                  user: cluster_user
+                  password: cluster_password
+                  vhost: /cluster
+                - url: amqp://cluster_url_host:cluster_url_pass@host:10000/cluster_url_vhost
+
         default:
         default2:
         foo_default:

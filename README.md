@@ -195,6 +195,37 @@ It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your
 Please bear in mind, that you can expect problems, if your tasks are generally running longer than the heartbeat period, to which there are no good solutions ([link](https://github.com/php-amqplib/RabbitMqBundle/issues/301)). 
 Consider using either a big value for the heartbeat or leave the heartbeat disabled in favour of the tcp's `keepalive` (both on the client and server side) and the `graceful_max_execution_timeout` feature. 
 
+### Multiple Hosts ###
+
+You can provide multiple hosts for a connection. This will allow you to use RabbitMQ cluster with multiple nodes.
+
+```yaml
+  old_sound_rabbit_mq:
+      connections:
+          default:
+              hosts:
+                - host: host1
+                  port: 3672
+                  user: user1
+                  password: password1
+                  vhost: vhost1
+                - url: 'amqp://guest:password@localhost:5672/vhost'
+              connection_timeout: 3
+              read_write_timeout: 3
+```
+
+Pay attention that you can not specify 
+```yaml
+  connection_timeout 
+  read_write_timeout
+  use_socket
+  ssl_context
+  keepalive
+  heartbeat
+  connection_parameters_provider 
+```
+parameters to each host separately.
+
 ### Dynamic Connection Parameters ###
 
 Sometimes your connection information may need to be dynamic. Dynamic connection parameters allow you to supply or
