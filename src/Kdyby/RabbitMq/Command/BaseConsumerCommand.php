@@ -40,8 +40,6 @@ abstract class BaseConsumerCommand extends \Symfony\Component\Console\Command\Co
 	}
 
 	/**
-	 * @param \Symfony\Component\Console\Input\InputInterface $input An InputInterface instance
-	 * @param \Symfony\Component\Console\Output\OutputInterface $output An OutputInterface instance
 	 * @throws \InvalidArgumentException When the number of messages to consume is less than 0
 	 * @throws \BadFunctionCallException When the pcntl is not installed and option -s is true
 	 */
@@ -74,7 +72,7 @@ abstract class BaseConsumerCommand extends \Symfony\Component\Console\Command\Co
 
 		$this->consumer = $this->connection->getConsumer($input->getArgument('name'));
 
-		/** @var int|NULL $memoryLimit */
+		/** @var int|null $memoryLimit */
 		$memoryLimit = $input->getOption('memory-limit');
 		if ($memoryLimit !== NULL && \ctype_digit((string) $memoryLimit) && $memoryLimit > 0) {
 			$this->consumer->setMemoryLimit($memoryLimit);
@@ -86,10 +84,6 @@ abstract class BaseConsumerCommand extends \Symfony\Component\Console\Command\Co
 		}
 	}
 
-	/**
-	 * @param \Symfony\Component\Console\Input\InputInterface $input An InputInterface instance
-	 * @param \Symfony\Component\Console\Output\OutputInterface $output An OutputInterface instance
-	 */
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
 		$this->consumer->consume($this->amount);

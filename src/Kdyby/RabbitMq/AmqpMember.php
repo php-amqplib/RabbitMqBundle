@@ -209,7 +209,7 @@ abstract class AmqpMember
 	 */
 	protected function doQueueDeclare(string $name, array $options): void
 	{
-		[$queueName ] = $this->getChannel()->queue_declare(
+		[$queueName] = $this->getChannel()->queue_declare(
 			$name,
 			$options['passive'],
 			$options['durable'],

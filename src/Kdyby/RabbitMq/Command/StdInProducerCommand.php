@@ -29,9 +29,6 @@ class StdInProducerCommand extends \Symfony\Component\Console\Command\Command
 
 	/**
 	 * Executes the current command.
-	 *
-	 * @param \Symfony\Component\Console\Input\InputInterface $input An InputInterface instance
-	 * @param \Symfony\Component\Console\Output\OutputInterface $output An OutputInterface instance
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): void
 	{

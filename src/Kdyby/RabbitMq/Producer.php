@@ -39,7 +39,7 @@ class Producer extends \Kdyby\RabbitMq\AmqpMember implements \Kdyby\RabbitMq\IPr
 	protected function getBasicProperties(): array
 	{
 		return [
-			'content_type'  => $this->contentType,
+			'content_type' => $this->contentType,
 			'delivery_mode' => $this->deliveryMode,
 		];
 	}
