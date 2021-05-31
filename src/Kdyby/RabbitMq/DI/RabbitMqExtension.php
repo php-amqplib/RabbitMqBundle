@@ -25,6 +25,7 @@ class RabbitMqExtension extends \Nette\DI\CompilerExtension
 	public const TAG_CONSUMER = 'kdyby.rabbitmq.consumer';
 	public const TAG_RPC_CLIENT = 'kdyby.rabbitmq.rpc.client';
 	public const TAG_RPC_SERVER = 'kdyby.rabbitmq.rpc.server';
+	public const EXTENDS_KEY = '_extends';
 
 	/**
 	 * @var array
@@ -466,8 +467,8 @@ class RabbitMqExtension extends \Nette\DI\CompilerExtension
 			$consumerName,
 			'~^(?P<consumerName>[^>\s]+)\s*\<\s*(?P<producerName>[^>\s]+)\z~'
 		);
-		if (isset($config['_extends'])) {
-			$producerName = $config['_extends'];
+		if (isset($config[self::EXTENDS_KEY])) {
+			$producerName = $config[self::EXTENDS_KEY];
 
 		} elseif ($m) {
 			$consumerName = $m['consumerName'];
