@@ -1,6 +1,5 @@
 parameters:
 	ignoreErrors:
-		- '#Parameter \$callback of method KdybyTests\\RabbitMq\\Mock\\ChannelMock\:\:basic_consume\(\) has invalid typehint type PhpAmqpLib\\Channel\\callback.#'
 
 	excludes_analyse:
 		- *src/Kdyby/RabbitMq/DI/ClassAliasMap.php
