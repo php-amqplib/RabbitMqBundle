@@ -1,0 +1,32 @@
+name: Package CI
+
+on:
+  pull_request:
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ 7.4, 8.0 ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 5672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+          rabbitmq vhost: '/'
+
+      - run: composer update --no-interaction --no-suggest --no-progress --prefer-dist
+
+      - run: vendor/bin/parallel-lint -e php,phpt --exclude vendor .
+
+      - run: vendor/bin/tester -s -c ./tests/php.ini-unix ./tests/KdybyTests/
+
+      - run: vendor/bin/phpstan analyse -l 2 -c phpstan.neon src tests/KdybyTests
