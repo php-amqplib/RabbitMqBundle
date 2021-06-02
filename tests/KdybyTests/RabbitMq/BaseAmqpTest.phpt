@@ -27,7 +27,7 @@ class BaseAmqpTest extends \KdybyTests\RabbitMq\TestCase
 
 		Assert::exception(static function () use ($consumer): void {
 			$consumer->getChannel();
-		}, \ErrorException::class, 'stream_socket_client(): unable to connect to tcp://localhost:123 (Connection refused)');
+		}, \PhpAmqpLib\Exception\AMQPIOException::class, 'stream_socket_client(): Unable to connect to tcp://localhost:123 (Connection refused)');
 	}
 
 }
