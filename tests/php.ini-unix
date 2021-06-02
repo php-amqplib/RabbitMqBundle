@@ -1,0 +1,3 @@
+extension=sockets
+extension=iconv
+extension=tokenizer
