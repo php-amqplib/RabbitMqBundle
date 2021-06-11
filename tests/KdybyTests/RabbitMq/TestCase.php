@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
@@ -10,35 +12,22 @@
 
 namespace KdybyTests\RabbitMq;
 
-use Kdyby;
 use Mockery;
-use Nette;
-use Tester;
 
-
-
-require_once __DIR__ . '/../bootstrap.php';
-require_once __DIR__ . '/mocks.php';
-
-/**
- * @author Filip Procházka <filip@prochazka.su>
- */
-abstract class TestCase extends Tester\TestCase
+abstract class TestCase extends \Tester\TestCase
 {
 
 	/**
-	 * @var Mockery\Container
+	 * @var \Mockery\Container
 	 */
 	private $mockery;
-
-
 
 	/**
 	 * @param string $class
 	 * @throws \Mockery\Exception\RuntimeException
-	 * @return Mockery\Container|Mockery\Mock
+	 * @return \Mockery\Container|\Mockery\Mock
 	 */
-	protected function getMockery($class = NULL)
+	protected function getMockery(?string $class = NULL)
 	{
 		if (!$this->mockery) {
 			$this->mockery = new Mockery\Container(Mockery::getDefaultGenerator(), Mockery::getDefaultLoader());
@@ -51,9 +40,7 @@ abstract class TestCase extends Tester\TestCase
 		return $this->mockery;
 	}
 
-
-
-	protected function tearDown()
+	protected function tearDown(): void
 	{
 		if ($this->mockery) {
 			$this->mockery->mockery_close();

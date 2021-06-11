@@ -1,17 +1,13 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq\Command;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class ConsumerCommand extends BaseConsumerCommand
+class ConsumerCommand extends \Kdyby\RabbitMq\Command\BaseConsumerCommand
 {
 
-	protected function configure()
+	protected function configure(): void
 	{
 		parent::configure();
 

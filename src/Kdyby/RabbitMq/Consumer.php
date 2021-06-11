@@ -1,26 +1,21 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
 use PhpAmqpLib\Exception\AMQPExceptionInterface;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
-use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
-
-
 /**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- *
- * @method onStart(Consumer $self)
- * @method onConsume(Consumer $self, AMQPMessage $msg)
- * @method onReject(Consumer $self, AMQPMessage $msg, $processFlag)
- * @method onAck(Consumer $self, AMQPMessage $msg)
- * @method onError(Consumer $self, AMQPExceptionInterface $e)
- * @method onTimeout(Consumer $self)
+ * @method onStart(\Kdyby\RabbitMq\Consumer $self)
+ * @method onConsume(\Kdyby\RabbitMq\Consumer $self, \PhpAmqpLib\Message\AMQPMessage $msg)
+ * @method onReject(\Kdyby\RabbitMq\Consumer $self, \PhpAmqpLib\Message\AMQPMessage $msg, $processFlag)
+ * @method onAck(\Kdyby\RabbitMq\Consumer $self, \PhpAmqpLib\Message\AMQPMessage $msg)
+ * @method onError(\Kdyby\RabbitMq\Consumer $self, \PhpAmqpLib\Exception\AMQPExceptionInterface $e)
+ * @method onTimeout(\Kdyby\RabbitMq\Consumer $self)
  */
-class Consumer extends BaseConsumer
+class Consumer extends \Kdyby\RabbitMq\BaseConsumer
 {
 
 	/**
@@ -63,62 +58,54 @@ class Consumer extends BaseConsumer
 	 */
 	protected $memoryLimit;
 
-
-
 	/**
 	 * Set the memory limit
 	 *
 	 * @param int $memoryLimit
 	 */
-	public function setMemoryLimit($memoryLimit)
+	public function setMemoryLimit(int $memoryLimit): void
 	{
 		$this->memoryLimit = $memoryLimit;
 	}
 
-
-
 	/**
 	 * Get the memory limit
-	 *
-	 * @return int
 	 */
-	public function getMemoryLimit()
+	public function getMemoryLimit(): ?int
 	{
 		return $this->memoryLimit;
 	}
 
-
-
-	public function consume($msgAmount)
+	public function consume(int $msgAmount): void
 	{
 		$this->target = $msgAmount;
 		$this->setupConsumer();
 		$this->onStart($this);
 
-		$previousErrorHandler = set_error_handler(function ($severity, $message, $file, $line, $context) use (&$previousErrorHandler) {
-			if (!preg_match('~stream_select\\(\\)~i', $message)) {
-				$args = func_get_args();
-				return call_user_func_array($previousErrorHandler, $args);
+		$previousErrorHandler = \set_error_handler(static function ($severity, $message, $file, $line, $context) use (&$previousErrorHandler) {
+			if (!\preg_match('~stream_select\\(\\)~i', $message)) {
+				$args = \func_get_args();
+				return \call_user_func_array($previousErrorHandler, $args);
 			}
 
-			throw new AMQPRuntimeException($message . ' in ' . $file . ':' . $line, (int) $severity);
+			throw new \PhpAmqpLib\Exception\AMQPRuntimeException($message . ' in ' . $file . ':' . $line, (int) $severity);
 		});
 
 		try {
-			while (count($this->getChannel()->callbacks)) {
+			while (\count($this->getChannel()->callbacks)) {
 				$this->maybeStopConsumer();
 
 				try {
 					$this->getChannel()->wait(NULL, FALSE, $this->getIdleTimeout());
-				} catch (AMQPTimeoutException $e) {
+				} catch (\PhpAmqpLib\Exception\AMQPTimeoutException $e) {
 					$this->onTimeout($this);
 					// nothing bad happened, right?
 					// intentionally not throwing the exception
 				}
 			}
 
-		} catch (AMQPRuntimeException $e) {
-			restore_error_handler();
+		} catch (\PhpAmqpLib\Exception\AMQPRuntimeException $e) {
+			\restore_error_handler();
 
 			// sending kill signal to the consumer causes the stream_select to return false
 			// the reader doesn't like the false value, so it throws AMQPRuntimeException
@@ -129,63 +116,61 @@ class Consumer extends BaseConsumer
 			}
 
 		} catch (AMQPExceptionInterface $e) {
-			restore_error_handler();
+			\restore_error_handler();
 
 			$this->onError($this, $e);
 			throw $e;
 
-		} catch (TerminateException $e) {
+		} catch (\Kdyby\RabbitMq\Exception\TerminateException $e) {
 			$this->stopConsuming();
 		}
 	}
 
-
-
 	/**
 	 * Purge the queue
 	 */
-	public function purge()
+	public function purge(): void
 	{
-		$this->getChannel()->queue_purge($this->queueOptions['name'], true);
+		$this->getChannel()->queue_purge($this->queueOptions['name'], TRUE);
 	}
 
-
-
-	public function processMessage(AMQPMessage $msg)
+	public function processMessage(AMQPMessage $msg): void
 	{
 		$this->onConsume($this, $msg);
 		try {
-			$processFlag = call_user_func($this->callback, $msg);
+			$processFlag = \call_user_func($this->callback, $msg);
 			$this->handleProcessMessage($msg, $processFlag);
 
-		} catch (TerminateException $e) {
+		} catch (\Kdyby\RabbitMq\Exception\TerminateException $e) {
 			$this->handleProcessMessage($msg, $e->getResponse());
 			throw $e;
 
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$this->onReject($this, $msg, IConsumer::MSG_REJECT_REQUEUE);
 			throw $e;
 		}
 	}
 
-
-
-	protected function handleProcessMessage(AMQPMessage $msg, $processFlag)
+	/**
+	 * @param \PhpAmqpLib\Message\AMQPMessage $msg
+	 * @param int|bool $processFlag
+	 */
+	protected function handleProcessMessage(AMQPMessage $msg, $processFlag): void
 	{
-		if ($processFlag === IConsumer::MSG_REJECT_REQUEUE || false === $processFlag) {
+		if ($processFlag === IConsumer::MSG_REJECT_REQUEUE || $processFlag === FALSE) {
 			// Reject and requeue message to RabbitMQ
-			$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
+			$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], TRUE);
 			$this->onReject($this, $msg, $processFlag);
 
 		} elseif ($processFlag === IConsumer::MSG_SINGLE_NACK_REQUEUE) {
 			// NACK and requeue message to RabbitMQ
-			$msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], false, true);
+			$msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], FALSE, TRUE);
 			$this->onReject($this, $msg, $processFlag);
 
 		} else {
 			if ($processFlag === IConsumer::MSG_REJECT) {
 				// Reject and drop
-				$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
+				$msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], FALSE);
 				$this->onReject($this, $msg, $processFlag);
 
 			} else {
@@ -203,20 +188,18 @@ class Consumer extends BaseConsumer
 		}
 	}
 
-
-
 	/**
 	 * Checks if memory in use is greater or equal than memory allowed for this process
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	protected function isRamAlmostOverloaded()
+	protected function isRamAlmostOverloaded(): bool
 	{
 		if ($this->getMemoryLimit() === NULL) {
 			return FALSE;
 		}
 
-		return memory_get_usage(true) >= ($this->getMemoryLimit() * 1024 * 1024);
+		return \memory_get_usage(TRUE) >= ($this->getMemoryLimit() * 1024 * 1024);
 	}
 
 }

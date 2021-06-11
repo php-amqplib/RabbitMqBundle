@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<ruleset name="Kdyby/Console">
+	<rule ref="vendor/kdyby/coding-standard/ruleset.xml"/>
+</ruleset>

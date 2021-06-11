@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
@@ -10,26 +12,20 @@
 
 namespace Kdyby\RabbitMq\DI;
 
-use Kdyby;
 use Nette;
-use Nette\DI\Compiler;
-use Nette\PhpGenerator as Code;
 use Nette\DI\Config;
 use Nette\Utils\Validators;
 
-
-
-/**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- */
-class RabbitMqExtension extends Nette\DI\CompilerExtension
+class RabbitMqExtension extends \Nette\DI\CompilerExtension
 {
 
-	const TAG_PRODUCER = 'kdyby.rabbitmq.producer';
-	const TAG_CONSUMER = 'kdyby.rabbitmq.consumer';
-	const TAG_RPC_CLIENT = 'kdyby.rabbitmq.rpc.client';
-	const TAG_RPC_SERVER = 'kdyby.rabbitmq.rpc.server';
+	public const TAG_COMMAND_KDYBY = 'kdyby.console.command';
+	public const TAG_COMMAND = 'console.command';
+	public const TAG_PRODUCER = 'kdyby.rabbitmq.producer';
+	public const TAG_CONSUMER = 'kdyby.rabbitmq.consumer';
+	public const TAG_RPC_CLIENT = 'kdyby.rabbitmq.rpc.client';
+	public const TAG_RPC_SERVER = 'kdyby.rabbitmq.rpc.server';
+	public const EXTENDS_KEY = '_extends';
 
 	/**
 	 * @var array
@@ -60,7 +56,7 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	 */
 	public $producersDefaults = [
 		'connection' => 'default',
-		'class' => 'Kdyby\RabbitMq\Producer',
+		'class' => \Kdyby\RabbitMq\Producer::class,
 		'exchange' => [],
 		'queue' => [],
 		'contentType' => 'text/plain',
@@ -150,38 +146,46 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 	 */
 	private $producersConfig = [];
 
-
-
-	public function loadConfiguration()
+	/**
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$config = $this->getConfig($this->defaults);
+		$config = \Nette\DI\Config\Helpers::merge($this->getConfig(), $this->defaults);
 
 		foreach ($this->compiler->getExtensions() as $extension) {
 			if ($extension instanceof IProducersProvider) {
 				$producers = $extension->getRabbitProducers();
 				Validators::assert($producers, 'array:1..');
-				$config['producers'] = array_merge($config['producers'], $producers);
+				$config['producers'] = \array_merge($config['producers'], $producers);
 			}
 			if ($extension instanceof IConsumersProvider) {
 				$consumers = $extension->getRabbitConsumers();
 				Validators::assert($consumers, 'array:1..');
-				$config['consumers'] = array_merge($config['consumers'], $consumers);
+				$config['consumers'] = \array_merge($config['consumers'], $consumers);
 			}
 			if ($extension instanceof IRpcClientsProvider) {
 				$rpcClients = $extension->getRabbitRpcClients();
 				Validators::assert($rpcClients, 'array:1..');
-				$config['rpcClients'] = array_merge($config['rpcClients'], $rpcClients);
+				$config['rpcClients'] = \array_merge($config['rpcClients'], $rpcClients);
 			}
 			if ($extension instanceof IRpcServersProvider) {
 				$rpcServers = $extension->getRabbitRpcServers();
 				Validators::assert($rpcServers, 'array:1..');
-				$config['rpcServers'] = array_merge($config['rpcServers'], $rpcServers);
+				$config['rpcServers'] = \array_merge($config['rpcServers'], $rpcServers);
 			}
 		}
 
-		if ($unexpected = array_diff(array_keys($config), array_keys($this->defaults))) {
-			throw new Nette\Utils\AssertionException("Unexpected key '" . implode("', '", $unexpected) . "' in configuration of {$this->name}.");
+		$unexpected = \array_diff(\array_keys($config), \array_keys($this->defaults));
+		if ($unexpected) {
+			throw new \Nette\Utils\AssertionException(
+				\sprintf(
+					'Unexpected key \'%s\' in configuration of %s.',
+					\implode("', '", $unexpected),
+					$this->name
+				)
+			);
 		}
 
 		$builder->parameters[$this->name] = $config;
@@ -192,17 +196,18 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$this->loadRpcClients($config['rpcClients']);
 		$this->loadRpcServers($config['rpcServers']);
 
-		foreach ($this->connectionsMeta as $name => $meta) {
+		foreach ($this->connectionsMeta as $meta) {
+			/** @var \Nette\DI\Definitions\ServiceDefinition $connection */
 			$connection = $builder->getDefinition($meta['serviceId']);
 
 			if ($config['debugger']) {
 				$builder->addDefinition($panelService = $meta['serviceId'] . '.panel')
-					->setClass('Kdyby\RabbitMq\Diagnostics\Panel')
+					->setType(\Kdyby\RabbitMq\Diagnostics\Panel::class)
 					->addSetup('injectServiceMap', [
 						$meta['consumers'],
 						$meta['rpcServers'],
 					])
-					->setInject(FALSE)
+					->addTag(\Nette\DI\Extensions\InjectExtension::TAG_INJECT, FALSE)
 					->setAutowired(FALSE);
 
 				$connection->addSetup('injectPanel', ['@' . $panelService]);
@@ -220,16 +225,16 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		$this->loadConsole();
 	}
 
-
-
-	public function beforeCompile()
+	public function beforeCompile(): void
 	{
 		unset($this->getContainerBuilder()->parameters[$this->name]);
 	}
 
-
-
-	protected function loadConnections($connections)
+	/**
+	 * @param array<mixed> $connections
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	protected function loadConnections(array $connections): void
 	{
 		$this->connectionsMeta = []; // reset
 
@@ -241,17 +246,35 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		foreach ($connections as $name => $config) {
 			$config = $this->mergeConfig($config, $this->connectionDefaults);
 
-			Nette\Utils\Validators::assertField($config, 'user', 'string:3..', "The config item '%' of connection {$this->name}.{$name}");
-			Nette\Utils\Validators::assertField($config, 'password', 'string:3..', "The config item '%' of connection {$this->name}.{$name}");
+			Nette\Utils\Validators::assertField(
+				$config,
+				'user',
+				'string:3..',
+				\sprintf(
+					'The config item \'%%\' of connection %s.%s',
+					$this->name,
+					$name
+				)
+			);
+			Nette\Utils\Validators::assertField(
+				$config,
+				'password',
+				'string:3..',
+				\sprintf(
+					'The config item \'%%\' of connection %s.%s',
+					$this->name,
+					$name
+				)
+			);
 
 			$connection = $builder->addDefinition($serviceName = $this->prefix($name . '.connection'))
-				->setClass('Kdyby\RabbitMq\Connection')
+				->setType(\Kdyby\RabbitMq\Connection::class)
 				->setArguments([
 					$config['host'],
 					$config['port'],
 					$config['user'],
 					$config['password'],
-					$config['vhost']
+					$config['vhost'],
 				]);
 
 			$this->connectionsMeta[$name] = [
@@ -263,15 +286,17 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			];
 
 			// only the first connection is autowired
-			if (count($this->connectionsMeta) > 1) {
+			if (\count($this->connectionsMeta) > 1) {
 				$connection->setAutowired(FALSE);
 			}
 		}
 	}
 
-
-
-	protected function loadProducers($producers)
+	/**
+	 * @param array<mixed> $producers
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	protected function loadProducers(array $producers): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -279,12 +304,19 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			$config = $this->mergeConfig($config, ['autoSetupFabric' => $builder->parameters[$this->name]['autoSetupFabric']] + $this->producersDefaults);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
-				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in producer {$this->name}.{$name} was not defined.");
+				throw new \Nette\Utils\AssertionException(
+					\sprintf(
+						'Connection %s required in producer %s.%s was not defined.',
+						$config['connection'],
+						$this->name,
+						$name
+					)
+				);
 			}
 
 			$producer = $builder->addDefinition($serviceName = $this->prefix('producer.' . $name))
 				->setFactory($config['class'], ['@' . $this->connectionsMeta[$config['connection']]['serviceId']])
-				->setClass('Kdyby\RabbitMq\IProducer')
+				->setType(\Kdyby\RabbitMq\IProducer::class)
 				->addSetup('setContentType', [$config['contentType']])
 				->addSetup('setDeliveryMode', [$config['deliveryMode']])
 				->addSetup('setRoutingKey', [$config['routingKey']])
@@ -292,8 +324,26 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 
 			if (!empty($config['exchange'])) {
 				$config['exchange'] = $this->mergeConfig($config['exchange'], $this->exchangeDefaults);
-				Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
-				Nette\Utils\Validators::assertField($config['exchange'], 'type', 'string:3..', "The config item 'exchange.%' of producer {$this->name}.{$name}");
+				Nette\Utils\Validators::assertField(
+					$config['exchange'],
+					'name',
+					'string:3..',
+					\sprintf(
+						'The config item \'exchange.%%\' of producer %s.%s',
+						$this->name,
+						$name
+					)
+				);
+				Nette\Utils\Validators::assertField(
+					$config['exchange'],
+					'type',
+					'string:3..',
+					\sprintf(
+						"The config item 'exchange.%%' of producer %s.%s",
+						$this->name,
+						$name
+					)
+				);
 				$producer->addSetup('setExchangeOptions', [$config['exchange']]);
 			}
 
@@ -309,9 +359,11 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 	}
 
-
-
-	protected function loadConsumers($consumers)
+	/**
+	 * @param array<mixed> $consumers
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	protected function loadConsumers(array $consumers): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -320,7 +372,14 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			$config = $this->extendConsumerFromProducer($name, $config);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
-				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in consumer {$this->name}.{$name} was not defined.");
+				throw new \Nette\Utils\AssertionException(
+					\sprintf(
+						'Connection %s required in consumer %s.%s was not defined.',
+						$config['connection'],
+						$this->name,
+						$name
+					)
+				);
 			}
 
 			$consumer = $builder->addDefinition($serviceName = $this->prefix('consumer.' . $name))
@@ -328,8 +387,22 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				->setAutowired(FALSE);
 
 			if (!empty($config['exchange'])) {
-				Nette\Utils\Validators::assertField($config['exchange'], 'name', 'string:3..', "The config item 'exchange.%' of consumer {$this->name}.{$name}");
-				Nette\Utils\Validators::assertField($config['exchange'], 'type', 'string:3..', "The config item 'exchange.%' of consumer {$this->name}.{$name}");
+				Nette\Utils\Validators::assertField(
+					$config['exchange'],
+					'name',
+					'string:3..',
+					\sprintf(
+						'The config item \'exchange.%%\' of consumer %s.%s',
+						$this->name,
+						$name
+					)
+				);
+				Nette\Utils\Validators::assertField(
+					$config['exchange'],
+					'type',
+					'string:3..',
+					\sprintf('The config item \'exchange.%%\' of consumer %s.%s', $this->name, $name)
+				);
 				$consumer->addSetup('setExchangeOptions', [$this->mergeConfig($config['exchange'], $this->exchangeDefaults)]);
 			}
 
@@ -344,24 +417,24 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 				}
 
 				$consumer
-					->setClass('Kdyby\RabbitMq\MultipleConsumer')
+					->setType(\Kdyby\RabbitMq\MultipleConsumer::class)
 					->addSetup('setQueues', [$config['queues']]);
 
 			} elseif (empty($config['queues']) && !empty($config['queue'])) {
 				$consumer
-					->setClass('Kdyby\RabbitMq\Consumer')
+					->setType(\Kdyby\RabbitMq\Consumer::class)
 					->addSetup('setQueueOptions', [$this->mergeConfig($config['queue'], $this->queueDefaults)])
 					->addSetup('setCallback', [self::fixCallback($config['callback'])]);
 
 			} else {
 				$consumer
-					->setClass('Kdyby\RabbitMq\AnonymousConsumer')
+					->setType(\Kdyby\RabbitMq\AnonymousConsumer::class)
 					->addSetup('setCallback', [self::fixCallback($config['callback'])]);
 			}
 
 			$consumer->setArguments(['@' . $this->connectionsMeta[$config['connection']]['serviceId']]);
 
-			if (array_filter($config['qos'])) { // has values
+			if (\array_filter($config['qos'])) { // has values
 				$config['qos'] = $this->mergeConfig($config['qos'], $this->qosDefaults);
 				$consumer->addSetup('setQosOptions', [
 					$config['qos']['prefetchSize'],
@@ -382,14 +455,22 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 	}
 
-
-
-	private function extendConsumerFromProducer(&$consumerName, $config)
+	/**
+	 * @param string $consumerName
+	 * @param array<mixed> $config
+	 * @return array<mixed>
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	private function extendConsumerFromProducer(string &$consumerName, array $config): array
 	{
-		if (isset($config[Config\Helpers::EXTENDS_KEY])) {
-			$producerName = $config[Config\Helpers::EXTENDS_KEY];
+		$m = Nette\Utils\Strings::match(
+			$consumerName,
+			'~^(?P<consumerName>[^>\s]+)\s*\<\s*(?P<producerName>[^>\s]+)\z~'
+		);
+		if (isset($config[self::EXTENDS_KEY])) {
+			$producerName = $config[self::EXTENDS_KEY];
 
-		} elseif ($m = Nette\Utils\Strings::match($consumerName, '~^(?P<consumerName>[^>\s]+)\s*\<\s*(?P<producerName>[^>\s]+)\z~')) {
+		} elseif ($m) {
 			$consumerName = $m['consumerName'];
 			$producerName = $m['producerName'];
 
@@ -398,7 +479,15 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 
 		if ( ! isset($this->producersConfig[$producerName])) {
-			throw new Nette\Utils\AssertionException("Consumer {$this->name}.{$consumerName} cannot extend unknown producer {$this->name}.{$producerName}.");
+			throw new \Nette\Utils\AssertionException(
+				\sprintf(
+					'Consumer %s.%s cannot extend unknown producer %s.%s.',
+					$this->name,
+					$consumerName,
+					$this->name,
+					$producerName
+				)
+			);
 		}
 		$producerConfig = $this->producersConfig[$producerName];
 
@@ -413,9 +502,11 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		return $config;
 	}
 
-
-
-	protected function loadRpcClients($clients)
+	/**
+	 * @param array<mixed> $clients
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	protected function loadRpcClients(array $clients): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -423,11 +514,21 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			$config = $this->mergeConfig($config, $this->rpcClientDefaults);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
-				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in rpc client {$this->name}.{$name} was not defined.");
+				throw new \Nette\Utils\AssertionException(
+					\sprintf(
+						'Connection %s required in rpc client %s.%s was not defined.',
+						$config['connection'],
+						$this->name,
+						$name
+					)
+				);
 			}
 
 			$builder->addDefinition($serviceName = $this->prefix('rpcClient.' . $name))
-				->setClass('Kdyby\RabbitMq\RpcClient', ['@' . $this->connectionsMeta[$config['connection']]['serviceId']])
+				->setType(\Kdyby\RabbitMq\RpcClient::class)
+				->setArguments([
+					'@' . $this->connectionsMeta[$config['connection']]['serviceId'],
+				])
 				->addSetup('initClient', [$config['expectSerializedResponse']])
 				->addTag(self::TAG_RPC_CLIENT)
 				->setAutowired(FALSE);
@@ -436,9 +537,11 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 	}
 
-
-
-	protected function loadRpcServers($servers)
+	/**
+	 * @param array<mixed> $servers
+	 * @throws \Nette\Utils\AssertionException
+	 */
+	protected function loadRpcServers(array $servers): void
 	{
 		$builder = $this->getContainerBuilder();
 
@@ -446,17 +549,25 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 			$config = $this->mergeConfig($config, $this->rpcServerDefaults);
 
 			if (!isset($this->connectionsMeta[$config['connection']])) {
-				throw new Nette\Utils\AssertionException("Connection {$config['connection']} required in rpc server {$this->name}.{$name} was not defined.");
+				throw new \Nette\Utils\AssertionException(
+					\sprintf(
+						'Connection %s required in rpc server %s.%s was not defined.',
+						$config['connection'],
+						$this->name,
+						$name
+					)
+				);
 			}
 
 			$rpcServer = $builder->addDefinition($serviceName = $this->prefix('rpcServer.' . $name))
-				->setClass('Kdyby\RabbitMq\RpcServer', ['@' . $this->connectionsMeta[$config['connection']]['serviceId']])
+				->setType(\Kdyby\RabbitMq\RpcServer::class)
+				->setArguments(['@' . $this->connectionsMeta[$config['connection']]['serviceId']])
 				->addSetup('initServer', [$name])
 				->addSetup('setCallback', [self::fixCallback($config['callback'])])
 				->addTag(self::TAG_RPC_SERVER)
 				->setAutowired(FALSE);
 
-			if (array_filter($config['qos'])) { // has values
+			if (\array_filter($config['qos'])) { // has values
 				$config['qos'] = $this->mergeConfig($config['qos'], $this->qosDefaults);
 				$rpcServer->addSetup('setQosOptions', [
 					$config['qos']['prefetchSize'],
@@ -469,66 +580,64 @@ class RabbitMqExtension extends Nette\DI\CompilerExtension
 		}
 	}
 
-
-
-	private function loadConsole()
+	private function loadConsole(): void
 	{
-		if (!class_exists('Kdyby\Console\DI\ConsoleExtension') || PHP_SAPI !== 'cli') {
+		if (!\class_exists(\Symfony\Component\Console\Command\Command::class) || PHP_SAPI !== 'cli') {
 			return;
 		}
 
 		$builder = $this->getContainerBuilder();
 
 		foreach ([
-			'Kdyby\RabbitMq\Command\ConsumerCommand',
-			'Kdyby\RabbitMq\Command\PurgeConsumerCommand',
-			'Kdyby\RabbitMq\Command\RpcServerCommand',
-			'Kdyby\RabbitMq\Command\SetupFabricCommand',
-			'Kdyby\RabbitMq\Command\StdInProducerCommand',
+			\Kdyby\RabbitMq\Command\ConsumerCommand::class,
+			\Kdyby\RabbitMq\Command\PurgeConsumerCommand::class,
+			\Kdyby\RabbitMq\Command\RpcServerCommand::class,
+			\Kdyby\RabbitMq\Command\SetupFabricCommand::class,
+			\Kdyby\RabbitMq\Command\StdInProducerCommand::class,
 		] as $i => $class) {
 			$builder->addDefinition($this->prefix('console.' . $i))
-				->setClass($class)
-				->addTag(Kdyby\Console\DI\ConsoleExtension::COMMAND_TAG);
+				->setType($class)
+				->addTag(self::TAG_COMMAND_KDYBY)
+				->addTag(self::TAG_COMMAND);
 		}
 	}
 
-
-
+	/**
+	 * @param array<mixed>|string $config
+	 * @param array<mixed>|string $defaults
+	 * @return array<mixed>|string
+	 */
 	protected function mergeConfig($config, $defaults)
 	{
-		return Config\Helpers::merge($config, $this->compiler->getContainerBuilder()->expand($defaults));
+		return Config\Helpers::merge(
+			$config,
+			\Nette\DI\Helpers::expand($defaults, $this->compiler->getContainerBuilder()->parameters)
+		);
 	}
 
-
-
+	/**
+	 * @param string|mixed $callback
+	 * @return string|mixed
+	 */
 	protected static function fixCallback($callback)
 	{
-		list($callback) = self::filterArgs($callback);
-		if ($callback instanceof Nette\DI\Statement && substr_count($callback->entity, '::') && empty($callback->arguments)) {
-			$callback = explode('::', $callback->entity, 2);
+		[$callback] = self::filterArgs($callback);
+		if ($callback instanceof Nette\DI\Statement && \substr_count($callback->entity, '::') && empty($callback->arguments)) {
+			$callback = \explode('::', $callback->entity, 2);
 		}
 
 		return $callback;
 	}
 
-
-
 	/**
-	 * @param string|\stdClass $statement
-	 * @return Nette\DI\Statement[]
+	 * @param string|mixed $statement
+	 * @return \Nette\DI\Statement[]
 	 */
-	protected static function filterArgs($statement)
+	protected static function filterArgs($statement): array
 	{
-		return Nette\DI\Compiler::filterArguments([is_string($statement) ? new Nette\DI\Statement($statement) : $statement]);
-	}
-
-
-
-	public static function register(Nette\Configurator $configurator)
-	{
-		$configurator->onCompile[] = function ($config, Compiler $compiler) {
-			$compiler->addExtension('rabbitmq', new RabbitMqExtension());
-		};
+		return Nette\DI\Helpers::filterArguments([
+			\is_string($statement) ? new Nette\DI\Statement($statement) : $statement,
+		]);
 	}
 
 }

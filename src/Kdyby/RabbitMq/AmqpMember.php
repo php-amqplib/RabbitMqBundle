@@ -1,32 +1,28 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Kdyby\RabbitMq;
 
-use Nette;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
 
-
-
 /**
- * @author Alvaro Videla <videlalvaro@gmail.com>
- * @author Filip Procházka <filip@prochazka.su>
- *
  * @property array $exchangeOptions
  * @property array $queueOptions
  */
 abstract class AmqpMember
 {
-	use Nette\SmartObject;
 
+	use \Nette\SmartObject;
 
 	/**
-	 * @var Connection
+	 * @var \Kdyby\RabbitMq\Connection
 	 */
 	protected $conn;
 
 	/**
-	 * @var Channel
+	 * @var \Kdyby\RabbitMq\Channel
 	 */
 	protected $ch;
 
@@ -43,14 +39,14 @@ abstract class AmqpMember
 	/**
 	 * @var bool
 	 */
-	protected $autoSetupFabric = true;
+	protected $autoSetupFabric = TRUE;
 
 	/**
 	 * @var array
 	 */
 	protected $basicProperties = [
 		'content_type' => 'text/plain',
-		'delivery_mode' => 2
+		'delivery_mode' => 2,
 	];
 
 	/**
@@ -58,58 +54,50 @@ abstract class AmqpMember
 	 */
 	protected $exchangeOptions = [
 		'name' => NULL,
-		'passive' => false,
-		'durable' => true,
-		'autoDelete' => false,
-		'internal' => false,
-		'nowait' => false,
-		'arguments' => null,
-		'ticket' => null,
-		'declare' => true,
+		'passive' => FALSE,
+		'durable' => TRUE,
+		'autoDelete' => FALSE,
+		'internal' => FALSE,
+		'nowait' => FALSE,
+		'arguments' => NULL,
+		'ticket' => NULL,
+		'declare' => TRUE,
 	];
 
 	/**
 	 * @var bool
 	 */
-	protected $exchangeDeclared = false;
+	protected $exchangeDeclared = FALSE;
 
 	/**
 	 * @var array
 	 */
 	protected $queueOptions = [
 		'name' => '',
-		'passive' => false,
-		'durable' => true,
-		'exclusive' => false,
-		'autoDelete' => false,
-		'nowait' => false,
-		'arguments' => null,
-		'ticket' => null,
+		'passive' => FALSE,
+		'durable' => TRUE,
+		'exclusive' => FALSE,
+		'autoDelete' => FALSE,
+		'nowait' => FALSE,
+		'arguments' => NULL,
+		'ticket' => NULL,
 		'routing_keys' => [],
 	];
 
 	/**
 	 * @var bool
 	 */
-	protected $queueDeclared = false;
+	protected $queueDeclared = FALSE;
 
-
-
-	/**
-	 * @param Connection $conn
-	 * @param string $consumerTag
-	 */
-	public function __construct(Connection $conn, $consumerTag = null)
+	public function __construct(Connection $conn, ?string $consumerTag = NULL)
 	{
 		$this->conn = $conn;
-		$this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
+		$this->consumerTag = empty($consumerTag) ? \sprintf('PHPPROCESS_%s_%s', \gethostname(), \getmypid()) : $consumerTag;
 
 		if (!($conn instanceof AMQPLazyConnection)) {
 			$this->getChannel();
 		}
 	}
-
-
 
 	public function __destruct()
 	{
@@ -122,12 +110,7 @@ abstract class AmqpMember
 		}
 	}
 
-
-
-	/**
-	 * @return AMQPChannel
-	 */
-	public function getChannel()
+	public function getChannel(): AMQPChannel
 	{
 		if (empty($this->ch)) {
 			$this->ch = $this->conn->channel();
@@ -136,24 +119,17 @@ abstract class AmqpMember
 		return $this->ch;
 	}
 
-
-
-	/**
-	 * @param AMQPChannel $ch
-	 */
-	public function setChannel(AMQPChannel $ch)
+	public function setChannel(AMQPChannel $ch): void
 	{
 		$this->ch = $ch;
 	}
 
-
-
 	/**
 	 * @throws \InvalidArgumentException
-	 * @param  array $options
+	 * @param  array<mixed> $options
 	 * @return void
 	 */
-	public function setExchangeOptions(array $options = [])
+	public function setExchangeOptions(array $options = []): void
 	{
 		if (!isset($options['name'])) {
 			throw new \InvalidArgumentException('You must provide an exchange name');
@@ -166,51 +142,37 @@ abstract class AmqpMember
 		$this->exchangeOptions = $options + $this->exchangeOptions;
 	}
 
-
-
 	/**
-	 * @return array
+	 * @return array<mixed>
 	 */
-	public function getExchangeOptions()
+	public function getExchangeOptions(): array
 	{
 		return $this->exchangeOptions;
 	}
 
-
-
 	/**
-	 * @param  array $options
+	 * @param  array<mixed> $options
 	 * @return void
 	 */
-	public function setQueueOptions(array $options = [])
+	public function setQueueOptions(array $options = []): void
 	{
 		$this->queueOptions = $options + $this->queueOptions;
 	}
 
-
-
 	/**
-	 * @return array
+	 * @return array<mixed>
 	 */
-	public function getQueueOptions()
+	public function getQueueOptions(): array
 	{
 		return $this->queueOptions;
 	}
 
-
-
-	/**
-	 * @param  string $routingKey
-	 * @return void
-	 */
-	public function setRoutingKey($routingKey)
+	public function setRoutingKey(string $routingKey): void
 	{
 		$this->routingKey = $routingKey;
 	}
 
-
-
-	protected function exchangeDeclare()
+	protected function exchangeDeclare(): void
 	{
 		if (empty($this->exchangeOptions['declare']) || empty($this->exchangeOptions['name'])) {
 			return;
@@ -225,28 +187,29 @@ abstract class AmqpMember
 			$this->exchangeOptions['internal'],
 			$this->exchangeOptions['nowait'],
 			$this->exchangeOptions['arguments'],
-			$this->exchangeOptions['ticket']);
+			$this->exchangeOptions['ticket']
+		);
 
-		$this->exchangeDeclared = true;
+		$this->exchangeDeclared = TRUE;
 	}
 
-
-
-	protected function queueDeclare()
+	protected function queueDeclare(): void
 	{
 		if (empty($this->queueOptions['name'])) {
 			return;
 		}
 
 		$this->doQueueDeclare($this->queueOptions['name'], $this->queueOptions);
-		$this->queueDeclared = true;
+		$this->queueDeclared = TRUE;
 	}
 
-
-
-	protected function doQueueDeclare($name, array $options)
+	/**
+	 * @param string $name
+	 * @param array<mixed> $options
+	 */
+	protected function doQueueDeclare(string $name, array $options): void
 	{
-		list($queueName, ,) = $this->getChannel()->queue_declare(
+		[$queueName] = $this->getChannel()->queue_declare(
 			$name,
 			$options['passive'],
 			$options['durable'],
@@ -269,9 +232,7 @@ abstract class AmqpMember
 		}
 	}
 
-
-
-	public function setupFabric()
+	public function setupFabric(): void
 	{
 		if (!$this->exchangeDeclared) {
 			$this->exchangeDeclare();
@@ -282,13 +243,12 @@ abstract class AmqpMember
 		}
 	}
 
-
-
 	/**
 	 * disables the automatic SetupFabric when using a consumer or producer
 	 */
-	public function disableAutoSetupFabric()
+	public function disableAutoSetupFabric(): void
 	{
-		$this->autoSetupFabric = false;
+		$this->autoSetupFabric = FALSE;
 	}
+
 }

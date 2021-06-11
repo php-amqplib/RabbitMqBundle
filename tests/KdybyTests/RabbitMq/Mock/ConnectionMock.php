@@ -10,16 +10,14 @@ declare(strict_types = 1);
  * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
  */
 
-namespace Kdyby\RabbitMq\DI;
+namespace KdybyTests\RabbitMq\Mock;
 
-interface IRpcServersProvider
+class ConnectionMock extends \Kdyby\RabbitMq\Connection
 {
 
-	/**
-	 * Returns array of name => array config.
-	 *
-	 * @return array<string, array<mixed>>
-	 */
-	public function getRabbitRpcServers(): array;
+	protected function doCreateChannel(string $id): \Kdyby\RabbitMq\Channel
+	{
+		return new ChannelMock($this, $id);
+	}
 
 }

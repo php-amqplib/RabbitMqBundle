@@ -1,59 +1,57 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Test: Kdyby\RabbitMq\Extension.
  *
  * @testCase KdybyTests\RabbitMq\ExtensionTest
- * @author Filip Procházka <filip@prochazka.su>
- * @package Kdyby\RabbitMq
  */
 
 namespace KdybyTests\RabbitMq;
 
 use Kdyby;
-use KdybyTests;
 use Nette;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use Tester;
 use Tester\Assert;
 
-require_once __DIR__ . '/TestCase.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 
 
-/**
- * @author Filip Procházka <filip@prochazka.su>
- */
-class ExtensionTest extends TestCase
+class ExtensionTest extends \KdybyTests\RabbitMq\TestCase
 {
 
-	/**
-	 * @return \SystemContainer|\Nette\DI\Container
-	 */
-	protected function createContainer()
+	protected function createContainer(): \Nette\DI\Container
 	{
 		$config = new Nette\Configurator();
 		$config->setTempDirectory(TEMP_DIR);
-		Kdyby\RabbitMq\DI\RabbitMqExtension::register($config);
+		$config->onCompile[] = static function ($config, Nette\DI\Compiler $compiler): void {
+			$compiler->addExtension('rabbitmq', new Kdyby\RabbitMq\DI\RabbitMqExtension());
+		};
 		$config->addConfig(__DIR__ . '/files/nette-reset.neon');
 		$config->addConfig(__DIR__ . '/files/default.neon');
 
 		return $config->createContainer();
 	}
 
-
-
-	public function testFunctional()
+	public function testFunctional(): void
 	{
 		$dic = $this->createContainer();
 
 		// foo was defined first in config
-		Assert::true($dic->getByType('Kdyby\RabbitMq\Connection') instanceof AMQPStreamConnection);
-		Assert::same($dic->getByType('Kdyby\RabbitMq\Connection'), $dic->getService('rabbitmq.foo_connection.connection'));
+		Assert::true($dic->getByType(\Kdyby\RabbitMq\Connection::class) instanceof AMQPStreamConnection);
+		Assert::same(
+			$dic->getByType(\Kdyby\RabbitMq\Connection::class),
+			$dic->getService('rabbitmq.foo_connection.connection')
+		);
 
 		// only the first defined connection is autowired
 		Assert::true($dic->getService('rabbitmq.default.connection') instanceof AMQPStreamConnection);
-		Assert::notSame($dic->getByType('Kdyby\RabbitMq\Connection'), $dic->getService('rabbitmq.default.connection'));
+		Assert::notSame(
+			$dic->getByType(\Kdyby\RabbitMq\Connection::class),
+			$dic->getService('rabbitmq.default.connection')
+		);
 
 		Assert::true($dic->getService('rabbitmq.producer.foo_producer') instanceof Kdyby\RabbitMq\Producer);
 		Assert::true($dic->getService('rabbitmq.producer.default_producer') instanceof Kdyby\RabbitMq\Producer);
@@ -74,4 +72,4 @@ class ExtensionTest extends TestCase
 
 }
 
-\run(new ExtensionTest());
+(new ExtensionTest())->run();
