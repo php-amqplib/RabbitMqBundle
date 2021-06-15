@@ -1,3 +1,4 @@
 extension=sockets
 extension=iconv
 extension=tokenizer
+extension=phar
