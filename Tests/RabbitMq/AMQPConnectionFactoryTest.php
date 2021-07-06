@@ -248,9 +248,11 @@ class AMQPConnectionFactoryTest extends TestCase
         $this->assertArrayHasKey(6, $instance->constructParams);
         $options = $instance->constructParams[6];
         $this->assertArrayHasKey('ssl_context', $options);
-        $context = $options['ssl_context'];
+        $this->assertArrayHasKey('context', $options);
+        $context = $options['context'];
         // unset to check whole array at once later
         $instance->constructParams[6]['ssl_context'] = null;
+        $instance->constructParams[6]['context'] = null;
         $this->assertIsResource($context);
         $this->assertEquals('stream-context', get_resource_type($context));
         $options = stream_context_get_options($context);
@@ -272,6 +274,7 @@ class AMQPConnectionFactoryTest extends TestCase
                 'connection_timeout' => 3,
                 'read_write_timeout' => 3,
                 'ssl_context' => null, // context checked earlier
+                'context' => null, // context checked earlier
                 'keepalive' => false,
                 'heartbeat' => 0,
             ]
@@ -455,9 +458,11 @@ class AMQPConnectionFactoryTest extends TestCase
         $this->assertArrayHasKey(6, $instance->constructParams);
         $options = $instance->constructParams[6];
         $this->assertArrayHasKey('ssl_context', $options);
-        $context = $options['ssl_context'];
+        $this->assertArrayHasKey('context', $options);
+        $context = $options['context'];
         // unset to check whole array at once later
         $instance->constructParams[6]['ssl_context'] = null;
+        $instance->constructParams[6]['context'] = null;
         $this->assertIsResource($context);
         $this->assertEquals('stream-context', get_resource_type($context));
         $options = stream_context_get_options($context);
@@ -466,9 +471,10 @@ class AMQPConnectionFactoryTest extends TestCase
         $this->assertArrayHasKey(1, $instance::$createConnectionParams);
         $createConnectionOptions = $instance::$createConnectionParams[1];
         $this->assertArrayHasKey('ssl_context', $createConnectionOptions);
-        $createConnectionContext = $createConnectionOptions['ssl_context'];
+        $createConnectionContext = $createConnectionOptions['context'];
         // unset to check whole array at once later
         $instance::$createConnectionParams[1]['ssl_context'] = null;
+        $instance::$createConnectionParams[1]['context'] = null;
         $this->assertIsResource($createConnectionContext);
         $this->assertEquals('stream-context', get_resource_type($createConnectionContext));
         $createConnectionOptions = stream_context_get_options($createConnectionContext);
@@ -491,6 +497,7 @@ class AMQPConnectionFactoryTest extends TestCase
                 'connection_timeout' => 3,
                 'read_write_timeout' => 3,
                 'ssl_context' => null,
+                'context' => null,
                 'keepalive' => false,
                 'heartbeat' => 0,
             ]
@@ -524,6 +531,7 @@ class AMQPConnectionFactoryTest extends TestCase
                     'connection_timeout' => 3,
                     'read_write_timeout' => 3,
                     'ssl_context'        => null, // context checked earlier
+                    'context'        => null, // context checked earlier
                     'keepalive'          => false,
                     'heartbeat'          => 0
                 ]
