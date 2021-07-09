@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use OldSound\RabbitMqBundle\Event\AfterPublishingMessageEvent;
+use OldSound\RabbitMqBundle\Event\BeforePublishingMessageEvent;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
@@ -53,6 +55,7 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
+        $this->dispatchEvent(BeforePublishingMessageEvent::NAME, new BeforePublishingMessageEvent($this, $msg));
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
@@ -62,5 +65,6 @@ class Producer extends BaseAmqp implements ProducerInterface
                 'headers' => $headers
             )
         ));
+        $this->dispatchEvent(AfterPublishingMessageEvent::NAME, new AfterPublishingMessageEvent($this, $msg));
     }
 }
