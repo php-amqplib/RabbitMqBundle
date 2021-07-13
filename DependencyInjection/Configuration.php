@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface
         $this->addMultipleConsumers($rootNode);
         $this->addDynamicConsumers($rootNode);
         $this->addBatchConsumers($rootNode);
+        $this->addGroupConsumers($rootNode);
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
@@ -168,6 +169,10 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->arrayNode('groups')->defaultValue(array('default'))
+                            ->prototype('scalar')
+                            ->end()
+                            ->end()
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
@@ -208,6 +213,10 @@ class Configuration implements ConfigurationInterface
                     ->append($this->getExchangeConfiguration())
                     ->children()
                         ->scalarNode('connection')->defaultValue('default')->end()
+                        ->arrayNode('groups')->defaultValue(array('default'))
+                        ->prototype('scalar')
+                        ->end()
+                        ->end()
                         ->scalarNode('idle_timeout')->end()
                         ->scalarNode('idle_timeout_exit_code')->end()
                         ->scalarNode('timeout_wait')->end()
@@ -248,6 +257,10 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getExchangeConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->arrayNode('groups')->defaultValue(array('default'))
+                            ->prototype('scalar')
+                            ->end()
+                            ->end()
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('idle_timeout_exit_code')->end()
@@ -294,6 +307,10 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->arrayNode('groups')->defaultValue(array('default'))
+                            ->prototype('scalar')
+                            ->end()
+                            ->end()
                             ->scalarNode('callback')->isRequired()->end()
                             ->scalarNode('idle_timeout')->end()
                             ->scalarNode('timeout_wait')->defaultValue(3)->end()
@@ -320,6 +337,40 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
     }
+    
+    protected function addGroupConsumers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('group_consumers')
+                    ->canBeUnset()
+                    ->useAttributeAsKey('key')
+                    ->prototype('array')
+                        ->children()
+                        ->scalarNode('connection')->defaultValue('default')->end()
+                        ->scalarNode('idle_timeout')->end()
+                        ->scalarNode('idle_timeout_exit_code')->end()
+                        ->scalarNode('timeout_wait')->end()
+                        ->arrayNode('graceful_max_execution')
+                            ->canBeUnset()
+                            ->children()
+                            ->integerNode('timeout')->end()
+                            ->integerNode('exit_code')->defaultValue(0)->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
+                        ->arrayNode('qos_options')
+                            ->canBeUnset()
+                            ->children()
+                                ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                ->scalarNode('prefetch_count')->defaultValue(0)->end()
+                                ->booleanNode('global')->defaultFalse()->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('enable_logger')->defaultFalse()->end()
+                ->end()
+            ->end();
+    }
 
     protected function addAnonConsumers(ArrayNodeDefinition $node)
     {
@@ -333,6 +384,10 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getExchangeConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->arrayNode('groups')->defaultValue(array('default'))
+                            ->prototype('scalar')
+                            ->end()
+                            ->end()
                             ->scalarNode('callback')->isRequired()->end()
                         ->end()
                     ->end()

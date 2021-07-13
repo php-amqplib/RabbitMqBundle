@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +31,7 @@ class OldSoundRabbitMqExtension extends Extension
     private $collectorEnabled;
 
     private $channelIds = array();
+    private $groups = array();
 
     private $config = array();
 
@@ -53,6 +55,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadDynamicConsumers();
         $this->loadBatchConsumers();
         $this->loadAnonConsumers();
+        $this->loadGroupConsumers();
         $this->loadRpcClients();
         $this->loadRpcServers();
 
@@ -187,6 +190,10 @@ class OldSoundRabbitMqExtension extends Extension
             $definition->setPublic(true);
             $definition->addTag('old_sound_rabbit_mq.base_amqp');
             $definition->addTag('old_sound_rabbit_mq.consumer');
+            foreach ($consumer['groups'] as $group) {
+                $this->groups[] = $group;
+                $definition->addTag('old_sound_rabbit_mq.consumer.group.' . $group);
+            }
             //this consumer doesn't define an exchange -> using AMQP Default
             if (!isset($consumer['exchange_options'])) {
                 $consumer['exchange_options'] = $this->getDefaultExchangeOptions();
@@ -272,6 +279,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setQueues', array($this->normalizeArgumentKeys($queues)));
 
+            foreach ($consumer['groups'] as $group) {
+                $this->groups[] = $group;
+                $definition->addTag('old_sound_rabbit_mq.consumer.group.' . $group);
+            }
+
             if ($consumer['queues_provider']) {
                 $definition->addMethodCall(
                     'setQueuesProvider',
@@ -350,6 +362,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addMethodCall('setExchangeOptions', array($this->normalizeArgumentKeys($consumer['exchange_options'])))
                 ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
 
+            foreach ($consumer['groups'] as $group) {
+                $this->groups[] = $group;
+                $definition->addTag('old_sound_rabbit_mq.consumer.group.' . $group);
+            }
+
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(
                     $consumer['qos_options']['prefetch_size'],
@@ -427,6 +444,11 @@ class OldSoundRabbitMqExtension extends Extension
                 ))
             ;
 
+            foreach ($consumer['groups'] as $group) {
+                $this->groups[] = $group;
+                $definition->addTag('old_sound_rabbit_mq.consumer.group.' . $group);
+            }
+
             if (isset($consumer['idle_timeout_exit_code'])) {
                 $definition->addMethodCall('setIdleTimeoutExitCode', array($consumer['idle_timeout_exit_code']));
             }
@@ -478,9 +500,85 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);
             }
 
+            foreach ($anon['groups'] as $group) {
+                $this->groups[] = $group;
+                $definition->addTag('old_sound_rabbit_mq.consumer.group.' . $group);
+            }
+
             $name = sprintf('old_sound_rabbit_mq.%s_anon', $key);
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($anon['callback'], $name);
+        }
+    }
+    
+    protected function loadGroupConsumers()
+    {
+        $groupConsumers = $this->config['group_consumers'];
+        $this->groups = array_unique(array_merge($this->groups, array_keys($groupConsumers)));
+
+        $defaultConfig = array('connection' => 'default', 'auto_setup_fabric' => true, 'enable_logger' => false);
+        foreach ($this->groups as $key) {
+            $group = isset($groupConsumers[$key]) ? $groupConsumers[$key] : $defaultConfig;
+            $definition = new Definition('%old_sound_rabbit_mq.group_consumer.class%');
+            $definition
+                ->setPublic(true)
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.group_consumer')
+            ;
+            $connection = isset($group['connection']) ? $group['connection'] : 'default';
+            $this->injectConnection($definition, $connection);
+            if ($this->collectorEnabled) {
+                $this->injectLoggedChannel($definition, $key . '_group_consumer', $connection);
+            }
+
+            if ($group['enable_logger']) {
+                $this->injectLogger($definition);
+            }
+
+            $definition->addMethodCall('addConsumers', array(
+                new TaggedIteratorArgument('old_sound_rabbit_mq.consumer.group.' . $key))
+            );
+
+            if (isset($group['timeout_wait'])) {
+                $definition->addMethodCall('setTimeoutWait', array($group['timeout_wait']));
+            }
+
+            if (array_key_exists('qos_options', $group)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $group['qos_options']['prefetch_size'],
+                    $group['qos_options']['prefetch_count'],
+                    $group['qos_options']['global']
+                ));
+            }
+
+            if (isset($group['idle_timeout'])) {
+                $definition->addMethodCall('setIdleTimeout', array($group['idle_timeout']));
+            }
+            if (isset($group['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', array($group['idle_timeout_exit_code']));
+            }
+
+            if (isset($group['graceful_max_execution'])) {
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
+                    array($group['graceful_max_execution']['timeout'])
+                );
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionTimeoutExitCode',
+                    array($group['graceful_max_execution']['exit_code'])
+                );
+            }
+
+            if (isset($group['auto_setup_fabric'])) {
+                if (!$group['auto_setup_fabric']) {
+                    $definition->addMethodCall('disableAutoSetupFabric');
+                } else {
+                    // TODO disable grouped consumers
+                }
+            }
+
+            $name = sprintf('old_sound_rabbit_mq.%s_group', $key);
+            $this->container->setDefinition($name, $definition);
         }
     }
 
