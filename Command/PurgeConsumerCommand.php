@@ -22,6 +22,11 @@ class PurgeConsumerCommand extends ConsumerCommand
         $this->setName('rabbitmq:purge');
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to initialize here as BaseConsumerCommand initializes on option that is not available here
+    }
+
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
