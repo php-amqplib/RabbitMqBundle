@@ -33,7 +33,7 @@ interface ConsumerInterface
 
     /**
      * @param AMQPMessage $msg The message
-     * @return int One of ConsumerInterface::MSG_* constants according to callback outcome.
+     * @return int|bool One of ConsumerInterface::MSG_* constants according to callback outcome, or false otherwise.
      */
     public function execute(AMQPMessage $msg);
 }
