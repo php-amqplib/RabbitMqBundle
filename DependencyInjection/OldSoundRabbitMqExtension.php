@@ -2,14 +2,16 @@
 
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
+use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * OldSoundRabbitMqExtension.
@@ -171,11 +173,32 @@ class OldSoundRabbitMqExtension extends Extension
                 if (null !== $producer['service_alias']) {
                     $this->container->setAlias($producer['service_alias'], $producerServiceName);
                 }
+
+                // register alias for argument auto wiring
+                if (method_exists($this->container, 'registerAliasForArgument')) {
+                    $argName = !str_ends_with(strtolower($key), 'producer') ? sprintf('%sProducer', $key) : $key;
+                    $this->container
+                        ->registerAliasForArgument($producerServiceName, ProducerInterface::class, $argName)
+                        ->setPublic(false);
+
+                    $this->container
+                        ->registerAliasForArgument($producerServiceName, $producer['class'], $argName)
+                        ->setPublic(false);
+                }
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {
                 $definition = new Definition('%old_sound_rabbit_mq.fallback.class%');
-                $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_producer', $key), $definition);
+                $producerServiceName = sprintf('old_sound_rabbit_mq.%s_producer', $key);
+                $this->container->setDefinition($producerServiceName, $definition);
+
+                // register alias for argumen auto wiring
+                if (method_exists($this->container, 'registerAliasForArgument')) {
+                    $argName = !str_ends_with(strtolower($key), 'producer') ? sprintf('%sProducer', $key) : $key;
+                    $this->container
+                        ->registerAliasForArgument($producerServiceName, ProducerInterface::class, $argName)
+                        ->setPublic(false);
+                }
             }
         }
     }
@@ -242,6 +265,18 @@ class OldSoundRabbitMqExtension extends Extension
             $name = sprintf('old_sound_rabbit_mq.%s_consumer', $key);
             $this->container->setDefinition($name, $definition);
             $this->addDequeuerAwareCall($consumer['callback'], $name);
+
+            // register alias for argument auto wiring
+            if (method_exists($this->container, 'registerAliasForArgument')) {
+                $argName = !str_ends_with(strtolower($key), 'consumer') ? sprintf('%sConsumer', $key) : $key;
+                $this->container
+                    ->registerAliasForArgument($name, ConsumerInterface::class, $argName)
+                    ->setPublic(false);
+
+                $this->container
+                    ->registerAliasForArgument($name, '%old_sound_rabbit_mq.consumer.class%', $argName)
+                    ->setPublic(false);
+                }
         }
     }
 

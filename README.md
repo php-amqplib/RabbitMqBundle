@@ -534,6 +534,35 @@ consumers:
         qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
 ```
 
+### Autowiring producers and consumers ###
+
+If used with **Symfony 4.2+** bundle declares in container set of aliases for producers and regular consumers. Those are 
+used for arguments autowiring based on declared type and argument name. This allows you to change previous producer 
+example to:
+
+```php
+public function indexAction($name, ProducerInteface $uploadPictureProducer)
+{
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $uploadPictureProducer->publish(serialize($msg));
+}
+```
+
+Name of argument is constructed from producer or consumer name from configuration and suffixed with producer or consumer
+word according to type. In contrast to container items naming convention word suffix (producer or consumer) will not be
+duplicated if name is already suffixed. `upload_picture` producer key will be changed to `$uploadPictureProducer`
+argument name. `upload_picture_producer` producer key would also be aliased to `$uploadPictureProducer` argument name.
+It is best to avoid names similar in such manner.
+
+All producers are aliased to `OldSound\RabbitMqBundle\RabbitMq\ProducerInterface` and producer class option from 
+configuration. In sandbox mode only ProducerInterface aliases are made. It is highly recommended to use ProducerInterface
+class when type hinting arguments for producer injection.
+
+All consumers are aliased to 'OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface' and '%old_sound_rabbit_mq.consumer.class%'
+configuration option value. There is no difference between regular and sandbox mode. It is highly recommended to use
+ConsumerInterface when type hinting arguments for client injection.
+
+
 ### Callbacks ###
 
 Here's an example callback:
@@ -807,7 +836,7 @@ binding scenarios might include exchange to exchange bindings via `destination_i
 ```yaml
 bindings:
     - {exchange: foo, destination: bar, routing_key: 'baz.*' }
-    - {exchange: foo1, destination: foo, routing_key: 'baz.*' destination_is_exchange: true}
+    - {exchange: foo1, destination: foo, routing_key: 'baz.*', destination_is_exchange: true}
 ```
 
 The rabbitmq:setup-fabric command will declare exchanges and queues as defined in your producer, consumer
