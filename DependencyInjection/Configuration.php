@@ -124,6 +124,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('class')->defaultValue('%old_sound_rabbit_mq.producer.class%')->end()
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                             ->scalarNode('service_alias')->defaultValue(null)->end()
+                            ->scalarNode('default_routing_key')->defaultValue('')->end()
                         ->end()
                     ->end()
                 ->end()
