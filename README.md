@@ -188,7 +188,7 @@ configuration to avoid unnecessary connections to your message broker in every r
 It's extremely recommended to use lazy connections because performance reasons, nevertheless lazy option is disabled
 by default to avoid possible breaks in applications already using this bundle.
 
-### Import notice - Heartbeats ###
+### Important notice - Heartbeats ###
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
 
