@@ -313,6 +313,10 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                             'declare'     => false,
                         )
                     )
+                ),
+                array(
+                    'setDefaultRoutingKey',
+                    array('')
                 )
             ),
             $definition->getMethodCalls()
@@ -394,6 +398,10 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                             'declare'     => false,
                         )
                     )
+                ),
+                array(
+                    'setDefaultRoutingKey',
+                    array('')
                 )
             ),
             $definition->getMethodCalls()
