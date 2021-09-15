@@ -186,7 +186,7 @@ class OldSoundRabbitMqExtension extends Extension
                         ->setPublic(false);
                 }
 
-                $definition->addMethodCall('setDefaultRoutingKey', $producer['default_routing_key']);
+                $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {
