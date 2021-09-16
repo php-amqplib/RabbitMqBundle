@@ -12,6 +12,7 @@ class Producer extends BaseAmqp implements ProducerInterface
 {
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
+    protected $defaultRoutingKey = '';
 
     public function setContentType($contentType)
     {
@@ -23,6 +24,13 @@ class Producer extends BaseAmqp implements ProducerInterface
     public function setDeliveryMode($deliveryMode)
     {
         $this->deliveryMode = $deliveryMode;
+
+        return $this;
+    }
+
+    public function setDefaultRoutingKey($defaultRoutingKey)
+    {
+        $this->defaultRoutingKey = $defaultRoutingKey;
 
         return $this;
     }
@@ -40,7 +48,7 @@ class Producer extends BaseAmqp implements ProducerInterface
      * @param array $additionalProperties
      * @param array $headers
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null)
+    public function publish($msgBody, $routingKey = null, $additionalProperties = array(), array $headers = null)
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
@@ -53,7 +61,8 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
+        $real_routingKey = $routingKey !== null ? $routingKey : $this->defaultRoutingKey;
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$real_routingKey);
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
                 'body' => $msgBody,
