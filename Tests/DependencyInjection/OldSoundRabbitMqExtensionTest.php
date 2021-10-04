@@ -317,6 +317,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 array(
                     'setDefaultRoutingKey',
                     array('')
+                ),
+                array(
+                    'setJsonSchemaCheck',
+                    array(false)
+                ),
+                array(
+                    'setJsonSchemaFile',
+                    array("OldSound\\RabbitMqBundle\\JsonSchema\\validation.schema")
                 )
             ),
             $definition->getMethodCalls()
@@ -402,6 +410,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 array(
                     'setDefaultRoutingKey',
                     array('')
+                ),
+                array(
+                    'setJsonSchemaCheck',
+                    array(false)
+                ),
+                array(
+                    'setJsonSchemaFile',
+                    array("OldSound\\RabbitMqBundle\\JsonSchema\\validation.schema")
                 )
             ),
             $definition->getMethodCalls()

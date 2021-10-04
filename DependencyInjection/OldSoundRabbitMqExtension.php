@@ -187,6 +187,8 @@ class OldSoundRabbitMqExtension extends Extension
                 }
 
                 $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
+                $definition->addMethodCall('setJsonSchemaCheck', array($producer['default_json_schema_check']));
+                $definition->addMethodCall('setJsonSchemaFile', array($producer['default_json_schema_file']));
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {

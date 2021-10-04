@@ -125,6 +125,8 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                             ->scalarNode('service_alias')->defaultValue(null)->end()
                             ->scalarNode('default_routing_key')->defaultValue('')->end()
+                            ->booleanNode('default_json_schema_check')->defaultFalse()->end()
+                            ->scalarNode('default_json_schema_file')->defaultValue('OldSound\RabbitMqBundle\JsonSchema\validation.schema')->end()
                         ->end()
                     ->end()
                 ->end()
