@@ -15,8 +15,8 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
-    protected $jsonSchemaCheck = false;
-    protected $jsonSchemaFile = "";
+    public $jsonSchemaCheck = false;
+    public $jsonSchemaFile = "";
 
     public function setJsonSchemaFile($jsonSchemaFile){
         $this->jsonSchemaFile = $jsonSchemaFile;
@@ -53,7 +53,8 @@ class Producer extends BaseAmqp implements ProducerInterface
         return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
     }
 
-    protected function validateJsonMessage($msg){
+    public function validateJsonMessage($msg){
+        dd($this->jsonSchemaFile);
         try{
             $schema = Schema::import(json_decode(file_get_contents($this->jsonSchemaFile, true)));
             $schema->in($msg);

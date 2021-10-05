@@ -2,24 +2,57 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
-use OldSound\RabbitMqBundle\RabbitMq\Producer;
-use PhpAmqpLib\Connection\AbstractConnection;
+use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PHPUnit\Framework\TestCase;
 
 class JsonSchemaTest extends TestCase
 {
-    public function testValidateJsonMessageFunction(){
+    protected function getConsumer($amqpConnection, $amqpChannel)
+    {
+        return new Consumer($amqpConnection, $amqpChannel);
+    }
 
-        // $msg = array('user_id' => 1235, 'image_path' => 'pic.png');
-        // // $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg));
-        // // $container = $kernel->getContainer();
+    protected function prepareAMQPConnection()
+    {
+        return $this->getMockBuilder(AMQPStreamConnection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function prepareAMQPChannel()
+    {
+        return $this->getMockBuilder(AMQPChannel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    public function testValidateJsonMessageFunction()
+    {
+        $producer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Producer')
+            ->disableOriginalConstructor()
+            ->getMock();;
+
         
-        // $clinet = $this->get
-        // $client = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Producer');
-        // //$con = new AbstractConnection("user", "pass");
-        // dd($client);
-        // $producer = new Producer($con);
-        // $producer ->publish('abc');
+        $amqpConnection = $this->prepareAMQPConnection();
+        $amqpChannel = $this->prepareAMQPChannel();
+        $consumer = $this->getConsumer($amqpConnection, $amqpChannel);
+        // disable autosetup fabric so we do not mock more objects
+        $consumer->disableAutoSetupFabric();
+        $consumer->setChannel($amqpChannel);
 
+        $this->assertEquals(false, $producer->jsonSchemaCheck);
+        $producer->setJsonSchemaCheck(true);
+
+        $json_msg = <<<'JSON'
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "age": 21
+        }
+        JSON;
+        
+        $producer->publish($json_msg);
     }
 }
