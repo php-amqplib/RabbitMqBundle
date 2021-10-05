@@ -95,6 +95,13 @@ old_sound_rabbit_mq:
                 name:       default_exchange
                 type:       direct
 
+        confirmation_producer:
+            exchange_options:
+                name: default_exchange
+                type: direct
+            confirm_select: true
+            confirm_timeout: 2
+
     consumers:
         foo_consumer:
             connection:      foo_connection

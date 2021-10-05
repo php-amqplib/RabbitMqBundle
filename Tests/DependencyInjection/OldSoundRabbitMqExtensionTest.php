@@ -315,9 +315,16 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     )
                 ),
                 array(
+                    'setConfirmationTimeout',
+                    array(
+                        0
+                    )
+                ),
+                array(
                     'setDefaultRoutingKey',
                     array('')
                 )
+
             ),
             $definition->getMethodCalls()
         );
@@ -400,10 +407,67 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     )
                 ),
                 array(
+                    'setConfirmationTimeout',
+                    array(
+                        0
+                    )
+                ),
+                array(
                     'setDefaultRoutingKey',
                     array('')
                 )
             ),
+            $definition->getMethodCalls()
+        );
+        $this->assertEquals('%old_sound_rabbit_mq.producer.class%', $definition->getClass());
+    }
+
+    public function testConfirmatioProducerDefinition()
+    {
+        $container = $this->getContainer('test.yml');
+
+        $this->assertTrue($container->has('old_sound_rabbit_mq.confirmation_producer_producer'));
+        $definition = $container->getDefinition('old_sound_rabbit_mq.confirmation_producer_producer');
+        $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
+        $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.confirmation_producer');
+        $this->assertEquals(array(
+            array(
+                'setExchangeOptions',
+                array(
+                    array(
+                        'name'        => 'default_exchange',
+                        'type'        => 'direct',
+                        'passive'     => false,
+                        'durable'     => true,
+                        'auto_delete' => false,
+                        'internal'    => false,
+                        'nowait'      => false,
+                        'arguments'   => null,
+                        'ticket'      => null,
+                        'declare'     => true,
+                    )
+                )
+            ),
+            array(
+                'setQueueOptions',
+                array(
+                    array(
+                        'name'        => '',
+                        'declare'     => false,
+                    )
+                )
+            ),
+            array(
+                'setConfirmationTimeout',
+                array(
+                    2
+                )
+            ),
+            array(
+                'setDefaultRoutingKey',
+                array('')
+            )
+        ),
             $definition->getMethodCalls()
         );
         $this->assertEquals('%old_sound_rabbit_mq.producer.class%', $definition->getClass());
