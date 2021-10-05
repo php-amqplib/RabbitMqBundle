@@ -162,6 +162,16 @@ class OldSoundRabbitMqExtension extends Extension
                 if (!$producer['auto_setup_fabric']) {
                     $definition->addMethodCall('disableAutoSetupFabric');
                 }
+                if (isset($producer['confirm_select'])) {
+                    $definition->addArgument(null);
+                    $confirmSelect = boolval($producer['confirm_select']);
+                    $definition->addArgument($confirmSelect);
+                }
+                $confirmationTimeout = 0;
+                if (isset($producer['confirm_timeout'])) {
+                    $confirmationTimeout = intval($producer['confirm_timeout']);
+                }
+                $definition->addMethodCall('setConfirmationTimeout', array($confirmationTimeout));
 
                 if ($producer['enable_logger']) {
                     $this->injectLogger($definition);

@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
@@ -13,6 +15,9 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
+    protected $acknowledged = true;
+    protected $confirmationTimeout = 0;
+    protected $confirmSelect = false;
 
     public function setContentType($contentType)
     {
@@ -41,14 +46,36 @@ class Producer extends BaseAmqp implements ProducerInterface
     }
 
     /**
+     * @param null $confirmationTimeout
+     */
+    public function setConfirmationTimeout($confirmationTimeout): void
+    {
+        $this->confirmationTimeout = intval($confirmationTimeout);
+    }
+
+    /**
+     * @param AbstractConnection $conn
+     * @param AMQPChannel|null $ch
+     * @param null $consumerTag
+     * @param bool $confirmSelect
+     */
+    public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null, bool $confirmSelect = false)
+    {
+        parent::__construct($conn, $ch, $consumerTag);
+        $this->confirmSelect = $confirmSelect;
+        $this->initializeProducer();
+    }
+
+    /**
      * Publishes the message and merges additional properties with basic properties
      *
      * @param string $msgBody
      * @param string $routingKey
      * @param array $additionalProperties
      * @param array $headers
+     * @return bool
      */
-    public function publish($msgBody, $routingKey = null, $additionalProperties = array(), array $headers = null)
+    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null): bool
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
@@ -63,6 +90,7 @@ class Producer extends BaseAmqp implements ProducerInterface
 
         $real_routingKey = $routingKey !== null ? $routingKey : $this->defaultRoutingKey;
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$real_routingKey);
+        $this->getChannel()->wait_for_pending_acks($this->confirmationTimeout);
         $this->logger->debug('AMQP message published', array(
             'amqp' => array(
                 'body' => $msgBody,
@@ -71,5 +99,32 @@ class Producer extends BaseAmqp implements ProducerInterface
                 'headers' => $headers
             )
         ));
+        return $this->acknowledged;
+    }
+
+    public function reconnect()
+    {
+        parent::reconnect();
+        $this->initializeProducer();
+    }
+
+    /**
+     */
+    protected function initializeProducer(): void
+    {
+        if ($this->confirmSelect) {
+            $this->getChannel()->confirm_select();
+            $this->getChannel()->set_ack_handler(
+                function (AMQPMessage $message) {
+                    $this->acknowledged = true;
+                }
+            );
+
+            $this->getChannel()->set_nack_handler(
+                function (AMQPMessage $message) {
+                    $this->acknowledged = false;
+                }
+            );
+        }
     }
 }

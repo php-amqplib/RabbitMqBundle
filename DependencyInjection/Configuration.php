@@ -125,6 +125,8 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                             ->scalarNode('service_alias')->defaultValue(null)->end()
                             ->scalarNode('default_routing_key')->defaultValue('')->end()
+                            ->scalarNode('confirm_select')->defaultFalse()->end()
+                            ->scalarNode('confirm_timeout')->defaultNull()->end()
                         ->end()
                     ->end()
                 ->end()
