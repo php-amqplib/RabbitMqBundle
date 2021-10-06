@@ -72,7 +72,7 @@ class Producer extends BaseAmqp implements ProducerInterface
      * @param string $msgBody
      * @param string $routingKey
      * @param array $additionalProperties
-     * @param array $headers
+     * @param array|null $headers
      * @return bool
      */
     public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null): bool
@@ -88,7 +88,7 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
-        $real_routingKey = $routingKey !== null ? $routingKey : $this->defaultRoutingKey;
+        $real_routingKey = !empty($routingKey) ? $routingKey : $this->defaultRoutingKey;
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$real_routingKey);
         $this->getChannel()->wait_for_pending_acks($this->confirmationTimeout);
         $this->logger->debug('AMQP message published', array(
