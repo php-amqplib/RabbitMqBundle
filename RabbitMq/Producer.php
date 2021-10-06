@@ -54,7 +54,6 @@ class Producer extends BaseAmqp implements ProducerInterface
     }
 
     public function validateJsonMessage($msg){
-        dd($this->jsonSchemaFile);
         try{
             $schema = Schema::import(json_decode(file_get_contents($this->jsonSchemaFile, true)));
             $schema->in($msg);
