@@ -4,7 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use DOMDocument;
 
-class xmlValidator implements ValidatorInterface
+class XmlValidator implements ValidatorInterface
 {
     public function isValid($msg, $validatorFile)
     {

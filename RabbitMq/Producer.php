@@ -6,7 +6,7 @@ use Exception;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use OldSound\RabbitMqBundle\RabbitMq\JsonValidator;
-use OldSound\RabbitMqBundle\RabbitMq\xmlValidator;
+use OldSound\RabbitMqBundle\RabbitMq\XmlValidator;
 
 /**
  * Producer, that publishes AMQP Messages
@@ -65,7 +65,7 @@ class Producer extends BaseAmqp implements ProducerInterface
         }
 
         if ($this->contentType == 'application/xml'){
-            $validatorEngine = new xmlValidator();
+            $validatorEngine = new XmlValidator();
         }
         
         if (!$validatorEngine->isValid($msg, $this->validatorFile[$this->contentType])){
