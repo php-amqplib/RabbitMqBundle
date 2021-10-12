@@ -134,7 +134,7 @@ old_sound_rabbit_mq:
             connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
             service_alias:    my_app_service # no alias by default
-            default_json_schema_check: boolean # defaults to false, do not check Json Validation
+            default_validator_check: boolean # defaults to false, do not use validator
     consumers:
         upload_picture:
             connection:       default
