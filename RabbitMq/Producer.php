@@ -2,10 +2,11 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
+use Exception;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
-use Swaggest\JsonSchema\Schema;
-use Swaggest\JsonSchema\Exception;
+use OldSound\RabbitMqBundle\RabbitMq\JsonValidator;
+use OldSound\RabbitMqBundle\RabbitMq\xmlValidator;
 
 /**
  * Producer, that publishes AMQP Messages
@@ -15,16 +16,16 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
-    public $jsonSchemaCheck = false;
-    public $jsonSchemaFile = "";
+    public $validatorCheck = false;
+    public $validatorFile = "";
 
-    public function setJsonSchemaFile($jsonSchemaFile){
-        $this->jsonSchemaFile = $jsonSchemaFile;
+    public function setValidatorFile($validatorFile){
+        $this->validatorFile = $validatorFile;
     }
 
-    public function setJsonSchemaCheck($jsonSchemaCheck)
+    public function setValidatorCheck($validatorCheck)
     {
-        $this->jsonSchemaCheck = $jsonSchemaCheck;
+        $this->validatorCheck = $validatorCheck;
     }
 
     public function setContentType($contentType)
@@ -53,13 +54,24 @@ class Producer extends BaseAmqp implements ProducerInterface
         return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
     }
 
-    public function validateJsonMessage($msg){
-        try{
-            $schema = Schema::import(json_decode(file_get_contents($this->jsonSchemaFile, true)));
-            $schema->in($msg);
-        }catch (Exception $e){
-            throw new Exception($e->getMessage());
+    public function validateMessage($msg)
+    {
+        if (!array_key_exists($this->contentType, $this->validatorFile)){
+            throw new Exception('Cannot find validator file of ' . $this->contentType);
         }
+        // Insert new validator here
+        if ($this->contentType == 'application/json'){
+            $validatorEngine = new JsonValidator();
+        }
+
+        if ($this->contentType == 'application/xml'){
+            $validatorEngine = new xmlValidator();
+        }
+        
+        if (!$validatorEngine->isValid($msg, $this->validatorFile[$this->contentType])){
+            throw new Exception($this->contentType . " message verification failed");
+        }
+
     }
 
     /**
@@ -72,8 +84,8 @@ class Producer extends BaseAmqp implements ProducerInterface
      */
     public function publish($msgBody, $routingKey = null, $additionalProperties = array(), array $headers = null)
     {
-        if ($this->contentType == 'application/json' && $this->jsonSchemaCheck){
-            $this->validateJsonMessage($msgBody);
+        if ($this->validatorCheck){
+            $this->validateMessage($msgBody);
         }
 
         if ($this->autoSetupFabric) {

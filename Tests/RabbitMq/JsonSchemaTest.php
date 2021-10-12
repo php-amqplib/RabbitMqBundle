@@ -41,8 +41,8 @@ class JsonSchemaTest extends TestCase
         // disable autosetup fabric so we do not mock more objects
         $consumer->disableAutoSetupFabric();
         $consumer->setChannel($amqpChannel);
-        $this->assertEquals(false, $producer->jsonSchemaCheck);
-        $producer->setJsonSchemaCheck(true);
+        $this->assertEquals(false, $producer->validatorCheck);
+        $producer->setValidatorCheck(true);
 
         $json_msg = <<<'JSON'
         {

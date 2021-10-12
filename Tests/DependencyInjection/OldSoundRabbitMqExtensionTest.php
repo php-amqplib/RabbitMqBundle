@@ -319,12 +319,15 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     array('')
                 ),
                 array(
-                    'setJsonSchemaCheck',
+                    'setValidatorCheck',
                     array(false)
                 ),
                 array(
-                    'setJsonSchemaFile',
-                    array("OldSound\\RabbitMqBundle\\JsonSchema\\validation.schema")
+                    'setValidatorFile',
+                    array(array(
+                        'application/json' => 'OldSound\\RabbitMqBundle\\Validators\\JsonValidation.schema',
+                        'application/xml' => 'OldSound\\RabbitMqBundle\\Validators\\XMLValidation.xsd'
+                ))
                 )
             ),
             $definition->getMethodCalls()
@@ -412,12 +415,15 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     array('')
                 ),
                 array(
-                    'setJsonSchemaCheck',
+                    'setValidatorCheck',
                     array(false)
                 ),
                 array(
-                    'setJsonSchemaFile',
-                    array("OldSound\\RabbitMqBundle\\JsonSchema\\validation.schema")
+                    'setValidatorFile',
+                    array(array(
+                        'application/json' => 'OldSound\\RabbitMqBundle\\Validators\\JsonValidation.schema',
+                        'application/xml' => 'OldSound\\RabbitMqBundle\\Validators\\XMLValidation.xsd'
+                ))
                 )
             ),
             $definition->getMethodCalls()
