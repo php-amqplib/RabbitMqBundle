@@ -18,7 +18,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
     public function testFooConnectionDefinition()
     {
         $container = $this->getContainer('test.yml');
-
+        
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection.foo_connection'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.connection.foo_connection');
         $this->assertTrue($container->has('old_sound_rabbit_mq.connection_factory.foo_connection'));
@@ -282,7 +282,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
     public function testFooProducerDefinition()
     {
         $container = $this->getContainer('test.yml');
-
+        
         $this->assertTrue($container->has('old_sound_rabbit_mq.foo_producer_producer'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_producer_producer');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
@@ -317,17 +317,6 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 array(
                     'setDefaultRoutingKey',
                     array('')
-                ),
-                array(
-                    'setValidatorCheck',
-                    array(false)
-                ),
-                array(
-                    'setValidatorFile',
-                    array(array(
-                        'application/json' => 'OldSound\\RabbitMqBundle\\Validators\\JsonValidation.schema',
-                        'application/xml' => 'OldSound\\RabbitMqBundle\\Validators\\XMLValidation.xsd'
-                ))
                 )
             ),
             $definition->getMethodCalls()
@@ -413,17 +402,6 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 array(
                     'setDefaultRoutingKey',
                     array('')
-                ),
-                array(
-                    'setValidatorCheck',
-                    array(false)
-                ),
-                array(
-                    'setValidatorFile',
-                    array(array(
-                        'application/json' => 'OldSound\\RabbitMqBundle\\Validators\\JsonValidation.schema',
-                        'application/xml' => 'OldSound\\RabbitMqBundle\\Validators\\XMLValidation.xsd'
-                ))
                 )
             ),
             $definition->getMethodCalls()
@@ -942,7 +920,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
     public function testHasCollectorWhenChannelsExist()
     {
         $container = $this->getContainer('collector.yml');
-
+        
         $this->assertTrue($container->has('old_sound_rabbit_mq.data_collector'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.data_collector');
 

@@ -32,7 +32,7 @@ class JsonSchemaTest extends TestCase
     {
         $producer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Producer')
             ->disableOriginalConstructor()
-            ->getMock();;
+            ->getMock();
 
         
         $amqpConnection = $this->prepareAMQPConnection();
@@ -41,9 +41,7 @@ class JsonSchemaTest extends TestCase
         // disable autosetup fabric so we do not mock more objects
         $consumer->disableAutoSetupFabric();
         $consumer->setChannel($amqpChannel);
-        $this->assertEquals(false, $producer->validatorCheck);
-        $producer->setValidatorCheck(true);
-
+        $producer->setContentType("application/json");
         $json_msg = <<<'JSON'
         {
             "firstName": "John",

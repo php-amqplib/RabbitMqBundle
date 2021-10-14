@@ -125,12 +125,14 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                             ->scalarNode('service_alias')->defaultValue(null)->end()
                             ->scalarNode('default_routing_key')->defaultValue('')->end()
-                            ->booleanNode('default_validator_check')->defaultFalse()->end()
-                            ->scalarNode('default_validator_file')->defaultValue(
-                                array(
-                                    'application/json' => 'OldSound\\RabbitMqBundle\\Validators\\JsonValidation.schema',
-                                    'application/xml' => 'OldSound\\RabbitMqBundle\\Validators\\XMLValidation.xsd'
-                            ))->end()
+                            ->arrayNode('validator')
+                                ->canBeUnset()
+                                ->children()
+                                    ->scalarNode('class')->isRequired()->end()
+                                    ->scalarNode('definitions')->defaultNull()->end()
+                                    ->scalarNode('schema')->isRequired()->end()
+                                ->end()       
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

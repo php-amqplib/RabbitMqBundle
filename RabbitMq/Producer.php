@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq;
 
-use Exception;
+use OldSound\RabbitMqBundle\RabbitMq\Exception\ValidationException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use OldSound\RabbitMqBundle\RabbitMq\JsonValidator;
@@ -16,16 +16,11 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
-    public $validatorCheck = false;
-    public $validatorFile = "";
+    public $validator = null;
 
-    public function setValidatorFile($validatorFile){
-        $this->validatorFile = $validatorFile;
-    }
-
-    public function setValidatorCheck($validatorCheck)
+    public function setValidator($validator)
     {
-        $this->validatorCheck = $validatorCheck;
+        $this->validator = $validator;
     }
 
     public function setContentType($contentType)
@@ -56,22 +51,14 @@ class Producer extends BaseAmqp implements ProducerInterface
 
     public function validateMessage($msg)
     {
-        if (!array_key_exists($this->contentType, $this->validatorFile)){
-            throw new Exception('Cannot find validator file of ' . $this->contentType);
-        }
-        // Insert new validator here
-        if ($this->contentType == 'application/json'){
-            $validatorEngine = new JsonValidator();
-        }
-
-        if ($this->contentType == 'application/xml'){
-            $validatorEngine = new XmlValidator();
+        if ($this->contentType != $this->validator->getContentType()) {
+            throw new ValidationException($this->contentType . " message verification failed");
         }
         
-        if (!$validatorEngine->isValid($msg, $this->validatorFile[$this->contentType])){
-            throw new Exception($this->contentType . " message verification failed");
+        $error = $this->validator->isValid($msg, $this->contentType);
+        if ($error != null){
+            throw new ValidationException($this->contentType . " message verification failed. Error was: " . $error);
         }
-
     }
 
     /**
@@ -84,7 +71,7 @@ class Producer extends BaseAmqp implements ProducerInterface
      */
     public function publish($msgBody, $routingKey = null, $additionalProperties = array(), array $headers = null)
     {
-        if ($this->validatorCheck){
+        if ($this->validator != null){
             $this->validateMessage($msgBody);
         }
 
