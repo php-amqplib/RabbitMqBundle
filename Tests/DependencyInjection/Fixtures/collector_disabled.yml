@@ -10,9 +10,6 @@ old_sound_rabbit_mq:
             exchange_options:
                 name:       default_exchange
                 type:       direct
-            validator_class:  null
-            definitions:      null
-            schema:           null
 
     consumers:
         default_consumer:
