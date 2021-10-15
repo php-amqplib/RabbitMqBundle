@@ -133,8 +133,7 @@ old_sound_rabbit_mq:
         upload_picture:
             connection:       default
             exchange_options: {name: 'upload-picture', type: direct}
-            service_alias:    my_app_service # no alias by default
-            default_validator_check: boolean # defaults to false, do not use validator
+            service_alias:    my_app_service # no alias by default            
     consumers:
         upload_picture:
             connection:       default
