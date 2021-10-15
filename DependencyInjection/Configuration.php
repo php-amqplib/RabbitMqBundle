@@ -118,6 +118,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->append($this->getExchangeConfiguration())
                         ->append($this->getQueueConfiguration())
+                        ->append($this->getValidatorConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
                             ->scalarNode('auto_setup_fabric')->defaultTrue()->end()
@@ -125,9 +126,6 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('enable_logger')->defaultFalse()->end()
                             ->scalarNode('service_alias')->defaultValue(null)->end()
                             ->scalarNode('default_routing_key')->defaultValue('')->end()
-                            ->scalarNode('validator_class')->defaultNull()->end()
-                            ->scalarNode('definitions')->defaultNull()->end()
-                            ->scalarNode('schema')->defaultNull()->end()
                         ->end()
                     ->end()
                 ->end()
@@ -394,6 +392,19 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+    }
+
+    protected function getValidatorConfiguration()
+    {
+        $node = new ArrayNodeDefinition('validator');
+
+        return $node
+            ->children()
+                ->scalarNode('class')->isRequired()->end()
+                ->scalarNode('definitions')->defaultNull()->end()
+                ->scalarNode('schema')->isRequired()->end()
             ->end()
         ;
     }

@@ -4,11 +4,9 @@
 
     <xsd:element name="person">
         <xsd:complexType>
-                <xsd:choice>
-                        <xsd:element name="firstName" type="xsd:string"/>
-                        <xsd:element name="lastName" type="xsd:string"/>
-                        <xsd:element name="age" type="xsd:integer"/>
-                </xsd:choice>
+            <xsd:element name="firstName" type="xsd:string"/>
+            <xsd:element name="lastName" type="xsd:string"/>
+            <xsd:element name="age" type="xsd:integer"/>
         </xsd:complexType>
     </xsd:element>
 </xsd:schema>

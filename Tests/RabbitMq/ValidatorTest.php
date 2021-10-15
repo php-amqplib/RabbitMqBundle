@@ -41,11 +41,11 @@ JSON;
         );
 
         $xml_msg = <<<'XML'
-        <xml>
+        <person>
         <firstName>John</firstName>
         <from>Doe</from>
         <age>21</age>
-        </xml>
+        </person>
 XML;
         $xmlValidator->method('getContentType')->willReturn('application/xml');
         $this->assertEquals(null, $xmlValidator->isValid($xml_msg));

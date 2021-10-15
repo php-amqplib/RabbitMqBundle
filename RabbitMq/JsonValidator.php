@@ -25,7 +25,7 @@ class JsonValidator implements ValidatorInterface
 
             if ($this->definitions != null) {
                 $refProvider = new Preloaded();
-                $refProvider->setSchemaData("defs.schema", json_decode(file_get_contents("./defs.schema", true)));
+                $refProvider->setSchemaData("defs.schema", json_decode(file_get_contents($this->definitions, true)));
                 $options->remoteRefProvider = $refProvider;
             }
 

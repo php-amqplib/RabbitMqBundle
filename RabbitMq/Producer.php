@@ -5,8 +5,6 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 use OldSound\RabbitMqBundle\RabbitMq\Exception\ValidationException;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
-use OldSound\RabbitMqBundle\RabbitMq\JsonValidator;
-use OldSound\RabbitMqBundle\RabbitMq\XmlValidator;
 
 /**
  * Producer, that publishes AMQP Messages
@@ -53,7 +51,7 @@ class Producer extends BaseAmqp implements ProducerInterface
     public function validateMessage($msg)
     {
         if ($this->contentType != $this->validator->getContentType()) {
-            throw new ValidationException($this->contentType . " message verification failed");
+            throw new ValidationException("Content type mismatch. Incoming message is of type" . $this->contentType . ". Expected type was " . $this->validator->getContentType());
         }
         
         $error = $this->validator->isValid($msg, $this->contentType);
