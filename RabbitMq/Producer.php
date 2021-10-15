@@ -18,9 +18,10 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $defaultRoutingKey = '';
     public $validator = null;
 
-    public function setValidator($validator)
+    public function setValidator($validator_class, $schema, $definitions)
     {
-        $this->validator = $validator;
+        $this->validator = new $validator_class();
+        $this->validator->setSchema($schema, $definitions);
     }
 
     public function setContentType($contentType)

@@ -10,10 +10,10 @@ old_sound_rabbit_mq:
             exchange_options:
                 name:       default_exchange
                 type:       direct
-            validator:
-                class:       OldSound\RabbitMqBundle\RabbitMq\JsonValidator
-                definitions: applicaion/json
-                schema:      OldSound\RabbitMqBundle\TestValidation\JsonValidation.schema
+            validator_class:  null
+            definitions:      null
+            schema:           null
+
     consumers:
         default_consumer:
             exchange_options:

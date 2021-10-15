@@ -187,11 +187,8 @@ class OldSoundRabbitMqExtension extends Extension
                 }
 
                 $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
-
-                if (!isset($producer['validator'])) {
-                    $validator = new $producer['validator']['class']();
-                    $validator->setSchema($producer['validator']['schema'], $producer['validator']['definitions']);
-                    $definition->addMethodCall('setValidator', array($validator));
+                if ($producer['validator_class'] != null) {
+                    $definition->addMethodCall('setValidator', array($producer['validator_class'], $producer['schema'], $producer['definitions']));
                 }
             }
         } else {

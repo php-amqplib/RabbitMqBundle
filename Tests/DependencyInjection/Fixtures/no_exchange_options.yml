@@ -6,7 +6,6 @@ old_sound_rabbit_mq:
     producers:
         producer:
             connection: default
-            validator:
-                class:       OldSound\RabbitMqBundle\RabbitMq\JsonValidator
-                definitions: applicaion/json
-                schema:      OldSound\RabbitMqBundle\TestValidation\JsonValidation.schema
+            validator_class:  null
+            definitions:      null
+            schema:           null
