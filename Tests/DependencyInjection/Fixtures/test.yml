@@ -73,6 +73,11 @@ old_sound_rabbit_mq:
                 nowait:      true
                 arguments:   null
                 ticket:      null
+            validator:
+                class:          OldSound\RabbitMqBundle\RabbitMq\JsonValidator
+                definitions:    null
+                schema:         OldSound\RabbitMqBundle\TestValidation\schema\JsonValidation.schema
+
 
         foo_producer_aliased:
             class:           My\Foo\Producer
