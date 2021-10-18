@@ -11,10 +11,12 @@ class JsonValidator implements ValidatorInterface
 {
     public $definitions = null;
     public $schema = null;
+    public $schema_url = null;
 
-    public function setSchema($schema, $definitions=null) {
+    public function setSchema($schema, $schema_url=null, $definitions=null) {
         $this->definitions = $definitions;
         $this->schema = $schema;
+        $this->schema_url = $schema_url;
     }
 
 
@@ -25,7 +27,7 @@ class JsonValidator implements ValidatorInterface
 
             if ($this->definitions != null) {
                 $refProvider = new Preloaded();
-                $refProvider->setSchemaData("defs.schema", json_decode(file_get_contents($this->definitions, true)));
+                $refProvider->setSchemaData($this->schema_url, json_decode(file_get_contents($this->definitions, true)));
                 $options->remoteRefProvider = $refProvider;
             }
 

@@ -8,7 +8,7 @@ class XmlValidator implements ValidatorInterface
 {
     public $schema = null;
 
-    public function setSchema($schema, $definitions=null) {
+    public function setSchema($schema, $schema_url=null, $definitions=null) {
         $this->schema = $schema;
     }
     public function validate($msg)

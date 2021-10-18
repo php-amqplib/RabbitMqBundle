@@ -405,6 +405,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('class')->isRequired()->end()
                 ->scalarNode('definitions')->defaultNull()->end()
                 ->scalarNode('schema')->isRequired()->end()
+                ->scalarNode('schema_url')->defaultNull()->end()
             ->end()
         ;
     }

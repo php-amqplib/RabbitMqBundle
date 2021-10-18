@@ -323,6 +323,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     array(
                         "OldSound\RabbitMqBundle\RabbitMq\JsonValidator",
                         "OldSound\RabbitMqBundle\TestValidation\schema\JsonValidation.schema",
+                        null,
                         null
                     )
                 )
