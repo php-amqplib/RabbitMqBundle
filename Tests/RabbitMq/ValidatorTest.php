@@ -14,7 +14,7 @@ class JsonSchemaTest extends TestCase
 
         $jsonValidator->setSchema(
             "OldSound\RabbitMqBundle\TestValidation/schema/JsonValidation.schema",
-            null,
+            null
         );
 
         $json_msg = <<<'JSON'
