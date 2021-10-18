@@ -32,7 +32,7 @@ class JsonValidator implements ValidatorInterface
             }
 
             $schema = Schema::import(json_decode(file_get_contents($this->schema, true)), $options);
-            $schema->in($msg);
+            $schema->in(json_decode($msg));
             return null;
         }catch (Exception $e){
             return $e->getMessage();
