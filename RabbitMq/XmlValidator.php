@@ -11,7 +11,7 @@ class XmlValidator implements ValidatorInterface
     public function setSchema($schema, $definitions=null) {
         $this->schema = $schema;
     }
-    public function isValid($msg)
+    public function validate($msg)
     {
         $xml = new DOMDocument();
         $xml->load($msg);

@@ -18,7 +18,7 @@ class JsonValidator implements ValidatorInterface
     }
 
 
-    public function isValid($msg)
+    public function validate($msg)
     {
         try{
             $options = new Context();

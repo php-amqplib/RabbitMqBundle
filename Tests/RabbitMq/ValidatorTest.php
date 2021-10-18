@@ -25,7 +25,7 @@ class JsonSchemaTest extends TestCase
         }
 JSON;
         $jsonValidator->method('getContentType')->willReturn('application/json');
-        $this->assertEquals(null, $jsonValidator->isValid($json_msg));
+        $this->assertEquals(null, $jsonValidator->validate($json_msg));
         
     }
 
@@ -48,6 +48,6 @@ JSON;
         </person>
 XML;
         $xmlValidator->method('getContentType')->willReturn('application/xml');
-        $this->assertEquals(null, $xmlValidator->isValid($xml_msg));
+        $this->assertEquals(null, $xmlValidator->validate($xml_msg));
     }
 }

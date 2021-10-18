@@ -54,7 +54,7 @@ class Producer extends BaseAmqp implements ProducerInterface
             throw new ValidationException("Content type mismatch. Incoming message is of type" . $this->contentType . ". Expected type was " . $this->validator->getContentType());
         }
         
-        $error = $this->validator->isValid($msg);
+        $error = $this->validator->validate($msg);
         if ($error != null){
             throw new ValidationException($this->contentType . " message verification failed. Error was: " . $error);
         }
