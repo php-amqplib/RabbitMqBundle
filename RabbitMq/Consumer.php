@@ -158,7 +158,7 @@ class Consumer extends BaseConsumer
                 )
             ));
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested restart', array(
+            $this->logger->info('Consumer requested stop', array(
                 'amqp' => array(
                     'queue' => $queueName,
                     'message' => $msg,
@@ -198,13 +198,13 @@ class Consumer extends BaseConsumer
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
             $msg->reject();
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+        } elseif ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
             $msg->nack(true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+        } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $msg->reject(false);
-        } else if ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
+        } elseif ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
             // Remove message from queue only if callback return not false
             $msg->ack();
         }
