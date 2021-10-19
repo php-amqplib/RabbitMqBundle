@@ -14,12 +14,12 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
-    public $validator = null;
+    protected $validator = null;
 
-    public function setValidator($validator_class, $schema, $schema_url, $definitions)
+    public function setValidator($validator_class, $schema, $additionalProperties)
     {
         $this->validator = new $validator_class();
-        $this->validator->setSchema($schema, $schema_url, $definitions);
+        $this->validator->setSchema($schema, $additionalProperties);
     }
 
     public function setContentType($contentType)

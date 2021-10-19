@@ -190,8 +190,7 @@ class OldSoundRabbitMqExtension extends Extension
                 if (isset($producer['validator'])) {
                     $definition->addMethodCall('setValidator', array($producer['validator']['class'],
                                                                      $producer['validator']['schema'],
-                                                                     $producer['validator']['schema_url'],
-                                                                     $producer['validator']['definitions']));
+                                                                     $producer['validator']['additionalProperties']));
                 }
             }
         } else {

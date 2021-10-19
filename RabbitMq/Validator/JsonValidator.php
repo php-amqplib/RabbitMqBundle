@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq;
+namespace OldSound\RabbitMqBundle\RabbitMq\Validator;
 
 use Swaggest\JsonSchema\Context;
 use Swaggest\JsonSchema\Schema;
@@ -9,14 +9,16 @@ use Swaggest\JsonSchema\RemoteRef\Preloaded;
 
 class JsonValidator implements ValidatorInterface
 {
-    public $definitions = null;
-    public $schema = null;
-    public $schema_url = null;
+    private $definitions = null;
+    private $schema = null;
+    private $schema_url = null;
 
-    public function setSchema($schema, $schema_url=null, $definitions=null) {
-        $this->definitions = $definitions;
+    public function setSchema($schema, $additionalProperties = array()) {
         $this->schema = $schema;
-        $this->schema_url = $schema_url;
+        if(isset($additionalProperties['definitions']) && isset($additionalProperties['schema_url'])){
+            $this->definitions = $additionalProperties['definitions'];
+            $this->schema_url = $additionalProperties['schema_url'];
+        }
     }
 
 

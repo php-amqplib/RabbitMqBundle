@@ -1,16 +1,17 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\RabbitMq;
+namespace OldSound\RabbitMqBundle\RabbitMq\Validator;
 
 use DOMDocument;
 
 class XmlValidator implements ValidatorInterface
 {
-    public $schema = null;
+    private $schema = null;
 
-    public function setSchema($schema, $schema_url=null, $definitions=null) {
+    public function setSchema($schema, $additionalProperties = array()) {
         $this->schema = $schema;
     }
+
     public function validate($msg)
     {
         $xml = new DOMDocument();

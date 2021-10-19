@@ -403,9 +403,8 @@ class Configuration implements ConfigurationInterface
         return $node
             ->children()
                 ->scalarNode('class')->isRequired()->end()
-                ->scalarNode('definitions')->defaultNull()->end()
                 ->scalarNode('schema')->isRequired()->end()
-                ->scalarNode('schema_url')->defaultNull()->end()
+                ->variableNode('additionalProperties')->defaultNull()->end()
             ->end()
         ;
     }

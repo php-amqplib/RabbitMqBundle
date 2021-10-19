@@ -8,7 +8,7 @@ class JsonSchemaTest extends TestCase
 {
     public function testJsonValidatorFunction()
     {
-        $jsonValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\JsonValidator')
+        $jsonValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Validator\JsonValidator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -31,7 +31,7 @@ JSON;
 
     public function testXmlValidatorFunction()
     {
-        $xmlValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\XmlValidator')
+        $xmlValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Validator\XmlValidator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -53,7 +53,7 @@ XML;
 
     public function testJsonValidatorWithSchemaDataFunction()
     {
-        $jsonValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\JsonValidator')
+        $jsonValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\Validator\JsonValidator')
             ->disableOriginalConstructor()
             ->getMock();
 
