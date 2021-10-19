@@ -50,4 +50,29 @@ XML;
         $xmlValidator->method('getContentType')->willReturn('application/xml');
         $this->assertEquals(null, $xmlValidator->validate($xml_msg));
     }
+
+    public function testJsonValidatorWithSchemaDataFunction()
+    {
+        $jsonValidator = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\JsonValidator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+            $jsonValidator->setSchema(
+            "OldSound\RabbitMqBundle\TestValidation/schema/top_level.schema",
+            "defs.schema",
+            "OldSound\RabbitMqBundle\TestValidation/schema/common_objects.schema"
+        );
+
+        $json_msg = <<<'JSON'
+        {
+            "prefix": "Mr",
+            "firstName": "John",
+            "lastName": "Doe",
+            "age": 21,
+            "language": "EN"
+        }
+JSON;
+        $jsonValidator->method('getContentType')->willReturn('application/json');
+        $this->assertEquals(null, $jsonValidator->validate($json_msg));
+    }
 }
