@@ -303,7 +303,7 @@ If you need to use a custom class for a producer (which should inherit from `Old
     ...
 ```
 
-There is also optional support for declarative validation, where a schema is used to validate an outgoing message. Having validation tied to the messaging layer makes your calling controller code much cleaner, as the handler only receives valid messages, with the infrastructure handling invalid ones. Currently, we have support for [JSON schema](https://github.com/swaggest/php-json-schema) to validate JSON messages, and [XML schema](https://www.php.net/manual/en/domdocument.schemavalidate.php) to validate XML messages. Additional message validators can be added by classes implementing the `OldSound\RabbitMqBundle\RabbitMq\ValidatorInterface` interface.
+There is also optional support for declarative validation, where a schema is used to validate an outgoing message. Having validation tied to the messaging layer makes your calling controller code much cleaner, as the handler only receives valid messages, with the infrastructure handling invalid ones. Currently, we have support for [JSON schema](https://github.com/swaggest/php-json-schema) to validate JSON messages, and [XML schema](https://www.php.net/manual/en/domdocument.schemavalidate.php) to validate XML messages. Additional message validators can be added by classes implementing the `OldSound\RabbitMqBundle\RabbitMq\Validator\ValidatorInterface` interface.
 
 To supply a schema to validate against, supply the implementing class and schema.
 
@@ -313,14 +313,14 @@ To supply a schema to validate against, supply the implementing class and schema
         update_person_details:
             ...
             validator:
-                class: "OldSound\\RabbitMqBundle\\RabbitMq\\JsonValidator"
+                class: "OldSound\\RabbitMqBundle\\RabbitMq\\Validator\\JsonValidator"
                 schema: "%kernel.project_dir%/config/jsonschema/person.schema"
     ...
 ```
 
-For XML schema, specify the class as `OldSound\\RabbitMqBundle\\RabbitMq\\XmlValidator`.
+For XML schema, specify the class as `OldSound\\RabbitMqBundle\\RabbitMq\\Validator\\XmlValidator`.
 
-If your JSON schema needs to load additional schema data (eg. required objects referenced from your main schema), specify schema_url and definitions:
+If your JSON schema needs to load additional schema data (eg. required objects referenced from your main schema), specify schema_url and definitions in the additionalProperties option:
 
 ```yaml
     ...
@@ -330,8 +330,7 @@ If your JSON schema needs to load additional schema data (eg. required objects r
             validator:
                 class: "OldSound\\RabbitMqBundle\\RabbitMq\\JsonValidator"
                 schema: "%kernel.project_dir%/config/jsonschema/person.schema"
-                schema_url: "defs.schema"
-                definitions: "%kernel.project_dir%/config/jsonschema/common_objects.schema"
+                additionalProperties: {schema_url: "defs.schema", definitions: "%kernel.project_dir%/config/jsonschema/common_objects.schema"}
     ...
 ```
 
