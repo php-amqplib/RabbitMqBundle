@@ -59,8 +59,10 @@ XML;
 
             $jsonValidator->setSchema(
             "OldSound\RabbitMqBundle\TestValidation/schema/top_level.schema",
-            "defs.schema",
-            "OldSound\RabbitMqBundle\TestValidation/schema/common_objects.schema"
+            array(
+                'schema_url'=>"defs.schema",
+                'definitions'=>"%kernel.project_dir%/config/jsonschema/common_objects.schema"
+            )
         );
 
         $json_msg = <<<'JSON'
