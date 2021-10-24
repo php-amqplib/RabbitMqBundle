@@ -37,7 +37,7 @@ JSON;
 
         $xmlValidator->setSchema(
             "OldSound\RabbitMqBundle\TestValidation/schema/XmlValidation.xsd",
-            null,
+            null
         );
 
         $xml_msg = <<<'XML'
