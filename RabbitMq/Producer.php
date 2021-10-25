@@ -10,7 +10,7 @@ use PhpAmqpLib\Wire\AMQPTable;
  */
 class Producer extends BaseAmqp implements ProducerInterface
 {
-    const DEFAULT_CONTENT_TYPE = 'text/plain';
+    public const DEFAULT_CONTENT_TYPE = 'text/plain';
     protected $contentType = Producer::DEFAULT_CONTENT_TYPE;
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
