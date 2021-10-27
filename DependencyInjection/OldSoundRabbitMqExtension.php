@@ -187,6 +187,11 @@ class OldSoundRabbitMqExtension extends Extension
                 }
 
                 $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
+                if (isset($producer['validator'])) {
+                    $definition->addMethodCall('setValidator', array($producer['validator']['class'],
+                                                                     $producer['validator']['schema'],
+                                                                     $producer['validator']['additionalProperties']));
+                }
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {

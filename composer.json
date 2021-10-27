@@ -19,7 +19,8 @@
         "php-amqplib/php-amqplib":      "^2.12.2|^3.0",
         "psr/log":                      "^1.0",
         "symfony/http-kernel":          "^4.4|^5.0",
-        "symfony/framework-bundle":     "^4.4|^5.0"
+        "symfony/framework-bundle":     "^4.4|^5.0",
+        "swaggest/json-schema":         "^0.12.38"
     },
     "require-dev": {
         "symfony/serializer":           "^4.3|^5.0",

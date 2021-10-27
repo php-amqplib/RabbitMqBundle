@@ -317,6 +317,17 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 array(
                     'setDefaultRoutingKey',
                     array('')
+                ),
+                array(
+                    'setValidator',
+                    array(
+                        "OldSound\RabbitMqBundle\RabbitMq\JsonValidator",
+                        "OldSound\RabbitMqBundle\TestValidation\schema\JsonValidation.schema",
+                        array(
+                            "definitions" => null, 
+                            "schema_url" => null
+                        )
+                    )
                 )
             ),
             $definition->getMethodCalls()

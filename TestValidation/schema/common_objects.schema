@@ -1,0 +1,23 @@
+{
+    "definitions": {
+        "language": {
+            "type": "string",
+            "enum": [
+                "EN",
+                "TH",
+                "ID",
+                "VI"
+            ]
+        },
+
+        "prefix": {
+            "type": "string",
+            "enum": [
+                "Mr",
+                "Miss",
+                "Mrs",
+                "Ms
+            ]
+        }
+    }
+}

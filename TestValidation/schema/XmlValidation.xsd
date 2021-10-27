@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://test.ns/mynamespace">
+
+    <xsd:element name="person">
+        <xsd:complexType>
+            <xsd:element name="firstName" type="xsd:string"/>
+            <xsd:element name="lastName" type="xsd:string"/>
+            <xsd:element name="age" type="xsd:integer"/>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>
