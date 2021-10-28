@@ -9,7 +9,6 @@
     }],
     "require": {
         "php":                          "^7.1|^8.0",
-        "ext-pcntl": "*",
 
         "symfony/dependency-injection": "^4.3|^5.0",
         "symfony/event-dispatcher":     "^4.3|^5.0",
@@ -33,6 +32,7 @@
         "emag-tech-labs/rabbitmq-bundle": "self.version"
     },
     "suggest": {
+        "ext-pcntl": "*",
         "symfony/framework-bundle": "To use this lib as a full Symfony Bundle and to use the profiler data collector"
     },
     "extra": {
