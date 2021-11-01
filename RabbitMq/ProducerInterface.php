@@ -12,5 +12,5 @@ interface ProducerInterface
      * @param array $additionalProperties
      * @return bool
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array()): bool;
+    public function publish($msgBody, $routingKey = '', $additionalProperties = array());
 }
