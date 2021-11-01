@@ -131,9 +131,12 @@ old_sound_rabbit_mq:
             url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
-            connection:       default
-            exchange_options: {name: 'upload-picture', type: direct}
-            service_alias:    my_app_service # no alias by default
+            connection:            default
+            exchange_options:      {name: 'upload-picture', type: direct}
+            service_alias:         my_app_service # no alias by default
+            default_routing_key:   'optional.routing.key' # defaults to '' if not set
+            default_content_type:  'content/type' # defaults to 'text/plain'
+            default_delivery_mode: 2 # optional. 1 means non-persistent, 2 means persistent. Defaults to "2".
     consumers:
         upload_picture:
             connection:       default
@@ -284,8 +287,7 @@ As you can see, if in your configuration you have a producer called __upload\_pi
 
 Besides the message itself, the `OldSound\RabbitMqBundle\RabbitMq\Producer#publish()` method also accepts an optional routing key parameter and an optional array of additional properties. The array of additional properties allows you to alter the properties with which an `PhpAmqpLib\Message\AMQPMessage` object gets constructed by default. This way, for example, you can change the application headers.
 
-You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message
-delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode.
+You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message delivery mode respectively, overriding any default set in the "producers" config section. If not overriden by either the "producers" configuration or an explicit call to these methods (as per the below example), the default values are __text/plain__ for content type and __2__ for delivery mode.
 
 ```php
 $this->get('old_sound_rabbit_mq.upload_picture_producer')->setContentType('application/json');
