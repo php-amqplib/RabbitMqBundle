@@ -22,6 +22,11 @@ class DeleteCommand extends ConsumerCommand
         $this->setName('rabbitmq:delete');
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        // nothing to initialize here as BaseConsumerCommand initializes on option that is not available here
+    }
+
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
