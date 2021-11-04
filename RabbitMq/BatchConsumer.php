@@ -154,13 +154,14 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
                 )
             ));
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested restart', array(
+            $this->logger->info('Consumer requested stop', array(
                 'amqp' => array(
                     'queue' => $this->queueOptions['name'],
                     'message' => $this->messages,
                     'stacktrace' => $e->getTraceAsString()
                 )
             ));
+            $this->handleProcessMessages($e->getHandleCode());
             $this->resetBatch();
             $this->stopConsuming();
         } catch (\Exception $e) {
@@ -213,12 +214,14 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
             $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, true);
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+        } elseif ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
             $this->getMessageChannel($deliveryTag)->basic_nack($deliveryTag, false, true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+        } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, false);
+        } elseif ($processFlag == ConsumerInterface::MSG_ACK_SENT) {
+            // do nothing, ACK should be already sent
         } else {
             // Remove message from queue only if callback return not false
             $this->getMessageChannel($deliveryTag)->basic_ack($deliveryTag);
