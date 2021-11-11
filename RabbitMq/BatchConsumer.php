@@ -220,7 +220,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, false);
-        } elseif ($processFlag == ConsumerInterface::MSG_ACK_SENT) {
+        } elseif ($processFlag === ConsumerInterface::MSG_ACK_SENT) {
             // do nothing, ACK should be already sent
         } else {
             // Remove message from queue only if callback return not false
