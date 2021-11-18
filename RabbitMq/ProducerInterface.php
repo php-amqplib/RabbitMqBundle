@@ -12,4 +12,12 @@ interface ProducerInterface
      * @param array $additionalProperties
      */
     public function publish($msgBody, $routingKey = '', $additionalProperties = array());
+
+    /**
+     * Set message content type
+     *
+     * @param string $contentType
+     */
+    public function setContentType($contentType);
 }
+
