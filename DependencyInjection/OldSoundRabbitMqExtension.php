@@ -654,7 +654,7 @@ class OldSoundRabbitMqExtension extends Extension
         $definition->addArgument(new Reference(sprintf('old_sound_rabbit_mq.connection.%s', $connectionName)));
     }
 
-    public function getAlias()
+    public function getAlias() : string
     {
         return 'old_sound_rabbit_mq';
     }
