@@ -49,6 +49,12 @@ jobs:
                       stability: stable
                       coverage: none
                       experimental: false
+                    - php-version: '8.1'
+                      symfony-version: '^5.0'
+                      composer-version: v2
+                      stability: stable
+                      coverage: none
+                      experimental: false
 
         steps:
             - name: Checkout
