@@ -23,8 +23,8 @@
     "require-dev": {
         "symfony/serializer":           "^4.4|^5.3|^6.0",
         "phpunit/phpunit":              "^9.5",
-        "phpstan/phpstan":              "^0.12.11",
-        "phpstan/phpstan-phpunit":      "^0.12.6"
+        "phpstan/phpstan":              "^1.2",
+        "phpstan/phpstan-phpunit":      "^1.0"
     },
     "replace": {
         "oldsound/rabbitmq-bundle": "self.version",
