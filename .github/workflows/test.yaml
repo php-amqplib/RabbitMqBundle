@@ -46,7 +46,7 @@ jobs:
                     - php-version: '8.0'
                       symfony-version: '^5.0'
                       composer-version: v2
-                      stability: RC
+                      stability: stable
                       coverage: none
                       experimental: false
 
