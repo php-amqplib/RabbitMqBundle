@@ -8,7 +8,7 @@
         "name" : "Alvaro Videla"
     }],
     "require": {
-        "php":                          "^7.1|^8.0",
+        "php":                          "^7.4|^8.0",
 
         "symfony/dependency-injection": "^4.3|^5.0|^6.0",
         "symfony/event-dispatcher":     "^4.3|^5.0|^6.0",
