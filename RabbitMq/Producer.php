@@ -15,6 +15,12 @@ class Producer extends BaseAmqp implements ProducerInterface
     protected $deliveryMode = 2;
     protected $defaultRoutingKey = '';
 
+    /**
+     * Set content type
+     *
+     * @param string $contentType
+     * @return self
+     */
     public function setContentType($contentType)
     {
         $this->contentType = $contentType;
@@ -22,6 +28,12 @@ class Producer extends BaseAmqp implements ProducerInterface
         return $this;
     }
 
+    /**
+     * Set delivery mode
+     *
+     * @param string $deliveryMode
+     * @return self
+     */
     public function setDeliveryMode($deliveryMode)
     {
         $this->deliveryMode = $deliveryMode;
@@ -55,7 +67,7 @@ class Producer extends BaseAmqp implements ProducerInterface
             $this->setupFabric();
         }
 
-        $msg = new AMQPMessage((string) $msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
+        $msg = new AMQPMessage((string)$msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
         if (!empty($headers)) {
             $headersTable = new AMQPTable($headers);
