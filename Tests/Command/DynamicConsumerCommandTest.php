@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DynamicConsumerCommandTest extends BaseCommandTest
 {
-
     protected function setUp(): void
     {
         parent::setUp();

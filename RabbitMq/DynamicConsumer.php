@@ -4,18 +4,18 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 use OldSound\RabbitMqBundle\Provider\QueueOptionsProviderInterface;
 
-class DynamicConsumer extends Consumer{
-
+class DynamicConsumer extends Consumer
+{
     /**
      * Queue provider
      *
      * @var QueueOptionsProviderInterface
      */
     protected $queueOptionsProvider = null;
-    
+
     /**
      * Context the consumer runs in
-     * 
+     *
      * @var string
      */
     protected $context = null;
@@ -32,7 +32,7 @@ class DynamicConsumer extends Consumer{
         $this->queueOptionsProvider = $queueOptionsProvider;
         return $this;
     }
-    
+
     public function setContext($context)
     {
         $this->context = $context;
@@ -40,11 +40,11 @@ class DynamicConsumer extends Consumer{
 
 
     protected function setupConsumer()
-    {   
+    {
         $this->mergeQueueOptions();
         parent::setupConsumer();
     }
-    
+
     protected function mergeQueueOptions()
     {
         if (null === $this->queueOptionsProvider) {

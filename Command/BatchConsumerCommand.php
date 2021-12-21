@@ -25,7 +25,8 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
             // Halt consumer if waiting for a new message from the queue
             try {
                 $this->consumer->stopConsuming();
-            } catch (AMQPTimeoutException $e) {}
+            } catch (AMQPTimeoutException $e) {
+            }
         }
     }
 
