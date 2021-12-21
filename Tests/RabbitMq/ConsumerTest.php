@@ -271,23 +271,34 @@ class ConsumerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $eventDispatcher->expects($this->at(1))
+        $eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->with($this->isInstanceOf(OnIdleEvent::class), OnIdleEvent::NAME)
-            ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
-                $event->setForceStop(false);
+            ->withConsecutive(
+                [
+                    $this->isInstanceOf(OnConsumeEvent::class),
+                    OnConsumeEvent::NAME,
+                ],
+                [
+                    $this->callback(function (OnIdleEvent $event) {
+                        $event->setForceStop(false);
 
-                return $event;
-            });
+                        return true;
+                    }),
+                    OnIdleEvent::NAME,
+                ],
+                [
+                    $this->isInstanceOf(OnConsumeEvent::class),
+                    OnConsumeEvent::NAME,
+                ],
+                [
+                    $this->callback(function (OnIdleEvent $event) {
+                        $event->setForceStop(true);
 
-        $eventDispatcher->expects($this->at(3))
-            ->method('dispatch')
-            ->with($this->isInstanceOf(OnIdleEvent::class), OnIdleEvent::NAME)
-            ->willReturnCallback(function (OnIdleEvent $event, $eventName) {
-                $event->setForceStop(true);
-
-                return $event;
-            });
+                        return true;
+                    }),
+                    OnIdleEvent::NAME,
+                ]
+            );
 
         $consumer->setEventDispatcher($eventDispatcher);
 
