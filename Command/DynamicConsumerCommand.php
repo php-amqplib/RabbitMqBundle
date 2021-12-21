@@ -8,6 +8,7 @@
  *
  * @author Tibor Barna <tibor.barna@wiredminds.de>
  */
+
 namespace OldSound\RabbitMqBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;

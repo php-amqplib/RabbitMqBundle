@@ -238,7 +238,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
 
     protected function assertBindingMethodCalls(Definition $definition, $binding)
     {
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
             array(
                 'setArguments',
                 array(
@@ -287,7 +288,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_producer_producer');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_producer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -352,7 +354,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             '%old_sound_rabbit_mq.producer.class% $defaultProducer' => 'old_sound_rabbit_mq.default_producer_producer',
         );
 
-        foreach($expectedAliases as $id => $target) {
+        foreach ($expectedAliases as $id => $target) {
             $this->assertTrue($container->hasAlias($id), sprintf('Container should have %s alias for autowiring support.', $id));
 
             $alias = $container->getAlias($id);
@@ -380,7 +382,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_producer_producer');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_producer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -433,7 +436,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_consumer_consumer');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_consumer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -500,7 +504,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             ConsumerInterface::class . ' $qosTestConsumer' => 'old_sound_rabbit_mq.qos_test_consumer_consumer',
             '%old_sound_rabbit_mq.consumer.class% $qosTestConsumer' => 'old_sound_rabbit_mq.qos_test_consumer_consumer'
         );
-        foreach($expectedAliases as $id => $target) {
+        foreach ($expectedAliases as $id => $target) {
             $this->assertTrue($container->hasAlias($id), sprintf('Container should have %s alias for autowiring support.', $id));
 
             $alias = $container->getAlias($id);
@@ -517,7 +521,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_consumer_consumer');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_consumer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -594,7 +599,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
 
         $this->assertTrue($container->has('old_sound_rabbit_mq.multi_test_consumer_multiple'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.multi_test_consumer_multiple');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -671,7 +677,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $this->assertTrue($container->has('old_sound_rabbit_mq.bar_dyn_consumer_dynamic'));
 
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_dyn_consumer_dynamic');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                         array(
@@ -684,8 +691,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                                 'internal' => false,
                                 'nowait' => false,
                                 'declare' => true,
-                                'arguments' => NULL,
-                                'ticket' => NULL,
+                                'arguments' => null,
+                                'ticket' => null,
                             )
                         )
                 ),
@@ -714,7 +721,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_anon_consumer_anon');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_anon_consumer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -750,7 +758,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_anon_consumer_anon');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_anon_consumer');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array(
                     'setExchangeOptions',
                     array(
@@ -845,7 +854,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.foo_server_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.foo_connection');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.foo_server');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array('initServer', array('foo_server')),
                 array('setCallback', array(array(new Reference('foo_server.callback'), 'execute'))),
                 array('setSerializer', array('json_encode')),
@@ -863,7 +873,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_server_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.default_server');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array('initServer', array('default_server')),
                 array('setCallback', array(array(new Reference('default_server.callback'), 'execute'))),
                 array('setSerializer', array('serialize')),
@@ -881,7 +892,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_queue_options_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.server_with_queue_options');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 array('initServer', array('server_with_queue_options')),
                 array('setCallback', array(array(new Reference('server_with_queue_options.callback'), 'execute'))),
                 array('setQueueOptions', array(array(
@@ -911,7 +923,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_exchange_options_server');
         $this->assertEquals((string) $definition->getArgument(0), 'old_sound_rabbit_mq.connection.default');
         $this->assertEquals((string) $definition->getArgument(1), 'old_sound_rabbit_mq.channel.server_with_exchange_options');
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
             array('initServer', array('server_with_exchange_options')),
             array('setCallback', array(array(new Reference('server_with_exchange_options.callback'), 'execute'))),
             array('setExchangeOptions', array(array(
@@ -940,7 +953,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $this->assertTrue($container->has('old_sound_rabbit_mq.data_collector'));
         $definition = $container->getDefinition('old_sound_rabbit_mq.data_collector');
 
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 new Reference('old_sound_rabbit_mq.channel.default_producer'),
                 new Reference('old_sound_rabbit_mq.channel.default_consumer'),
             ),
@@ -997,7 +1011,8 @@ class OldSoundRabbitMqExtensionTest extends TestCase
         $container = $this->getContainer('config_with_enable_logger.yml');
         $definition = $container->getDefinition('old_sound_rabbit_mq.default_consumer_consumer');
         $this->assertTrue(
-            $definition->hasTag('monolog.logger'), 'service should be marked for logger'
+            $definition->hasTag('monolog.logger'),
+            'service should be marked for logger'
         );
     }
 

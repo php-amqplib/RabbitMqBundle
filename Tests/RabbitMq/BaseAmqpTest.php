@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BaseAmqpTest extends TestCase
 {
-
     public function testLazyConnection()
     {
         $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')

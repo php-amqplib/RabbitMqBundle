@@ -13,7 +13,7 @@ class AMQPLoggedChannel extends AMQPChannel
 {
     private $basicPublishLog = array();
 
-    public function basic_publish($msg, $exchange = '', $routingKey = '', $mandatory = false, $immediate = false, $ticket = NULL)
+    public function basic_publish($msg, $exchange = '', $routingKey = '', $mandatory = false, $immediate = false, $ticket = null)
     {
         $this->basicPublishLog[] = array(
             'msg'         => $msg,

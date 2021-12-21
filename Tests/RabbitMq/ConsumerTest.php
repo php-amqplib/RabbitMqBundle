@@ -409,7 +409,7 @@ class ConsumerTest extends TestCase
 
         $amqpChannel->expects($this->exactly(2))
             ->method('wait')
-            ->with(null, false, $this->LessThanOrEqual($consumer->getTimeoutWait()) )
+            ->with(null, false, $this->LessThanOrEqual($consumer->getTimeoutWait()))
             ->willReturnCallback(function ($allowedMethods, $nonBlocking, $waitTimeout) use ($consumer) {
                 // ensure max execution date time "counts down"
                 $consumer->setGracefulMaxExecutionDateTime(

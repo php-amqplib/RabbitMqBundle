@@ -1,6 +1,7 @@
 <?php
 
 namespace OldSound\RabbitMqBundle\RabbitMq\Exception;
+
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 /**
@@ -16,6 +17,4 @@ class StopConsumerException extends \RuntimeException
     {
         return ConsumerInterface::MSG_SINGLE_NACK_REQUEUE;
     }
-
 }
-
