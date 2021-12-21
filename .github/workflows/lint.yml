@@ -6,8 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-          ref: ${{ github.head_ref }}
 
     - name: PHP-CS-Fixer
       uses: docker://oskarstark/php-cs-fixer-ga
