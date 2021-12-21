@@ -94,7 +94,7 @@ class RpcClient extends BaseAmqp
     protected function getQueueName()
     {
         if (null === $this->queueName) {
-            list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, false);
+            list($this->queueName, , ) = $this->getChannel()->queue_declare("", false, false, true, false);
         }
 
         return $this->queueName;

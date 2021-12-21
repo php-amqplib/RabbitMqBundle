@@ -226,7 +226,6 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             // Remove message from queue only if callback return not false
             $this->getMessageChannel($deliveryTag)->basic_ack($deliveryTag);
         }
-
     }
 
     /**

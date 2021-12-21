@@ -2,7 +2,6 @@
 
 namespace OldSound\RabbitMqBundle\RabbitMq\Exception;
 
-
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 
 class AckStopConsumerException extends StopConsumerException
@@ -11,5 +10,4 @@ class AckStopConsumerException extends StopConsumerException
     {
         return ConsumerInterface::MSG_ACK;
     }
-
 }

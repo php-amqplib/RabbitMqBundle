@@ -281,7 +281,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->container
                     ->registerAliasForArgument($name, '%old_sound_rabbit_mq.consumer.class%', $argName)
                     ->setPublic(false);
-                }
+            }
         }
     }
 
@@ -373,7 +373,6 @@ class OldSoundRabbitMqExtension extends Extension
     protected function loadDynamicConsumers()
     {
         foreach ($this->config['dynamic_consumers'] as $key => $consumer) {
-
             if (empty($consumer['queue_options_provider'])) {
                 throw new InvalidConfigurationException(
                     "Error on loading $key dynamic consumer. " .
