@@ -206,7 +206,8 @@ abstract class BaseAmqp
                 $this->exchangeOptions['internal'],
                 $this->exchangeOptions['nowait'],
                 $this->exchangeOptions['arguments'],
-                $this->exchangeOptions['ticket']);
+                $this->exchangeOptions['ticket']
+            );
 
             $this->exchangeDeclared = true;
         }
@@ -218,10 +219,16 @@ abstract class BaseAmqp
     protected function queueDeclare()
     {
         if ($this->queueOptions['declare']) {
-            list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
-                $this->queueOptions['durable'], $this->queueOptions['exclusive'],
-                $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],
-                $this->queueOptions['arguments'], $this->queueOptions['ticket']);
+            list($queueName, , ) = $this->getChannel()->queue_declare(
+                $this->queueOptions['name'],
+                $this->queueOptions['passive'],
+                $this->queueOptions['durable'],
+                $this->queueOptions['exclusive'],
+                $this->queueOptions['auto_delete'],
+                $this->queueOptions['nowait'],
+                $this->queueOptions['arguments'],
+                $this->queueOptions['ticket']
+            );
 
             if (isset($this->queueOptions['routing_keys']) && count($this->queueOptions['routing_keys']) > 0) {
                 foreach ($this->queueOptions['routing_keys'] as $routingKey) {

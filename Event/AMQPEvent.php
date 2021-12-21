@@ -14,10 +14,10 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class AMQPEvent extends AbstractAMQPEvent
 {
-    const ON_CONSUME                = 'on_consume';
-    const ON_IDLE                   = 'on_idle';
-    const BEFORE_PROCESSING_MESSAGE = 'before_processing';
-    const AFTER_PROCESSING_MESSAGE  = 'after_processing';
+    public const ON_CONSUME                = 'on_consume';
+    public const ON_IDLE                   = 'on_idle';
+    public const BEFORE_PROCESSING_MESSAGE = 'before_processing';
+    public const AFTER_PROCESSING_MESSAGE  = 'after_processing';
 
     /**
      * @var AMQPMessage

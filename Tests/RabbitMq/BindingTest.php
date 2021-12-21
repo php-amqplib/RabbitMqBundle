@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class BindingTest extends TestCase
 {
-
     protected function getBinding($amqpConnection, $amqpChannel)
     {
         return new Binding($amqpConnection, $amqpChannel);

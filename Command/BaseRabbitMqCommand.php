@@ -28,6 +28,4 @@ abstract class BaseRabbitMqCommand extends Command implements ContainerAwareInte
     {
         return $this->container;
     }
-
-
 }

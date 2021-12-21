@@ -140,7 +140,8 @@ class Consumer extends BaseConsumer
 
     protected function processMessageQueueCallback(AMQPMessage $msg, $queueName, $callback)
     {
-        $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
+        $this->dispatchEvent(
+            BeforeProcessingMessageEvent::NAME,
             new BeforeProcessingMessageEvent($this, $msg)
         );
         try {

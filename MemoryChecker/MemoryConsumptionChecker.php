@@ -17,7 +17,8 @@ class MemoryConsumptionChecker
      *
      * @param NativeMemoryUsageProvider $memoryUsageProvider
      */
-    public function __construct(NativeMemoryUsageProvider $memoryUsageProvider) {
+    public function __construct(NativeMemoryUsageProvider $memoryUsageProvider)
+    {
         $this->memoryUsageProvider = $memoryUsageProvider;
     }
 
@@ -61,5 +62,4 @@ class MemoryConsumptionChecker
 
         return (int)$numerical;
     }
-
 }
