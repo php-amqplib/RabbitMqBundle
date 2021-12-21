@@ -55,9 +55,9 @@ abstract class BaseAmqp
     protected $eventDispatcher = null;
 
     /**
-     * @param AbstractConnection   $conn
-     * @param AMQPChannel|null $ch
-     * @param null             $consumerTag
+     * @param AbstractConnection $conn
+     * @param AMQPChannel|null   $ch
+     * @param string|null        $consumerTag
      */
     public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
