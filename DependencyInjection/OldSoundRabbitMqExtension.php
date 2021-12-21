@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -71,7 +72,7 @@ class OldSoundRabbitMqExtension extends Extension
         }
     }
 
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         return new Configuration($this->getAlias());
     }
@@ -531,7 +532,7 @@ class OldSoundRabbitMqExtension extends Extension
      *
      * @return array
      */
-    private function normalizeArgumentKeys(array $config)
+    private function normalizeArgumentKeys(array $config): array
     {
         if (isset($config['arguments'])) {
             $arguments = $config['arguments'];
@@ -559,7 +560,7 @@ class OldSoundRabbitMqExtension extends Extension
      * @param string $arguments
      * @return array
      */
-    private function argumentsStringAsArray($arguments)
+    private function argumentsStringAsArray($arguments): array
     {
         $argumentsArray = array();
 
@@ -654,7 +655,7 @@ class OldSoundRabbitMqExtension extends Extension
         $definition->addArgument(new Reference(sprintf('old_sound_rabbit_mq.connection.%s', $connectionName)));
     }
 
-    public function getAlias() : string
+    public function getAlias(): string
     {
         return 'old_sound_rabbit_mq';
     }
@@ -664,6 +665,7 @@ class OldSoundRabbitMqExtension extends Extension
      *
      * @param string $callback
      * @param string $name
+     * @throws \ReflectionException
      */
     protected function addDequeuerAwareCall($callback, $name)
     {
@@ -691,7 +693,7 @@ class OldSoundRabbitMqExtension extends Extension
      *
      * @return array
      */
-    protected function getDefaultExchangeOptions()
+    protected function getDefaultExchangeOptions(): array
     {
         return array(
             'name' => '',
@@ -706,7 +708,7 @@ class OldSoundRabbitMqExtension extends Extension
      *
      * @return array
      */
-    protected function getDefaultQueueOptions()
+    protected function getDefaultQueueOptions(): array
     {
         return array(
             'name' => '',
