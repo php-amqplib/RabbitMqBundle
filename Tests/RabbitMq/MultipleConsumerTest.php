@@ -57,10 +57,10 @@ class MultipleConsumerTest extends TestCase
         $callback = $this->prepareCallback($processFlag);
 
         $this->multipleConsumer->setQueues(
-            array(
-                'test-1' => array('callback' => $callback),
-                'test-2' => array('callback' => $callback)
-            )
+            [
+                'test-1' => ['callback' => $callback],
+                'test-2' => ['callback' => $callback],
+            ]
         );
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
@@ -82,10 +82,10 @@ class MultipleConsumerTest extends TestCase
         $queuesProvider->expects($this->once())
             ->method('getQueues')
             ->will($this->returnValue(
-                array(
-                    'test-1' => array('callback' => $callback),
-                    'test-2' => array('callback' => $callback)
-                )
+                [
+                    'test-1' => ['callback' => $callback],
+                    'test-2' => ['callback' => $callback],
+                ]
             ));
 
         $this->multipleConsumer->setQueuesProvider($queuesProvider);
@@ -115,20 +115,20 @@ class MultipleConsumerTest extends TestCase
         $callback = $this->prepareCallback($processFlag);
 
         $this->multipleConsumer->setQueues(
-            array(
-                'test-1' => array('callback' => $callback),
-                'test-2' => array('callback' => $callback)
-            )
+            [
+                'test-1' => ['callback' => $callback],
+                'test-2' => ['callback' => $callback],
+            ]
         );
 
         $queuesProvider = $this->prepareQueuesProvider();
         $queuesProvider->expects($this->once())
             ->method('getQueues')
             ->will($this->returnValue(
-                array(
-                    'test-3' => array('callback' => $callback),
-                    'test-4' => array('callback' => $callback)
-                )
+                [
+                    'test-3' => ['callback' => $callback],
+                    'test-4' => ['callback' => $callback],
+                ]
             ));
 
         $this->multipleConsumer->setQueuesProvider($queuesProvider);
@@ -152,14 +152,14 @@ class MultipleConsumerTest extends TestCase
 
     public function processMessageProvider()
     {
-        return array(
-            array(null, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(true, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
-        );
+        return [
+            [null, 'basic_ack'], // Remove message from queue only if callback return not false
+            [true, 'basic_ack'], // Remove message from queue only if callback return not false
+            [false, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_ACK, 'basic_ack'], // Remove message from queue only if callback return not false
+            [ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_REJECT, 'basic_reject', false], // Reject and drop
+        ];
     }
 
     /**
@@ -182,7 +182,7 @@ class MultipleConsumerTest extends TestCase
         $this->multipleConsumer->setExchangeOptions([
             'declare' => false,
             'name' => $exchangeName,
-            'type' => 'topic']);
+            'type' => 'topic', ]);
 
         $this->multipleConsumer->setQueues([
             $queueName => [
@@ -193,7 +193,7 @@ class MultipleConsumerTest extends TestCase
                 'nowait' => true,
                 'arguments' => $expectedArgs,
                 'ticket' => null,
-                'routing_keys' => $routingKeysOption]
+                'routing_keys' => $routingKeysOption, ],
         ]);
 
         $this->multipleConsumer->setRoutingKey('test-routing-key');
@@ -208,10 +208,10 @@ class MultipleConsumerTest extends TestCase
 
     public function queueBindingRoutingKeyProvider()
     {
-        return array(
-            array(array(), 'test-routing-key'),
-            array(array('test-routing-key-2'), 'test-routing-key-2'),
-        );
+        return [
+            [[], 'test-routing-key'],
+            [['test-routing-key-2'], 'test-routing-key-2'],
+        ];
     }
 
     /**

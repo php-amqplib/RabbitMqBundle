@@ -151,40 +151,40 @@ class Consumer extends BaseConsumer
                 AfterProcessingMessageEvent::NAME,
                 new AfterProcessingMessageEvent($this, $msg)
             );
-            $this->logger->debug('Queue message processed', array(
-                'amqp' => array(
+            $this->logger->debug('Queue message processed', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'return_code' => $processFlag
-                )
-            ));
+                    'return_code' => $processFlag,
+                ],
+            ]);
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested stop', array(
-                'amqp' => array(
+            $this->logger->info('Consumer requested stop', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             $this->handleProcessMessage($msg, $e->getHandleCode());
             $this->stopConsuming();
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         } catch (\Error $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         }
     }

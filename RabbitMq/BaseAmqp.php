@@ -19,14 +19,14 @@ abstract class BaseAmqp
     protected $queueDeclared = false;
     protected $routingKey = '';
     protected $autoSetupFabric = true;
-    protected $basicProperties = array('content_type' => 'text/plain', 'delivery_mode' => 2);
+    protected $basicProperties = ['content_type' => 'text/plain', 'delivery_mode' => 2];
 
     /**
      * @var LoggerInterface
      */
     protected $logger;
 
-    protected $exchangeOptions = array(
+    protected $exchangeOptions = [
         'passive' => false,
         'durable' => true,
         'auto_delete' => false,
@@ -35,9 +35,9 @@ abstract class BaseAmqp
         'arguments' => null,
         'ticket' => null,
         'declare' => true,
-    );
+    ];
 
-    protected $queueOptions = array(
+    protected $queueOptions = [
         'name' => '',
         'passive' => false,
         'durable' => true,
@@ -47,7 +47,7 @@ abstract class BaseAmqp
         'arguments' => null,
         'ticket' => null,
         'declare' => true,
-    );
+    ];
 
     /**
      * @var EventDispatcherInterface|null
@@ -133,7 +133,7 @@ abstract class BaseAmqp
      * @param  array                     $options
      * @return void
      */
-    public function setExchangeOptions(array $options = array())
+    public function setExchangeOptions(array $options = [])
     {
         if (!isset($options['name'])) {
             throw new \InvalidArgumentException('You must provide an exchange name');
@@ -150,7 +150,7 @@ abstract class BaseAmqp
      * @param  array $options
      * @return void
      */
-    public function setQueueOptions(array $options = array())
+    public function setQueueOptions(array $options = [])
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
     }
@@ -219,7 +219,7 @@ abstract class BaseAmqp
     protected function queueDeclare()
     {
         if ($this->queueOptions['declare']) {
-            list($queueName, , ) = $this->getChannel()->queue_declare(
+            [$queueName, , ] = $this->getChannel()->queue_declare(
                 $this->queueOptions['name'],
                 $this->queueOptions['passive'],
                 $this->queueOptions['durable'],
@@ -249,7 +249,7 @@ abstract class BaseAmqp
      * @param string $exchange
      * @param string $routing_key
      */
-    protected function queueBind($queue, $exchange, $routing_key, array $arguments = array())
+    protected function queueBind($queue, $exchange, $routing_key, array $arguments = [])
     {
         // queue binding is not permitted on the default exchange
         if ('' !== $exchange) {

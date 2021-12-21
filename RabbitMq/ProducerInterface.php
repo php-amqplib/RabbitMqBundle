@@ -11,5 +11,5 @@ interface ProducerInterface
      * @param string $routingKey
      * @param array $additionalProperties
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array());
+    public function publish($msgBody, $routingKey = '', $additionalProperties = []);
 }

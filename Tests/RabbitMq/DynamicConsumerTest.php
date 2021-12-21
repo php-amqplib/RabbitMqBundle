@@ -35,12 +35,12 @@ class DynamicConsumerTest extends ConsumerTest
         $queueOptionsProvider->expects($this->once())
             ->method('getQueueOptions')
             ->will($this->returnValue(
-                array(
+                [
                     'name' => 'queue_foo',
-                    'routing_keys' => array(
-                        'foo.*'
-                    )
-                )
+                    'routing_keys' => [
+                        'foo.*',
+                    ],
+                ]
             ));
 
         $consumer->setQueueOptionsProvider($queueOptionsProvider);

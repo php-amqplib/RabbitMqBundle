@@ -10,8 +10,8 @@ class RpcServer extends BaseConsumer
 
     public function initServer($name)
     {
-        $this->setExchangeOptions(array('name' => $name, 'type' => 'direct'));
-        $this->setQueueOptions(array('name' => $name . '-queue'));
+        $this->setExchangeOptions(['name' => $name, 'type' => 'direct']);
+        $this->setQueueOptions(['name' => $name . '-queue']);
     }
 
     public function processMessage(AMQPMessage $msg)
@@ -30,7 +30,7 @@ class RpcServer extends BaseConsumer
 
     protected function sendReply($result, $client, $correlationId)
     {
-        $reply = new AMQPMessage($result, array('content_type' => 'text/plain', 'correlation_id' => $correlationId));
+        $reply = new AMQPMessage($result, ['content_type' => 'text/plain', 'correlation_id' => $correlationId]);
         $this->getChannel()->basic_publish($reply, '', $client);
     }
 

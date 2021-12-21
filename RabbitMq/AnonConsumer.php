@@ -10,7 +10,7 @@ class AnonConsumer extends Consumer
     {
         parent::__construct($conn);
 
-        $this->setQueueOptions(array(
+        $this->setQueueOptions([
             'name' => '',
             'passive' => false,
             'durable' => false,
@@ -18,7 +18,7 @@ class AnonConsumer extends Consumer
             'auto_delete' => true,
             'nowait' => false,
             'arguments' => null,
-            'ticket' => null
-        ));
+            'ticket' => null,
+        ]);
     }
 }
