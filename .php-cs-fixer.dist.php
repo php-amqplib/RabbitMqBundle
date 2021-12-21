@@ -37,6 +37,7 @@ $config = new PhpCsFixer\Config();
 $config
     ->setRiskyAllowed(true)
     ->setRules([
+        '@PHP74Migration' => true,
         '@PSR12' => true,
     ])
     ->setFinder($finder)
