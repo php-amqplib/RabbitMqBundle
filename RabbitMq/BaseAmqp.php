@@ -55,9 +55,9 @@ abstract class BaseAmqp
     protected $eventDispatcher = null;
 
     /**
-     * @param AbstractConnection   $conn
-     * @param AMQPChannel|null $ch
-     * @param null             $consumerTag
+     * @param AbstractConnection $conn
+     * @param AMQPChannel|null   $ch
+     * @param string|null        $consumerTag
      */
     public function __construct(AbstractConnection $conn, AMQPChannel $ch = null, $consumerTag = null)
     {
@@ -68,7 +68,7 @@ abstract class BaseAmqp
             $this->getChannel();
         }
 
-        $this->consumerTag = empty($consumerTag) ? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid()) : $consumerTag;
+        $this->consumerTag = $consumerTag ?? sprintf("PHPPROCESS_%s_%s", gethostname(), getmypid());
 
         $this->logger = new NullLogger();
     }

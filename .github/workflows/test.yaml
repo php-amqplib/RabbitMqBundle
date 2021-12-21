@@ -6,49 +6,20 @@ jobs:
     test:
         name: PHP ${{ matrix.php-version }} + Symfony ${{ matrix.symfony-version }}
 
-        runs-on: ubuntu-18.04
-
-        continue-on-error: ${{ matrix.experimental }}
+        runs-on: ubuntu-20.04
 
         strategy:
             matrix:
-                include:
-                    - php-version: '7.1'
-                      symfony-version: '^4.3'
-                      composer-version: v1
-                      stability: stable
-                      coverage: none
-                      experimental: false
-                    - php-version: '7.2'
-                      symfony-version: '^4.3'
-                      composer-version: v1
-                      stability: stable
-                      coverage: none
-                      experimental: false
-                    - php-version: '7.2'
-                      symfony-version: '^5.0'
-                      composer-version: v1
-                      stability: stable
-                      coverage: none
-                      experimental: false
-                    - php-version: '7.3'
-                      symfony-version: '^5.0'
-                      composer-version: v1
-                      stability: stable
-                      coverage: none
-                      experimental: false
+                php-version: ['7.4', '8.0', '8.1']
+                symfony-version: ['4.4', '5.3', '5.4', '6.0']
+                coverage: ['none']
+                exclude:
                     - php-version: '7.4'
-                      symfony-version: '^5.0'
-                      composer-version: v2
-                      stability: stable
-                      coverage: xdebug
-                      experimental: false
+                      symfony-version: '6.0'
+                include:
                     - php-version: '8.0'
-                      symfony-version: '^5.0'
-                      composer-version: v2
-                      stability: RC
-                      coverage: none
-                      experimental: false
+                      symfony-version: '5.4'
+                      coverage: xdebug
 
         steps:
             - name: Checkout
@@ -60,22 +31,17 @@ jobs:
                   coverage: ${{ matrix.coverage }}
                   ini-values: "memory_limit=-1"
                   php-version: ${{ matrix.php-version }}
-                  tools: composer:${{ matrix.composer-version }}
+                  tools: composer,flex
 
             - name: Validate composer.json
               run: composer validate --no-check-lock
-
-            - name: Configure Symfony version
-              run: composer require --no-update symfony/framework-bundle "${{ matrix.symfony-version }}"
-
-            - name: Configure composer stability
-              if: matrix.stability != 'stable'
-              run: composer config minimum-stability "${{ matrix.stability }}"
 
             - name: Install Composer dependencies
               uses: ramsey/composer-install@v1
               with:
                   composer-options: "--prefer-dist"
+              env:
+                  SYMFONY_REQUIRE: "${{ matrix.symfony-version }}.*"
 
             - name: Setup problem matchers for PHP
               run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
