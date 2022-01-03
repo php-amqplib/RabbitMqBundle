@@ -168,6 +168,7 @@ The argument value must be a list of datatype and value. Valid datatypes are:
 * `T` - Timestamps
 * `F` - Table
 * `A` - Array
+* `t` - Bool
 
 Adapt the `arguments` according to your needs.
 
