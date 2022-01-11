@@ -110,6 +110,9 @@ class Producer extends BaseAmqp implements ProducerInterface
     }
 
     /**
+     * Initializes the producer
+     * If confirmation is enabled set confirm_select at the channel
+     * and add ack and nack handlers
      */
     protected function initializeProducer(): void
     {
