@@ -12,9 +12,9 @@ class PurgeCommandTest extends BaseCommandTest
         parent::setUp();
         $this->definition->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 new InputOption('--no-confirmation', null, InputOption::VALUE_NONE, 'Switches off confirmation mode.'),
-            )));
+            ]));
         $this->application->expects($this->once())
             ->method('getHelperSet')
             ->will($this->returnValue($this->helperSet));

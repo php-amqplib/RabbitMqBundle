@@ -87,8 +87,8 @@ class ConsumerTest extends TestCase
         $eventDispatcher->expects($this->atLeastOnce())
             ->method('dispatch')
             ->withConsecutive(
-                array(new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME),
-                array(new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME)
+                [new BeforeProcessingMessageEvent($consumer, $amqpMessage), BeforeProcessingMessageEvent::NAME],
+                [new AfterProcessingMessageEvent($consumer, $amqpMessage), AfterProcessingMessageEvent::NAME]
             )
             ->willReturnOnConsecutiveCalls(
                 new BeforeProcessingMessageEvent($consumer, $amqpMessage),
@@ -100,15 +100,15 @@ class ConsumerTest extends TestCase
 
     public function processMessageProvider()
     {
-        return array(
-            array(null, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(true, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
-            array(ConsumerInterface::MSG_ACK_SENT), // ack not sent by the consumer but should be sent by the implementer of ConsumerInterface
-        );
+        return [
+            [null, 'basic_ack'], // Remove message from queue only if callback return not false
+            [true, 'basic_ack'], // Remove message from queue only if callback return not false
+            [false, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_ACK, 'basic_ack'], // Remove message from queue only if callback return not false
+            [ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_REJECT, 'basic_reject', false], // Reject and drop
+            [ConsumerInterface::MSG_ACK_SENT], // ack not sent by the consumer but should be sent by the implementer of ConsumerInterface
+        ];
     }
 
     /**
@@ -116,22 +116,22 @@ class ConsumerTest extends TestCase
      */
     public function consumeProvider()
     {
-        $testCases["All ok 4 callbacks"] = array(
-            array(
-                "messages" => array(
+        $testCases["All ok 4 callbacks"] = [
+            [
+                "messages" => [
                     "msgCallback1",
                     "msgCallback2",
                     "msgCallback3",
                     "msgCallback4",
-                )
-            )
-        );
+                ],
+            ],
+        ];
 
-        $testCases["No callbacks"] = array(
-            array(
-                "messages" => array()
-            )
-        );
+        $testCases["No callbacks"] = [
+            [
+                "messages" => [],
+            ],
+        ];
 
         return $testCases;
     }

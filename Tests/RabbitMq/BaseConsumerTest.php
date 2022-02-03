@@ -17,7 +17,7 @@ class BaseConsumerTest extends TestCase
             ->getMock();
 
         $this->consumer = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\BaseConsumer')
-            ->setConstructorArgs(array($amqpConnection))
+            ->setConstructorArgs([$amqpConnection])
             ->getMockForAbstractClass();
     }
 

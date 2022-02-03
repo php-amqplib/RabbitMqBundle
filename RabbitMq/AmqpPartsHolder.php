@@ -8,7 +8,7 @@ class AmqpPartsHolder
 
     public function __construct()
     {
-        $this->parts = array();
+        $this->parts = [];
     }
 
     public function addPart($type, BaseAmqp $part)
@@ -19,6 +19,6 @@ class AmqpPartsHolder
     public function getParts($type)
     {
         $type = (string) $type;
-        return isset($this->parts[$type]) ? $this->parts[$type] : array();
+        return $this->parts[$type] ?? [];
     }
 }

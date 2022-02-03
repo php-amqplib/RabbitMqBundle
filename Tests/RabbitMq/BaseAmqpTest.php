@@ -63,7 +63,7 @@ class BaseAmqpTest extends TestCase
             ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
             ->willReturn(new AMQPEvent());
 
-        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
+        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, [AMQPEvent::ON_CONSUME, new AMQPEvent()]);
     }
 
     /**

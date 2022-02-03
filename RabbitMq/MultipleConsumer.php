@@ -8,7 +8,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class MultipleConsumer extends Consumer
 {
-    protected $queues = array();
+    protected $queues = [];
 
     /**
      * Queues provider
@@ -73,7 +73,7 @@ class MultipleConsumer extends Consumer
     protected function queueDeclare()
     {
         foreach ($this->queues as $name => $options) {
-            list($queueName, , ) = $this->getChannel()->queue_declare(
+            [$queueName, , ] = $this->getChannel()->queue_declare(
                 $name,
                 $options['passive'],
                 $options['durable'],

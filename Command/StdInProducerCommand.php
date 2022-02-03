@@ -58,7 +58,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
                 throw new \InvalidArgumentException(sprintf(
                     'Invalid payload format "%s", expecting one of: %s.',
                     $format,
-                    implode(', ', array(self::FORMAT_PHP, self::FORMAT_RAW))
+                    implode(', ', [self::FORMAT_PHP, self::FORMAT_RAW])
                 ));
         }
 

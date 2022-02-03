@@ -459,7 +459,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('ticket')->defaultNull()->end()
                 ->arrayNode('routing_keys')
                     ->prototype('scalar')->end()
-                    ->defaultValue(array())
+                    ->defaultValue([])
                 ->end()
             ->end()
         ;

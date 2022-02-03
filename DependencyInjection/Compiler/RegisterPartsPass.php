@@ -18,7 +18,7 @@ class RegisterPartsPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('old_sound_rabbit_mq.parts_holder');
 
-        $tags = array(
+        $tags = [
             'old_sound_rabbit_mq.base_amqp',
             'old_sound_rabbit_mq.binding',
             'old_sound_rabbit_mq.producer',
@@ -28,11 +28,11 @@ class RegisterPartsPass implements CompilerPassInterface
             'old_sound_rabbit_mq.batch_consumer',
             'old_sound_rabbit_mq.rpc_client',
             'old_sound_rabbit_mq.rpc_server',
-        );
+        ];
 
         foreach ($tags as $tag) {
             foreach ($container->findTaggedServiceIds($tag) as $id => $attributes) {
-                $definition->addMethodCall('addPart', array($tag, new Reference($id)));
+                $definition->addMethodCall('addPart', [$tag, new Reference($id)]);
             }
         }
     }

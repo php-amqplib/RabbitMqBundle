@@ -16,7 +16,7 @@ class AMQPSSLConnection extends BaseAMQPSSLConnection
         $this->constructParams = func_get_args();
     }
 
-    public static function create_connection($hosts, $options = array())
+    public static function create_connection($hosts, $options = [])
     {
         // save params for direct access in tests
         self::$createConnectionParams = func_get_args();
