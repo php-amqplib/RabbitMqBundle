@@ -1,6 +1,12 @@
 # RabbitMqBundle #
 
+[![Latest Version](http://img.shields.io/packagist/v/php-amqplib/rabbitmq-bundle.svg?style=flat-square)](https://github.com/php-amqplib/RabbitMqBundle/releases)
+[![Test](https://github.com/php-amqplib/RabbitMqBundle/actions/workflows/test.yaml/badge.svg)](https://github.com/php-amqplib/RabbitMqBundle/actions/workflows/test.yaml)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/php-amqplib/RabbitMqBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/php-amqplib/RabbitMqBundle/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/php-amqplib/RabbitMqBundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/php-amqplib/RabbitMqBundle/?branch=master)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
 [![Join the chat at https://gitter.im/php-amqplib/RabbitMqBundle](https://badges.gitter.im/php-amqplib/RabbitMqBundle.svg)](https://gitter.im/php-amqplib/RabbitMqBundle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ## About ##
 
@@ -23,11 +29,12 @@ All the examples expect a running RabbitMQ server.
 
 This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.com/paris/schedule#session-av1) conference. See the slides [here](http://www.slideshare.net/old_sound/theres-a-rabbit-on-my-symfony).
 
-[![Build Status](https://secure.travis-ci.org/php-amqplib/RabbitMqBundle.png?branch=master)](http://travis-ci.org/php-amqplib/RabbitMqBundle)
+## Version 2 ##
+Due to the breaking changes happened caused by Symfony >=4.4, a new tag was released, making the bundle compatible with Symfony >=4.4.
 
 ## Installation ##
 
-### For Symfony Framework >= 2.3 ###
+### For Symfony Framework >= 4.4 ###
 
 Require the bundle and its dependencies with composer:
 
@@ -60,7 +67,7 @@ Require the bundle in your composer.json file:
 ```
 {
     "require": {
-        "php-amqplib/rabbitmq-bundle": "~1.6",
+        "php-amqplib/rabbitmq-bundle": "^2.0",
     }
 }
 ```
@@ -123,9 +130,12 @@ old_sound_rabbit_mq:
             url: 'amqp://guest:password@localhost:5672/vhost?lazy=1&connection_timeout=6'
     producers:
         upload_picture:
-            connection:       default
-            exchange_options: {name: 'upload-picture', type: direct}
-            service_alias:    my_app_service # no alias by default
+            connection:            default
+            exchange_options:      {name: 'upload-picture', type: direct}
+            service_alias:         my_app_service # no alias by default
+            default_routing_key:   'optional.routing.key' # defaults to '' if not set
+            default_content_type:  'content/type' # defaults to 'text/plain'
+            default_delivery_mode: 2 # optional. 1 means non-persistent, 2 means persistent. Defaults to "2".
     consumers:
         upload_picture:
             connection:       default
@@ -158,6 +168,7 @@ The argument value must be a list of datatype and value. Valid datatypes are:
 * `T` - Timestamps
 * `F` - Table
 * `A` - Array
+* `t` - Bool
 
 Adapt the `arguments` according to your needs.
 
@@ -173,16 +184,50 @@ queue_options:
 
 ### Important notice - Lazy Connections ###
 
-In a Symfony environment all services are fully bootstrapped for each request, from version >= 2.3 you can declare
+In a Symfony environment all services are fully bootstrapped for each request, from version >= 4.3 you can declare
 a service as lazy ([Lazy Services](http://symfony.com/doc/master/components/dependency_injection/lazy_services.html)).
 This bundle still doesn't support new Lazy Services feature but you can set `lazy: true` in your connection
 configuration to avoid unnecessary connections to your message broker in every request.
 It's extremely recommended to use lazy connections because performance reasons, nevertheless lazy option is disabled
 by default to avoid possible breaks in applications already using this bundle.
 
-### Import notice - Heartbeats ###
+### Important notice - Heartbeats ###
 
 It's a good idea to set the ```read_write_timeout``` to 2x the heartbeat so your socket will be open. If you don't do this, or use a different multiplier, there's a risk the __consumer__ socket will timeout.
+
+Please bear in mind, that you can expect problems, if your tasks are generally running longer than the heartbeat period, to which there are no good solutions ([link](https://github.com/php-amqplib/RabbitMqBundle/issues/301)). 
+Consider using either a big value for the heartbeat or leave the heartbeat disabled in favour of the tcp's `keepalive` (both on the client and server side) and the `graceful_max_execution_timeout` feature. 
+
+### Multiple Hosts ###
+
+You can provide multiple hosts for a connection. This will allow you to use RabbitMQ cluster with multiple nodes.
+
+```yaml
+  old_sound_rabbit_mq:
+      connections:
+          default:
+              hosts:
+                - host: host1
+                  port: 3672
+                  user: user1
+                  password: password1
+                  vhost: vhost1
+                - url: 'amqp://guest:password@localhost:5672/vhost'
+              connection_timeout: 3
+              read_write_timeout: 3
+```
+
+Pay attention that you can not specify 
+```yaml
+  connection_timeout 
+  read_write_timeout
+  use_socket
+  ssl_context
+  keepalive
+  heartbeat
+  connection_parameters_provider 
+```
+parameters to each host separately.
 
 ### Dynamic Connection Parameters ###
 
@@ -242,8 +287,7 @@ As you can see, if in your configuration you have a producer called __upload\_pi
 
 Besides the message itself, the `OldSound\RabbitMqBundle\RabbitMq\Producer#publish()` method also accepts an optional routing key parameter and an optional array of additional properties. The array of additional properties allows you to alter the properties with which an `PhpAmqpLib\Message\AMQPMessage` object gets constructed by default. This way, for example, you can change the application headers.
 
-You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message
-delivery mode respectively. Default values are __text/plain__ for content type and __2__ for delivery mode.
+You can use __setContentType__ and __setDeliveryMode__ methods in order to set the message content type and the message delivery mode respectively, overriding any default set in the "producers" config section. If not overriden by either the "producers" configuration or an explicit call to these methods (as per the below example), the default values are __text/plain__ for content type and __2__ for delivery mode.
 
 ```php
 $this->get('old_sound_rabbit_mq.upload_picture_producer')->setContentType('application/json');
@@ -429,6 +473,23 @@ consumers:
         idle_timeout_exit_code: 0
 ```
 
+#### Timeout wait ####
+
+Set the `timeout_wait` in seconds.
+The `timeout_wait` specifies how long the consumer will wait without receiving a new message before ensuring the current connection is still valid.
+
+```yaml
+consumers:
+    upload_picture:
+        connection:             default
+        exchange_options:       {name: 'upload-picture', type: direct}
+        queue_options:          {name: 'upload-picture'}
+        callback:               upload_picture_service
+        idle_timeout:           60
+        idle_timeout_exit_code: 0
+        timeout_wait:           10
+```
+
 #### Graceful max execution timeout ####
 
 If you'd like your consumer to be running up to certain time and then gracefully exit, then set the `graceful_max_execution.timeout` in seconds.
@@ -475,6 +536,35 @@ consumers:
         qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
 ```
 
+### Autowiring producers and consumers ###
+
+If used with **Symfony 4.2+** bundle declares in container set of aliases for producers and regular consumers. Those are 
+used for arguments autowiring based on declared type and argument name. This allows you to change previous producer 
+example to:
+
+```php
+public function indexAction($name, ProducerInteface $uploadPictureProducer)
+{
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $uploadPictureProducer->publish(serialize($msg));
+}
+```
+
+Name of argument is constructed from producer or consumer name from configuration and suffixed with producer or consumer
+word according to type. In contrast to container items naming convention word suffix (producer or consumer) will not be
+duplicated if name is already suffixed. `upload_picture` producer key will be changed to `$uploadPictureProducer`
+argument name. `upload_picture_producer` producer key would also be aliased to `$uploadPictureProducer` argument name.
+It is best to avoid names similar in such manner.
+
+All producers are aliased to `OldSound\RabbitMqBundle\RabbitMq\ProducerInterface` and producer class option from 
+configuration. In sandbox mode only ProducerInterface aliases are made. It is highly recommended to use ProducerInterface
+class when type hinting arguments for producer injection.
+
+All consumers are aliased to 'OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface' and '%old_sound_rabbit_mq.consumer.class%'
+configuration option value. There is no difference between regular and sandbox mode. It is highly recommended to use
+ConsumerInterface when type hinting arguments for client injection.
+
+
 ### Callbacks ###
 
 Here's an example callback:
@@ -514,6 +604,8 @@ As you can see, this is as simple as implementing one method: __ConsumerInterfac
 Keep in mind that your callbacks _need to be registered_ as normal Symfony services. There you can inject the service container, the database service, the Symfony logger, and so on.
 
 See [https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md](https://github.com/php-amqplib/php-amqplib/blob/master/doc/AMQPMessage.md) for more details of what's part of a message instance.
+
+To stop the consumer, callback can throw ```StopConsumerException``` (the last consumed message _will not_ be ack) or ```AckStopConsumerException``` (the message _will_ be ack). If using demonized, ex: supervisor, the consumer will actually restart.
 
 ### Recap ###
 
@@ -606,12 +698,12 @@ rpc_clients:
         expect_serialized_response: false
 ```
 
-You can also set a expiration for request in seconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
+You can also set a expiration for request in milliseconds, after which message will no longer be handled by server and client request will simply time out. Setting expiration for messages works only for RabbitMQ 3.x and above. Visit http://www.rabbitmq.com/ttl.html#per-message-ttl for more information.
 
 ```php
 public function indexAction($name)
 {
-    $expiration = 5; // seconds
+    $expiration = 5000; // milliseconds
     $client = $this->get('old_sound_rabbit_mq.integer_store_rpc');
     $client->addRequest($body, $server, $requestId, $routingKey, $expiration);
     try {
@@ -662,6 +754,38 @@ To enable [direct reply-to clients](https://www.rabbitmq.com/direct-reply-to.htm
 
 This option will use pseudo-queue __amq.rabbitmq.reply-to__ when doing RPC calls. On the RPC server there is no modification needed.
 
+### Priority queue ###
+
+RabbitMQ has priority queue implementation in the core as of version 3.5.0. Any queue can be turned into a priority one using client-provided optional arguments (but, unlike other features that use optional arguments, not policies).
+The implementation supports a limited number of priorities: 255. Values between 1 and 10 are recommended. [Check documentation](https://www.rabbitmq.com/priority.html)
+
+here is how you can declare a priority queue 
+
+```yml
+    consumers:
+        upload_picture:
+            connection:       default
+            exchange_options: {name: 'upload-picture', type: direct}
+            queue_options:    {name: 'upload-picture', arguments: {'x-max-priority': ['I', 10]} }
+            callback:         upload_picture_service
+
+```
+
+if `upload-picture` queue exist before you must delete this queue before you run `rabbitmq:setup-fabric` command
+
+
+Now let's say you want to make a message with high priority, you have to publish the message with this additional information 
+
+```php
+public function indexAction()
+{    
+    $msg = array('user_id' => 1235, 'image_path' => '/path/to/new/pic.png');
+    $additionalProperties = ['priority' => 10] ; 
+    $routing_key = '';
+    $this->get('old_sound_rabbit_mq.upload_picture_producer')->publish(serialize($msg), $routing_key , $additionalProperties );
+}
+```
+
 ### Multiple Consumers ###
 
 It's a good practice to have a lot of queues for logic separation. With a simple consumer you will have to create one worker (consumer) per queue and it can be hard to manage when dealing
@@ -708,13 +832,13 @@ Be aware that queues providers are responsible for the proper calls to `setDeque
 
 ### Arbitrary Bindings ###
 
-You may find that your application has a complex workflow and you you need to have arbitrary binding. Arbitrary
+You may find that your application has a complex workflow and you need to have arbitrary binding. Arbitrary
 binding scenarios might include exchange to exchange bindings via `destination_is_exchange` property.
 
 ```yaml
 bindings:
     - {exchange: foo, destination: bar, routing_key: 'baz.*' }
-    - {exchange: foo1, destination: foo, routing_key: 'baz.*' destination_is_exchange: true}
+    - {exchange: foo1, destination: foo, routing_key: 'baz.*', destination_is_exchange: true}
 ```
 
 The rabbitmq:setup-fabric command will declare exchanges and queues as defined in your producer, consumer
@@ -860,7 +984,7 @@ class DevckBasicConsumer implements BatchConsumerInterface
         $result = [];
         /** @var AMQPMessage $message */
         foreach ($messages as $message) {
-            $result[(int)$message->delivery_info['delivery_tag']] = $this->executeSomeLogicPerMessage($message);
+            $result[$message->getDeliveryTag()] = $this->executeSomeLogicPerMessage($message);
         }
 
         // you ack only some messages that have return true
@@ -890,6 +1014,8 @@ How to run the following batch consumer:
 ```
 
 Important: BatchConsumers will not have the -m|messages option available
+Important: BatchConsumers can also have the -b|batches option available if you want to only consume a specific number of batches and then stop the consumer.
+! Give the number of the batches only if you want the consumer to stop after those batch messages were consumed.! 
 
 ### STDIN Producer ###
 

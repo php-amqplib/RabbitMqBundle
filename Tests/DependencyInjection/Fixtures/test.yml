@@ -45,7 +45,19 @@ old_sound_rabbit_mq:
             lazy:       true
             use_socket: true
 
+        cluster_connection:
+            hosts:
+                - host: cluster_host
+                  port: 111
+                  user: cluster_user
+                  password: cluster_password
+                  vhost: /cluster
+                - url: amqp://cluster_url_host:cluster_url_pass@host:10000/cluster_url_vhost
+
         default:
+        default2:
+        foo_default:
+        bar_default:
 
     producers:
         foo_producer:
@@ -86,6 +98,7 @@ old_sound_rabbit_mq:
     consumers:
         foo_consumer:
             connection:      foo_connection
+            timeout_wait:    3
             exchange_options:
                 name:        foo_exchange
                 type:        direct
@@ -134,6 +147,7 @@ old_sound_rabbit_mq:
     multiple_consumers:
         multi_test_consumer:
             connection: foo_connection
+            timeout_wait:    3
             exchange_options:
                 name:           foo_multiple_exchange
                 type:           direct
@@ -155,7 +169,7 @@ old_sound_rabbit_mq:
                       - 'iphone.upload'
                     callback:        foo.multiple_test2.callback
             queues_provider: foo.queues_provider
-            
+
     dynamic_consumers:
         foo_dyn_consumer:
             connection: foo_default
@@ -222,3 +236,19 @@ old_sound_rabbit_mq:
             exchange_options:
                 name: exchange
                 type: topic
+services:
+    foo.callback:
+    default.callback:
+    foo.multiple_test1.callback:
+    foo.multiple_test2.callback:
+    foo.queues_provider:
+    foo.dynamic.callback:
+    foo.dynamic.provider:
+    bar.dynamic.provider:
+    bar.dynamic.callback:
+    foo_anon.callback:
+    default_anon.callback:
+    foo_server.callback:
+    default_server.callback:
+    server_with_queue_options.callback:
+    server_with_exchange_options.callback:

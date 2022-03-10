@@ -25,7 +25,8 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
             // Halt consumer if waiting for a new message from the queue
             try {
                 $this->consumer->stopConsuming();
-            } catch (AMQPTimeoutException $e) {}
+            } catch (AMQPTimeoutException $e) {
+            }
         }
     }
 
@@ -36,12 +37,12 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
         $this
             ->setName('rabbitmq:batch:consumer')
             ->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
+            ->addOption('batches', 'b', InputOption::VALUE_OPTIONAL, 'Number of batches to consume', '0')
             ->addOption('route', 'r', InputOption::VALUE_OPTIONAL, 'Routing Key', '')
-            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
             ->setDescription('Executes a Batch Consumer');
-        ;
     }
 
     /**
@@ -52,7 +53,7 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
      *
      * @return  integer                         0 if everything went fine, or an error code
      *
-     * @throws  \InvalidArgumentException       When the number of messages to consume is less than 0
+     * @throws  \InvalidArgumentException       When the number of batches to consume is less than 0
      * @throws  \BadFunctionCallException       When the pcntl is not installed and option -s is true
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -66,17 +67,22 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
                 throw new \BadFunctionCallException("Function 'pcntl_signal' is referenced in the php.ini 'disable_functions' and can't be called.");
             }
 
-            pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
-            pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
+            pcntl_signal(SIGTERM, [&$this, 'stopConsumer']);
+            pcntl_signal(SIGINT, [&$this, 'stopConsumer']);
         }
 
         if (defined('AMQP_DEBUG') === false) {
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
+        $batchAmountTarget = (int)$input->getOption('batches');
+        if (0 > $batchAmountTarget) {
+            throw new \InvalidArgumentException("The -b option should be greater than 0");
+        }
+
         $this->initConsumer($input);
 
-        return $this->consumer->consume();
+        return $this->consumer->consume($batchAmountTarget);
     }
 
     /**
@@ -89,7 +95,7 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
 
         if (null !== $input->getOption('memory-limit') &&
             ctype_digit((string) $input->getOption('memory-limit')) &&
-            $input->getOption('memory-limit') > 0
+            (int) $input->getOption('memory-limit') > 0
         ) {
             $this->consumer->setMemoryLimit($input->getOption('memory-limit'));
         }

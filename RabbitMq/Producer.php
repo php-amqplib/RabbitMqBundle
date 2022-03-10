@@ -10,8 +10,10 @@ use PhpAmqpLib\Wire\AMQPTable;
  */
 class Producer extends BaseAmqp implements ProducerInterface
 {
-    protected $contentType = 'text/plain';
+    public const DEFAULT_CONTENT_TYPE = 'text/plain';
+    protected $contentType = Producer::DEFAULT_CONTENT_TYPE;
     protected $deliveryMode = 2;
+    protected $defaultRoutingKey = '';
 
     public function setContentType($contentType)
     {
@@ -27,9 +29,16 @@ class Producer extends BaseAmqp implements ProducerInterface
         return $this;
     }
 
+    public function setDefaultRoutingKey($defaultRoutingKey)
+    {
+        $this->defaultRoutingKey = $defaultRoutingKey;
+
+        return $this;
+    }
+
     protected function getBasicProperties()
     {
-        return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
+        return ['content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode];
     }
 
     /**
@@ -40,7 +49,7 @@ class Producer extends BaseAmqp implements ProducerInterface
      * @param array $additionalProperties
      * @param array $headers
      */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array(), array $headers = null)
+    public function publish($msgBody, $routingKey = null, $additionalProperties = [], array $headers = null)
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
@@ -53,14 +62,15 @@ class Producer extends BaseAmqp implements ProducerInterface
             $msg->set('application_headers', $headersTable);
         }
 
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$routingKey);
-        $this->logger->debug('AMQP message published', array(
-            'amqp' => array(
+        $real_routingKey = $routingKey !== null ? $routingKey : $this->defaultRoutingKey;
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$real_routingKey);
+        $this->logger->debug('AMQP message published', [
+            'amqp' => [
                 'body' => $msgBody,
                 'routingkeys' => $routingKey,
                 'properties' => $additionalProperties,
-                'headers' => $headers
-            )
-        ));
+                'headers' => $headers,
+            ],
+        ]);
     }
 }

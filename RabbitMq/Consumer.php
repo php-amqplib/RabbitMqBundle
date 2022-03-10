@@ -13,11 +13,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Consumer extends BaseConsumer
 {
-    const TIMEOUT_TYPE_IDLE = 'idle';
-    const TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION = 'graceful-max-execution';
-
     /**
-     * @var int $memoryLimit
+     * @var int|null $memoryLimit
      */
     protected $memoryLimit = null;
 
@@ -33,6 +30,16 @@ class Consumer extends BaseConsumer
     protected $gracefulMaxExecutionTimeoutExitCode = 0;
 
     /**
+     * @var int|null
+     */
+    protected $timeoutWait;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $lastActivityDateTime;
+
+    /**
      * Set the memory limit
      *
      * @param int $memoryLimit
@@ -45,7 +52,7 @@ class Consumer extends BaseConsumer
     /**
      * Get the memory limit
      *
-     * @return int
+     * @return int|null
      */
     public function getMemoryLimit()
     {
@@ -67,7 +74,8 @@ class Consumer extends BaseConsumer
 
         $this->setupConsumer();
 
-        while (count($this->getChannel()->callbacks)) {
+        $this->setLastActivityDateTime(new \DateTime());
+        while ($this->getChannel()->is_consuming()) {
             $this->dispatchEvent(OnConsumeEvent::NAME, new OnConsumeEvent($this));
             $this->maybeStopConsumer();
 
@@ -76,29 +84,35 @@ class Consumer extends BaseConsumer
              * graceful max execution timeout is being used.
              */
             $waitTimeout = $this->chooseWaitTimeout();
-            if (
-                $waitTimeout['timeoutType'] === self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION
-                && $waitTimeout['seconds'] < 1
+            if ($this->gracefulMaxExecutionDateTime
+                && $waitTimeout < 1
             ) {
                 return $this->gracefulMaxExecutionTimeoutExitCode;
             }
 
             if (!$this->forceStop) {
                 try {
-                    $this->getChannel()->wait(null, false, $waitTimeout['seconds']);
+                    $this->getChannel()->wait(null, false, $waitTimeout);
+                    $this->setLastActivityDateTime(new \DateTime());
                 } catch (AMQPTimeoutException $e) {
-                    if (self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION === $waitTimeout['timeoutType']) {
+                    $now = time();
+
+                    if ($this->gracefulMaxExecutionDateTime
+                        && $this->gracefulMaxExecutionDateTime <= new \DateTime("@$now")
+                    ) {
                         return $this->gracefulMaxExecutionTimeoutExitCode;
-                    }
+                    } elseif ($this->getIdleTimeout()
+                        && ($this->getLastActivityDateTime()->getTimestamp() + $this->getIdleTimeout() <= $now)
+                    ) {
+                        $idleEvent = new OnIdleEvent($this);
+                        $this->dispatchEvent(OnIdleEvent::NAME, $idleEvent);
 
-                    $idleEvent = new OnIdleEvent($this);
-                    $this->dispatchEvent(OnIdleEvent::NAME, $idleEvent);
-
-                    if ($idleEvent->isForceStop()) {
-                        if (null !== $this->getIdleTimeoutExitCode()) {
-                            return $this->getIdleTimeoutExitCode();
-                        } else {
-                            throw $e;
+                        if ($idleEvent->isForceStop()) {
+                            if (null !== $this->getIdleTimeoutExitCode()) {
+                                return $this->getIdleTimeoutExitCode();
+                            } else {
+                                throw $e;
+                            }
                         }
                     }
                 }
@@ -115,7 +129,7 @@ class Consumer extends BaseConsumer
     {
         $this->getChannel()->queue_purge($this->queueOptions['name'], true);
     }
-    
+
     /**
      * Delete the queue
      */
@@ -126,7 +140,8 @@ class Consumer extends BaseConsumer
 
     protected function processMessageQueueCallback(AMQPMessage $msg, $queueName, $callback)
     {
-        $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
+        $this->dispatchEvent(
+            BeforeProcessingMessageEvent::NAME,
             new BeforeProcessingMessageEvent($this, $msg)
         );
         try {
@@ -136,40 +151,40 @@ class Consumer extends BaseConsumer
                 AfterProcessingMessageEvent::NAME,
                 new AfterProcessingMessageEvent($this, $msg)
             );
-            $this->logger->debug('Queue message processed', array(
-                'amqp' => array(
+            $this->logger->debug('Queue message processed', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'return_code' => $processFlag
-                )
-            ));
+                    'return_code' => $processFlag,
+                ],
+            ]);
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested restart', array(
-                'amqp' => array(
+            $this->logger->info('Consumer requested stop', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             $this->handleProcessMessage($msg, $e->getHandleCode());
             $this->stopConsuming();
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         } catch (\Error $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         }
     }
@@ -183,16 +198,16 @@ class Consumer extends BaseConsumer
     {
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], true);
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+            $msg->reject();
+        } elseif ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
-            $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag'], false, true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+            $msg->nack(true);
+        } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
-            $msg->delivery_info['channel']->basic_reject($msg->delivery_info['delivery_tag'], false);
-        } else if ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
+            $msg->reject(false);
+        } elseif ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
             // Remove message from queue only if callback return not false
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+            $msg->ack();
         }
 
         $this->consumed++;
@@ -239,6 +254,11 @@ class Consumer extends BaseConsumer
         $this->gracefulMaxExecutionTimeoutExitCode = $exitCode;
     }
 
+    public function setTimeoutWait(int $timeoutWait): void
+    {
+        $this->timeoutWait = $timeoutWait;
+    }
+
     /**
      * @return \DateTime|null
      */
@@ -255,20 +275,19 @@ class Consumer extends BaseConsumer
         return $this->gracefulMaxExecutionTimeoutExitCode;
     }
 
+    public function getTimeoutWait(): ?int
+    {
+        return $this->timeoutWait;
+    }
+
     /**
-     * Choose the timeout to use for the $this->getChannel()->wait() method.
-     *
-     * @return array Of structure
-     *  {
-     *      timeoutType: string; // one of self::TIMEOUT_TYPE_*
-     *      seconds: int;
-     *  }
+     * Choose the timeout wait (in seconds) to use for the $this->getChannel()->wait() method.
      */
-    private function chooseWaitTimeout()
+    private function chooseWaitTimeout(): int
     {
         if ($this->gracefulMaxExecutionDateTime) {
             $allowedExecutionDateInterval = $this->gracefulMaxExecutionDateTime->diff(new \DateTime());
-            $allowedExecutionSeconds =  $allowedExecutionDateInterval->days * 86400
+            $allowedExecutionSeconds = $allowedExecutionDateInterval->days * 86400
                 + $allowedExecutionDateInterval->h * 3600
                 + $allowedExecutionDateInterval->i * 60
                 + $allowedExecutionDateInterval->s;
@@ -281,25 +300,30 @@ class Consumer extends BaseConsumer
              * Respect the idle timeout if it's set and if it's less than
              * the remaining allowed execution.
              */
-            if (
-                $this->getIdleTimeout()
+            if ($this->getIdleTimeout()
                 && $this->getIdleTimeout() < $allowedExecutionSeconds
             ) {
-                return array(
-                    'timeoutType' => self::TIMEOUT_TYPE_IDLE,
-                    'seconds' => $this->getIdleTimeout(),
-                );
+                $waitTimeout = $this->getIdleTimeout();
+            } else {
+                $waitTimeout = $allowedExecutionSeconds;
             }
-
-            return array(
-                'timeoutType' => self::TIMEOUT_TYPE_GRACEFUL_MAX_EXECUTION,
-                'seconds' => $allowedExecutionSeconds,
-            );
+        } else {
+            $waitTimeout = $this->getIdleTimeout();
         }
 
-        return array(
-            'timeoutType' => self::TIMEOUT_TYPE_IDLE,
-            'seconds' => $this->getIdleTimeout(),
-        );
+        if (!is_null($this->getTimeoutWait()) && $this->getTimeoutWait() > 0) {
+            $waitTimeout = min($waitTimeout, $this->getTimeoutWait());
+        }
+        return $waitTimeout;
+    }
+
+    public function setLastActivityDateTime(\DateTime $dateTime)
+    {
+        $this->lastActivityDateTime = $dateTime;
+    }
+
+    protected function getLastActivityDateTime(): ?\DateTime
+    {
+        return $this->lastActivityDateTime;
     }
 }

@@ -10,14 +10,14 @@ class BaseConsumerTest extends TestCase
     /** @var BaseConsumer */
     protected $consumer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $amqpConnection =  $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        $amqpConnection = $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->consumer = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\BaseConsumer')
-            ->setConstructorArgs(array($amqpConnection))
+            ->setConstructorArgs([$amqpConnection])
             ->getMockForAbstractClass();
     }
 
@@ -43,12 +43,5 @@ class BaseConsumerTest extends TestCase
         $this->assertEquals(0, $this->consumer->getIdleTimeoutExitCode());
         $this->consumer->setIdleTimeoutExitCode(43);
         $this->assertEquals(43, $this->consumer->getIdleTimeoutExitCode());
-    }
-
-    public function testForceStopConsumer()
-    {
-        $this->assertAttributeEquals(false, 'forceStop', $this->consumer);
-        $this->consumer->forceStopConsumer();
-        $this->assertAttributeEquals(true, 'forceStop', $this->consumer);
     }
 }

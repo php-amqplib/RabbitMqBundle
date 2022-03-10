@@ -52,7 +52,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     /**
      * @var array
      */
-    protected $messages = array();
+    protected $messages = [];
 
     /**
      * @var int
@@ -60,10 +60,23 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     protected $batchCounter = 0;
 
     /**
+     * @var int
+     */
+    protected $batchAmount = 0;
+
+    /**
+     * @var int
+     */
+    protected $consumed = 0;
+
+    /**
      * @var \DateTime|null DateTime after which the consumer will gracefully exit. "Gracefully" means, that
      *      any currently running consumption will not be interrupted.
      */
     protected $gracefulMaxExecutionDateTime;
+
+    /** @var int */
+    private $batchAmountTarget;
 
     /**
      * @param \DateTime|null $dateTime
@@ -93,11 +106,13 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         return $this;
     }
 
-    public function consume()
+    public function consume(int $batchAmountTarget = 0)
     {
+        $this->batchAmountTarget = $batchAmountTarget;
+
         $this->setupConsumer();
 
-        while (count($this->getChannel()->callbacks)) {
+        while ($this->getChannel()->is_consuming()) {
             if ($this->isCompleteBatch()) {
                 $this->batchConsume();
             }
@@ -112,6 +127,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             } catch (AMQPTimeoutException $e) {
                 if (!$this->isEmptyBatch()) {
                     $this->batchConsume();
+                    $this->maybeStopConsumer();
                 } elseif ($this->keepAlive === true) {
                     continue;
                 } elseif (null !== $this->getIdleTimeoutExitCode()) {
@@ -121,6 +137,8 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
                 }
             }
         }
+
+        return 0;
     }
 
     private function batchConsume()
@@ -128,45 +146,47 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         try {
             $processFlags = call_user_func($this->callback, $this->messages);
             $this->handleProcessMessages($processFlags);
-            $this->logger->debug('Queue message processed', array(
-                'amqp' => array(
+            $this->logger->debug('Queue message processed', [
+                'amqp' => [
                     'queue' => $this->queueOptions['name'],
                     'messages' => $this->messages,
-                    'return_codes' => $processFlags
-                )
-            ));
+                    'return_codes' => $processFlags,
+                ],
+            ]);
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested restart', array(
-                'amqp' => array(
+            $this->logger->info('Consumer requested stop', [
+                'amqp' => [
                     'queue' => $this->queueOptions['name'],
                     'message' => $this->messages,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
+            $this->handleProcessMessages($e->getHandleCode());
             $this->resetBatch();
             $this->stopConsuming();
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $this->queueOptions['name'],
                     'message' => $this->messages,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             $this->resetBatch();
             throw $e;
         } catch (\Error $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $this->queueOptions['name'],
                     'message' => $this->messages,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             $this->resetBatch();
             throw $e;
         }
 
+        $this->batchAmount++;
         $this->resetBatch();
     }
 
@@ -184,8 +204,8 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     }
 
     /**
-     * @param   int     $deliveryTag
-     * @param   mixed   $processFlag
+     * @param   string|int     $deliveryTag
+     * @param   mixed          $processFlag
      *
      * @return  void
      */
@@ -194,12 +214,14 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
             $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, true);
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+        } elseif ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
             $this->getMessageChannel($deliveryTag)->basic_nack($deliveryTag, false, true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+        } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $this->getMessageChannel($deliveryTag)->basic_reject($deliveryTag, false);
+        } elseif ($processFlag === ConsumerInterface::MSG_ACK_SENT) {
+            // do nothing, ACK should be already sent
         } else {
             // Remove message from queue only if callback return not false
             $this->getMessageChannel($deliveryTag)->basic_ack($deliveryTag);
@@ -254,7 +276,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             return $processFlags;
         }
 
-        $response = array();
+        $response = [];
         foreach ($this->messages as $deliveryTag => $message) {
             $response[$deliveryTag] = $processFlags;
         }
@@ -268,7 +290,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
      */
     private function resetBatch()
     {
-        $this->messages = array();
+        $this->messages = [];
         $this->batchCounter = 0;
     }
 
@@ -280,19 +302,18 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     private function addMessage(AMQPMessage $message)
     {
         $this->batchCounter++;
-        $this->messages[(int)$message->delivery_info['delivery_tag']] = $message;
+        $this->messages[$message->getDeliveryTag()] = $message;
     }
 
     /**
      * @param   int     $deliveryTag
      *
-     * @return  AMQPMessage
+     * @return  AMQPMessage|null
      */
     private function getMessage($deliveryTag)
     {
-        return isset($this->messages[$deliveryTag])
-            ? $this->messages[$deliveryTag]
-            : null
+        return $this->messages[$deliveryTag]
+            ?? null
         ;
     }
 
@@ -306,11 +327,11 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
     private function getMessageChannel($deliveryTag)
     {
         $message = $this->getMessage($deliveryTag);
-        if (!$message) {
+        if ($message === null) {
             throw new AMQPRuntimeException(sprintf('Unknown delivery_tag %d!', $deliveryTag));
         }
 
-        return $message->delivery_info['channel'];
+        return $message->getChannel();
     }
 
     /**
@@ -322,7 +343,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             $this->batchConsume();
         }
 
-        $this->getChannel()->basic_cancel($this->getConsumerTag());
+        $this->getChannel()->basic_cancel($this->getConsumerTag(), false, true);
     }
 
     /**
@@ -334,7 +355,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             $this->setupFabric();
         }
 
-        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, [$this, 'processMessage']);
     }
 
     /**
@@ -352,7 +373,7 @@ class BatchConsumer extends BaseAmqp implements DequeuerInterface
             pcntl_signal_dispatch();
         }
 
-        if ($this->forceStop) {
+        if ($this->forceStop || ($this->batchAmount == $this->batchAmountTarget && $this->batchAmountTarget > 0)) {
             $this->stopConsuming();
         }
 

@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 
 class MultipleConsumerCommand extends BaseConsumerCommand
 {
@@ -21,7 +22,7 @@ class MultipleConsumerCommand extends BaseConsumerCommand
         return 'old_sound_rabbit_mq.%s_multiple';
     }
 
-    protected function initConsumer($input)
+    protected function initConsumer(InputInterface $input)
     {
         parent::initConsumer($input);
         $this->consumer->setContext($input->getArgument('context'));

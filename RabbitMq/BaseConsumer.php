@@ -24,9 +24,6 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
     /** @var int */
     protected $idleTimeoutExitCode;
 
-    /**
-     * @param $callback
-     */
     public function setCallback($callback)
     {
         $this->callback = $callback;
@@ -42,6 +39,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
     /**
      * @param int $msgAmount
+     * @throws \ErrorException
      */
     public function start($msgAmount = 0)
     {
@@ -49,7 +47,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
 
         $this->setupConsumer();
 
-        while (count($this->getChannel()->callbacks)) {
+        while ($this->getChannel()->is_consuming()) {
             $this->getChannel()->wait();
         }
     }
@@ -70,7 +68,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
-        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, [$this, 'processMessage']);
     }
 
     public function processMessage(AMQPMessage $msg)

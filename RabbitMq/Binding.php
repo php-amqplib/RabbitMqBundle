@@ -59,7 +59,7 @@ class Binding extends BaseAmqp
     }
 
     /**
-     * @param bool $destination
+     * @param string $destination
      */
     public function setDestination($destination)
     {
@@ -75,7 +75,7 @@ class Binding extends BaseAmqp
     }
 
     /**
-     * @param string $destinationIsExchange
+     * @param bool $destinationIsExchange
      */
     public function setDestinationIsExchange($destinationIsExchange)
     {
@@ -141,7 +141,7 @@ class Binding extends BaseAmqp
         $method  = ($this->destinationIsExchange) ? 'exchange_bind' : 'queue_bind';
         $channel = $this->getChannel();
         call_user_func(
-            array($channel, $method),
+            [$channel, $method],
             $this->destination,
             $this->exchange,
             $this->routingKey,

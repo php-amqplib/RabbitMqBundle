@@ -2,6 +2,8 @@
 
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use OldSound\RabbitMqBundle\Event\AMQPEvent;
 use OldSound\RabbitMqBundle\RabbitMq\BaseAmqp;
 use OldSound\RabbitMqBundle\RabbitMq\Consumer;
@@ -9,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BaseAmqpTest extends TestCase
 {
-
     public function testLazyConnection()
     {
         $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')
@@ -44,28 +45,31 @@ class BaseAmqpTest extends TestCase
 
     public function testDispatchEvent()
     {
-        /** @var BaseAmqp|\PHPUnit_Framework_MockObject_MockObject $baseAmqpConsumer */
+        /** @var BaseAmqp|MockObject $baseAmqpConsumer */
         $baseAmqpConsumer = $this->getMockBuilder('OldSound\RabbitMqBundle\RabbitMq\BaseAmqp')
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Contracts\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
+
         $baseAmqpConsumer->expects($this->atLeastOnce())
             ->method('getEventDispatcher')
             ->willReturn($eventDispatcher);
 
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(AMQPEvent::ON_CONSUME, new AMQPEvent())
-            ->willReturn(true);
-        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
+            ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
+            ->willReturn(new AMQPEvent());
+
+        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, [AMQPEvent::ON_CONSUME, new AMQPEvent()]);
     }
 
     /**
-     * @param $name
-     * @param $obj
-     * @param $params
+     * @param string $name
+     * @param MockObject $obj
+     * @param array $params
      *
      * @return mixed
      */

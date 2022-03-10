@@ -19,3 +19,6 @@ old_sound_rabbit_mq:
             queue_options:
                 name:       default_queue
             callback:       default.callback
+services:
+    default.callback:
+    

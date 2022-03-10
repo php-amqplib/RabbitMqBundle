@@ -3,22 +3,23 @@
 namespace OldSound\RabbitMqBundle\Tests\RabbitMq;
 
 use OldSound\RabbitMqBundle\RabbitMq\Binding;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BindingTest extends TestCase
 {
-
     protected function getBinding($amqpConnection, $amqpChannel)
     {
         return new Binding($amqpConnection, $amqpChannel);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      */
     protected function prepareAMQPConnection()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -46,11 +47,11 @@ class BindingTest extends TestCase
         $ch->expects($this->once())
             ->method('queue_bind')
             ->will($this->returnCallback(function ($d, $s, $k, $n, $a) use ($destination, $source, $key) {
-                \PHPUnit_Framework_Assert::assertSame($destination, $d);
-                \PHPUnit_Framework_Assert::assertSame($source, $s);
-                \PHPUnit_Framework_Assert::assertSame($key, $k);
-                \PHPUnit_Framework_Assert::assertFalse($n);
-                \PHPUnit_Framework_Assert::assertNull($a);
+                Assert::assertSame($destination, $d);
+                Assert::assertSame($source, $s);
+                Assert::assertSame($key, $k);
+                Assert::assertFalse($n);
+                Assert::assertNull($a);
             }));
 
         $binding = $this->getBinding($con, $ch);
@@ -71,11 +72,11 @@ class BindingTest extends TestCase
         $ch->expects($this->once())
             ->method('exchange_bind')
             ->will($this->returnCallback(function ($d, $s, $k, $n, $a) use ($destination, $source, $key) {
-                \PHPUnit_Framework_Assert::assertSame($destination, $d);
-                \PHPUnit_Framework_Assert::assertSame($source, $s);
-                \PHPUnit_Framework_Assert::assertSame($key, $k);
-                \PHPUnit_Framework_Assert::assertFalse($n);
-                \PHPUnit_Framework_Assert::assertNull($a);
+                Assert::assertSame($destination, $d);
+                Assert::assertSame($source, $s);
+                Assert::assertSame($key, $k);
+                Assert::assertFalse($n);
+                Assert::assertNull($a);
             }));
 
         $binding = $this->getBinding($con, $ch);

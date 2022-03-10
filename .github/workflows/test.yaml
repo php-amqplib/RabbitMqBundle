@@ -1,0 +1,68 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+    test:
+        name: PHP ${{ matrix.php-version }} + Symfony ${{ matrix.symfony-version }}
+
+        runs-on: ubuntu-20.04
+
+        strategy:
+            matrix:
+                php-version: ['7.4', '8.0', '8.1']
+                symfony-version: ['4.4', '5.3', '5.4', '6.0']
+                coverage: ['none']
+                exclude:
+                    - php-version: '7.4'
+                      symfony-version: '6.0'
+                include:
+                    - php-version: '8.0'
+                      symfony-version: '5.4'
+                      coverage: xdebug
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  coverage: ${{ matrix.coverage }}
+                  ini-values: "memory_limit=-1"
+                  php-version: ${{ matrix.php-version }}
+                  tools: composer,flex
+
+            - name: Validate composer.json
+              run: composer validate --no-check-lock
+
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@v1
+              with:
+                  composer-options: "--prefer-dist"
+              env:
+                  SYMFONY_REQUIRE: "${{ matrix.symfony-version }}.*"
+
+            - name: Setup problem matchers for PHP
+              run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+            - name: Setup problem matchers for PHPUnit
+              run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+            - name: Run PHPUnit
+              if: matrix.coverage == 'none'
+              run: vendor/bin/phpunit
+
+            - name: Run PHPUnit with coverage
+              if: matrix.coverage != 'none'
+              run: vendor/bin/phpunit --coverage-clover=coverage.clover
+
+            - name: Run PHPStan
+              run: vendor/bin/phpstan analyse
+
+            - name: Upload Scrutinizer coverage
+              if: matrix.coverage != 'none'
+              continue-on-error: true
+              uses: sudo-bot/action-scrutinizer@latest
+              with:
+                  cli-args: "--format=php-clover coverage.clover"

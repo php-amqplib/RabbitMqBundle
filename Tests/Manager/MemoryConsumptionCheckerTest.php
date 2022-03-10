@@ -1,6 +1,6 @@
 <?php
 
-namespace OldSound\RabbitMqBundle\Tests\Event;
+namespace OldSound\RabbitMqBundle\Tests\Manager;
 
 use OldSound\RabbitMqBundle\MemoryChecker\MemoryConsumptionChecker;
 use OldSound\RabbitMqBundle\MemoryChecker\NativeMemoryUsageProvider;

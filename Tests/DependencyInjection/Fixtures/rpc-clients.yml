@@ -7,7 +7,7 @@ old_sound_rabbit_mq:
             user:     foo_user
             password: foo_password
             vhost:    /foo
-
+        default:
     rpc_clients:
         foo_client:
             connection:      foo_connection

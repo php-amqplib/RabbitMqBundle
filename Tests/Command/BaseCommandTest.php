@@ -11,7 +11,7 @@ abstract class BaseCommandTest extends TestCase
     protected $helperSet;
     protected $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->application = $this->getMockBuilder('Symfony\\Component\\Console\\Application')
             ->disableOriginalConstructor()
@@ -26,6 +26,6 @@ abstract class BaseCommandTest extends TestCase
             ->will($this->returnValue($this->definition));
         $this->definition->expects($this->any())
             ->method('getArguments')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
     }
 }

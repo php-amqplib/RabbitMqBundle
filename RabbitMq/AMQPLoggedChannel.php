@@ -11,18 +11,18 @@ use PhpAmqpLib\Channel\AMQPChannel;
  */
 class AMQPLoggedChannel extends AMQPChannel
 {
-    private $basicPublishLog = array();
+    private $basicPublishLog = [];
 
-    public function basic_publish($msg, $exchange = '', $routingKey = '', $mandatory = false, $immediate = false, $ticket = NULL)
+    public function basic_publish($msg, $exchange = '', $routingKey = '', $mandatory = false, $immediate = false, $ticket = null)
     {
-        $this->basicPublishLog[] = array(
+        $this->basicPublishLog[] = [
             'msg'         => $msg,
             'exchange'    => $exchange,
             'routing_key' => $routingKey,
             'mandatory'   => $mandatory,
             'immediate'   => $immediate,
-            'ticket'      => $ticket
-        );
+            'ticket'      => $ticket,
+        ];
 
         parent::basic_publish($msg, $exchange, $routingKey, $mandatory, $immediate, $ticket);
     }

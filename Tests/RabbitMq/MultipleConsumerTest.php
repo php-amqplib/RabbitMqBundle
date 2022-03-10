@@ -6,8 +6,10 @@ use OldSound\RabbitMqBundle\Provider\QueuesProviderInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MultipleConsumerTest extends TestCase
@@ -22,14 +24,14 @@ class MultipleConsumerTest extends TestCase
     /**
      * AMQP channel
      *
-     * @var \PHPUnit_Framework_MockObject_MockObject|AMQPChannel
+     * @var MockObject|AMQPChannel
      */
     private $amqpChannel;
 
     /**
      * AMQP connection
      *
-     * @var \PHPUnit_Framework_MockObject_MockObject|AMQPConnection
+     * @var MockObject|AMQPStreamConnection
      */
     private $amqpConnection;
 
@@ -38,7 +40,7 @@ class MultipleConsumerTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->amqpConnection = $this->prepareAMQPConnection();
         $this->amqpChannel = $this->prepareAMQPChannel();
@@ -55,21 +57,16 @@ class MultipleConsumerTest extends TestCase
         $callback = $this->prepareCallback($processFlag);
 
         $this->multipleConsumer->setQueues(
-            array(
-                'test-1' => array('callback' => $callback),
-                'test-2' => array('callback' => $callback)
-            )
+            [
+                'test-1' => ['callback' => $callback],
+                'test-2' => ['callback' => $callback],
+            ]
         );
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
     }
 
     /**
@@ -85,10 +82,10 @@ class MultipleConsumerTest extends TestCase
         $queuesProvider->expects($this->once())
             ->method('getQueues')
             ->will($this->returnValue(
-                array(
-                    'test-1' => array('callback' => $callback),
-                    'test-2' => array('callback' => $callback)
-                )
+                [
+                    'test-1' => ['callback' => $callback],
+                    'test-2' => ['callback' => $callback],
+                ]
             ));
 
         $this->multipleConsumer->setQueuesProvider($queuesProvider);
@@ -104,36 +101,8 @@ class MultipleConsumerTest extends TestCase
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
-    }
-
-    public function testQueuesPrivider()
-    {
-        $amqpConnection = $this->prepareAMQPConnection();
-        $amqpChannel = $this->prepareAMQPChannel();
-        $this->multipleConsumer->setContext('foo');
-
-        $queuesProvider = $this->prepareQueuesProvider();
-        $queuesProvider->expects($this->once())
-            ->method('getQueues')
-            ->will($this->returnValue(
-                array(
-                    'queue_foo' => array()
-                )
-            ));
-
-        $this->multipleConsumer->setQueuesProvider($queuesProvider);
-
-        $reflectionClass = new \ReflectionClass(get_class($this->multipleConsumer));
-        $reflectionMethod = $reflectionClass->getMethod('mergeQueues');
-        $reflectionMethod->setAccessible(true);
-        $reflectionMethod->invoke($this->multipleConsumer);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
     }
 
     /**
@@ -146,20 +115,20 @@ class MultipleConsumerTest extends TestCase
         $callback = $this->prepareCallback($processFlag);
 
         $this->multipleConsumer->setQueues(
-            array(
-                'test-1' => array('callback' => $callback),
-                'test-2' => array('callback' => $callback)
-            )
+            [
+                'test-1' => ['callback' => $callback],
+                'test-2' => ['callback' => $callback],
+            ]
         );
 
         $queuesProvider = $this->prepareQueuesProvider();
         $queuesProvider->expects($this->once())
             ->method('getQueues')
             ->will($this->returnValue(
-                array(
-                    'test-3' => array('callback' => $callback),
-                    'test-4' => array('callback' => $callback)
-                )
+                [
+                    'test-3' => ['callback' => $callback],
+                    'test-4' => ['callback' => $callback],
+                ]
             ));
 
         $this->multipleConsumer->setQueuesProvider($queuesProvider);
@@ -175,37 +144,84 @@ class MultipleConsumerTest extends TestCase
 
         $this->prepareAMQPChannelExpectations($expectedMethod, $expectedRequeue);
 
-        // Create a default message
-        $amqpMessage = new AMQPMessage('foo body');
-        $amqpMessage->delivery_info['channel'] = $this->amqpChannel;
-        $amqpMessage->delivery_info['delivery_tag'] = 0;
-
-        $this->multipleConsumer->processQueueMessage('test-1', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-2', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-3', $amqpMessage);
-        $this->multipleConsumer->processQueueMessage('test-4', $amqpMessage);
+        $this->multipleConsumer->processQueueMessage('test-1', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-2', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-3', $this->createMessage());
+        $this->multipleConsumer->processQueueMessage('test-4', $this->createMessage());
     }
 
     public function processMessageProvider()
     {
-        return array(
-            array(null, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(true, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(false, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_ACK, 'basic_ack'), // Remove message from queue only if callback return not false
-            array(ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true), // Reject and requeue message to RabbitMQ
-            array(ConsumerInterface::MSG_REJECT, 'basic_reject', false), // Reject and drop
-        );
+        return [
+            [null, 'basic_ack'], // Remove message from queue only if callback return not false
+            [true, 'basic_ack'], // Remove message from queue only if callback return not false
+            [false, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_ACK, 'basic_ack'], // Remove message from queue only if callback return not false
+            [ConsumerInterface::MSG_REJECT_REQUEUE, 'basic_reject', true], // Reject and requeue message to RabbitMQ
+            [ConsumerInterface::MSG_REJECT, 'basic_reject', false], // Reject and drop
+        ];
+    }
+
+    /**
+     * @dataProvider queueBindingRoutingKeyProvider
+     */
+    public function testShouldConsiderQueueArgumentsOnQueueDeclaration($routingKeysOption, $expectedRoutingKey)
+    {
+        $queueName = 'test-queue-name';
+        $exchangeName = 'test-exchange-name';
+        $expectedArgs = ['test-argument' => ['S', 'test-value']];
+
+        $this->amqpChannel->expects($this->any())
+            ->method('getChannelId')->willReturn(0);
+
+        $this->amqpChannel->expects($this->any())
+            ->method('queue_declare')
+            ->willReturn([$queueName, 5, 0]);
+
+
+        $this->multipleConsumer->setExchangeOptions([
+            'declare' => false,
+            'name' => $exchangeName,
+            'type' => 'topic', ]);
+
+        $this->multipleConsumer->setQueues([
+            $queueName => [
+                'passive' => true,
+                'durable' => true,
+                'exclusive' => true,
+                'auto_delete' => true,
+                'nowait' => true,
+                'arguments' => $expectedArgs,
+                'ticket' => null,
+                'routing_keys' => $routingKeysOption, ],
+        ]);
+
+        $this->multipleConsumer->setRoutingKey('test-routing-key');
+
+        // we assert that arguments are passed to the bind method
+        $this->amqpChannel->expects($this->once())
+            ->method('queue_bind')
+            ->with($queueName, $exchangeName, $expectedRoutingKey, false, $expectedArgs);
+
+        $this->multipleConsumer->setupFabric();
+    }
+
+    public function queueBindingRoutingKeyProvider()
+    {
+        return [
+            [[], 'test-routing-key'],
+            [['test-routing-key-2'], 'test-routing-key-2'],
+        ];
     }
 
     /**
      * Preparing AMQP Connection
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|AMQPConnection
+     * @return MockObject|AMQPStreamConnection
      */
     private function prepareAMQPConnection()
     {
-        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPConnection')
+        return $this->getMockBuilder('\PhpAmqpLib\Connection\AMQPStreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -213,7 +229,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Connection
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|AMQPChannel
+     * @return MockObject|AMQPChannel
      */
     private function prepareAMQPChannel()
     {
@@ -225,7 +241,7 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing QueuesProviderInterface instance
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|QueuesProviderInterface
+     * @return MockObject|QueuesProviderInterface
      */
     private function prepareQueuesProvider()
     {
@@ -236,8 +252,8 @@ class MultipleConsumerTest extends TestCase
     /**
      * Preparing AMQP Channel Expectations
      *
-     * @param $expectedMethod
-     * @param $expectedRequeue
+     * @param mixed $expectedMethod
+     * @param string $expectedRequeue
      *
      * @return void
      */
@@ -245,28 +261,37 @@ class MultipleConsumerTest extends TestCase
     {
         $this->amqpChannel->expects($this->any())
             ->method('basic_reject')
-            ->will($this->returnCallback(function($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
-                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
-                \PHPUnit_Framework_Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
+            ->will($this->returnCallback(function ($delivery_tag, $requeue) use ($expectedMethod, $expectedRequeue) {
+                Assert::assertSame($expectedMethod, 'basic_reject'); // Check if this function should be called.
+                Assert::assertSame($requeue, $expectedRequeue); // Check if the message should be requeued.
             }));
 
         $this->amqpChannel->expects($this->any())
             ->method('basic_ack')
-            ->will($this->returnCallback(function($delivery_tag) use ($expectedMethod) {
-                \PHPUnit_Framework_Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
+            ->will($this->returnCallback(function ($delivery_tag) use ($expectedMethod) {
+                Assert::assertSame($expectedMethod, 'basic_ack'); // Check if this function should be called.
             }));
     }
 
     /**
      * Prepare callback
      *
-     * @param $processFlag
+     * @param bool $processFlag
      * @return callable
      */
     private function prepareCallback($processFlag)
     {
-        return function($msg) use (&$lastQueue, $processFlag) {
+        return function ($msg) use ($processFlag) {
             return $processFlag;
         };
+    }
+
+    private function createMessage()
+    {
+        $amqpMessage = new AMQPMessage('foo body');
+        $amqpMessage->setChannel($this->amqpChannel);
+        $amqpMessage->setDeliveryTag(0);
+
+        return $amqpMessage;
     }
 }
