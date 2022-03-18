@@ -4,7 +4,7 @@ namespace OldSound\RabbitMqBundle\RabbitMq;
 
 class Fallback implements ProducerInterface
 {
-    public function publish($msgBody, $routingKey = '', $additionalProperties = array()): bool
+    public function publish($msgBody, $routingKey = null, $additionalProperties = array())
     {
         return false;
     }

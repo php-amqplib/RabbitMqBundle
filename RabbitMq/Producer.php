@@ -46,12 +46,9 @@ class Producer extends BaseAmqp implements ProducerInterface
         return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
     }
 
-    /**
-     * @param null $confirmationTimeout
-     */
-    public function setConfirmationTimeout($confirmationTimeout): void
+    public function setConfirmationTimeout(int $confirmationTimeout): void
     {
-        $this->confirmationTimeout = intval($confirmationTimeout);
+        $this->confirmationTimeout = $confirmationTimeout;
     }
 
     /**
