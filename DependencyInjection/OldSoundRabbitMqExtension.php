@@ -172,7 +172,7 @@ class OldSoundRabbitMqExtension extends Extension
                 if (isset($producer['confirm_timeout'])) {
                     $confirmationTimeout = intval($producer['confirm_timeout']);
                 }
-                $definition->addMethodCall('setConfirmationTimeout', array($confirmationTimeout));
+                $definition->addMethodCall('setConfirmationTimeout', [$confirmationTimeout]);
 
                 if ($producer['enable_logger']) {
                     $this->injectLogger($definition);

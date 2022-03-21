@@ -89,14 +89,14 @@ class Producer extends BaseAmqp implements ProducerInterface
         $real_routingKey = !empty($routingKey) ? $routingKey : $this->defaultRoutingKey;
         $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], (string)$real_routingKey);
         $this->getChannel()->wait_for_pending_acks($this->confirmationTimeout);
-        $this->logger->debug('AMQP message published', array(
-            'amqp' => array(
+        $this->logger->debug('AMQP message published', [
+            'amqp' => [
                 'body' => $msgBody,
                 'routingkeys' => $routingKey,
                 'properties' => $additionalProperties,
-                'headers' => $headers
-            )
-        ));
+                'headers' => $headers,
+            ],
+        ]);
         return $this->acknowledged;
     }
 
