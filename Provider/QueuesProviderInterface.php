@@ -27,7 +27,7 @@ interface QueuesProviderInterface
      *    )
      * );
      * @return array
-     * 
+     *
      */
     public function getQueues();
 }

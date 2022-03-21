@@ -18,7 +18,7 @@ class MessageDataCollector extends DataCollector
     public function __construct($channels)
     {
         $this->channels = $channels;
-        $this->data = array();
+        $this->data = [];
     }
 
     public function collect(Request $request, Response $response, \Throwable $exception = null)

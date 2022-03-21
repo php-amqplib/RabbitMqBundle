@@ -68,7 +68,7 @@ abstract class BaseConsumer extends BaseAmqp implements DequeuerInterface
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
-        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, array($this, 'processMessage'));
+        $this->getChannel()->basic_consume($this->queueOptions['name'], $this->getConsumerTag(), false, false, false, false, [$this, 'processMessage']);
     }
 
     public function processMessage(AMQPMessage $msg)

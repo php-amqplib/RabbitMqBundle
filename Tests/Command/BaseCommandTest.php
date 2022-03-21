@@ -26,6 +26,6 @@ abstract class BaseCommandTest extends TestCase
             ->will($this->returnValue($this->definition));
         $this->definition->expects($this->any())
             ->method('getArguments')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
     }
 }

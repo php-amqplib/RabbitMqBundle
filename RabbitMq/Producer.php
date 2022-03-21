@@ -43,7 +43,7 @@ class Producer extends BaseAmqp implements ProducerInterface
 
     protected function getBasicProperties()
     {
-        return array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode);
+        return ['content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode];
     }
 
     public function setConfirmationTimeout(int $confirmationTimeout): void
@@ -73,7 +73,7 @@ class Producer extends BaseAmqp implements ProducerInterface
      * @param array|null $headers
      * @return bool
      */
-    public function publish($msgBody, $routingKey = null, $additionalProperties = array(), array $headers = null)
+    public function publish($msgBody, $routingKey = null, $additionalProperties = [], array $headers = null)
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();

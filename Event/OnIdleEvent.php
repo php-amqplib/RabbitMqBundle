@@ -11,7 +11,7 @@ use OldSound\RabbitMqBundle\RabbitMq\Consumer;
  */
 class OnIdleEvent extends AMQPEvent
 {
-    const NAME = AMQPEvent::ON_IDLE;
+    public const NAME = AMQPEvent::ON_IDLE;
 
     /**
      * @var bool

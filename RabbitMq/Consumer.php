@@ -140,7 +140,8 @@ class Consumer extends BaseConsumer
 
     protected function processMessageQueueCallback(AMQPMessage $msg, $queueName, $callback)
     {
-        $this->dispatchEvent(BeforeProcessingMessageEvent::NAME,
+        $this->dispatchEvent(
+            BeforeProcessingMessageEvent::NAME,
             new BeforeProcessingMessageEvent($this, $msg)
         );
         try {
@@ -150,40 +151,40 @@ class Consumer extends BaseConsumer
                 AfterProcessingMessageEvent::NAME,
                 new AfterProcessingMessageEvent($this, $msg)
             );
-            $this->logger->debug('Queue message processed', array(
-                'amqp' => array(
+            $this->logger->debug('Queue message processed', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'return_code' => $processFlag
-                )
-            ));
+                    'return_code' => $processFlag,
+                ],
+            ]);
         } catch (Exception\StopConsumerException $e) {
-            $this->logger->info('Consumer requested restart', array(
-                'amqp' => array(
+            $this->logger->info('Consumer requested stop', [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             $this->handleProcessMessage($msg, $e->getHandleCode());
             $this->stopConsuming();
         } catch (\Exception $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         } catch (\Error $e) {
-            $this->logger->error($e->getMessage(), array(
-                'amqp' => array(
+            $this->logger->error($e->getMessage(), [
+                'amqp' => [
                     'queue' => $queueName,
                     'message' => $msg,
-                    'stacktrace' => $e->getTraceAsString()
-                )
-            ));
+                    'stacktrace' => $e->getTraceAsString(),
+                ],
+            ]);
             throw $e;
         }
     }
@@ -198,13 +199,13 @@ class Consumer extends BaseConsumer
         if ($processFlag === ConsumerInterface::MSG_REJECT_REQUEUE || false === $processFlag) {
             // Reject and requeue message to RabbitMQ
             $msg->reject();
-        } else if ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
+        } elseif ($processFlag === ConsumerInterface::MSG_SINGLE_NACK_REQUEUE) {
             // NACK and requeue message to RabbitMQ
             $msg->nack(true);
-        } else if ($processFlag === ConsumerInterface::MSG_REJECT) {
+        } elseif ($processFlag === ConsumerInterface::MSG_REJECT) {
             // Reject and drop
             $msg->reject(false);
-        } else if ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
+        } elseif ($processFlag !== ConsumerInterface::MSG_ACK_SENT) {
             // Remove message from queue only if callback return not false
             $msg->ack();
         }

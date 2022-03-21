@@ -8,7 +8,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class MultipleConsumer extends Consumer
 {
-    protected $queues = array();
+    protected $queues = [];
 
     /**
      * Queues provider
@@ -16,7 +16,7 @@ class MultipleConsumer extends Consumer
      * @var QueuesProviderInterface|null
      */
     protected $queuesProvider = null;
-    
+
     /**
      * Context the consumer runs in
      *
@@ -46,7 +46,7 @@ class MultipleConsumer extends Consumer
     {
         $this->queues = $queues;
     }
-    
+
     public function setContext($context)
     {
         $this->context = $context;
@@ -64,7 +64,7 @@ class MultipleConsumer extends Consumer
             //PHP 5.3 Compliant
             $currentObject = $this;
 
-            $this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use($currentObject, $name) {
+            $this->getChannel()->basic_consume($name, $this->getQueueConsumerTag($name), false, false, false, false, function (AMQPMessage $msg) use ($currentObject, $name) {
                 $currentObject->processQueueMessage($name, $msg);
             });
         }
@@ -73,10 +73,16 @@ class MultipleConsumer extends Consumer
     protected function queueDeclare()
     {
         foreach ($this->queues as $name => $options) {
-            list($queueName, ,) = $this->getChannel()->queue_declare($name, $options['passive'],
-                $options['durable'], $options['exclusive'],
-                $options['auto_delete'], $options['nowait'],
-                $options['arguments'], $options['ticket']);
+            [$queueName, , ] = $this->getChannel()->queue_declare(
+                $name,
+                $options['passive'],
+                $options['durable'],
+                $options['exclusive'],
+                $options['auto_delete'],
+                $options['nowait'],
+                $options['arguments'],
+                $options['ticket']
+            );
 
             if (isset($options['routing_keys']) && count($options['routing_keys']) > 0) {
                 foreach ($options['routing_keys'] as $routingKey) {

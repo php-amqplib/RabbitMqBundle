@@ -14,21 +14,21 @@ class RpcClientTest extends TestCase
     {
         /** @var RpcClient $client */
         $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
-            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->setMethods(['sendReply', 'maybeStopConsumer'])
             ->disableOriginalConstructor()
             ->getMock();
         /** @var AMQPMessage $message */
         $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
-            ->setMethods(array('get'))
-            ->setConstructorArgs(array('message'))
+            ->setMethods(['get'])
+            ->setConstructorArgs(['message'])
             ->getMock();
         $serializer = $this->getMockBuilder('\Symfony\Component\Serializer\SerializerInterface')
-            ->setMethods(array('serialize', 'deserialize'))
+            ->setMethods(['serialize', 'deserialize'])
             ->getMock();
         $serializer->expects($this->once())->method('deserialize')->with('message', 'json', null);
         $client->initClient(true);
-        $client->setUnserializer(function($data) use ($serializer) {
-            $serializer->deserialize($data, 'json','');
+        $client->setUnserializer(function ($data) use ($serializer) {
+            $serializer->deserialize($data, 'json', '');
         });
         $client->processMessage($message);
     }
@@ -37,14 +37,14 @@ class RpcClientTest extends TestCase
     {
         /** @var RpcClient $client */
         $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
-            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->setMethods(['sendReply', 'maybeStopConsumer'])
             ->disableOriginalConstructor()
             ->getMock();
         $expectedNotify = 'message';
         /** @var AMQPMessage $message */
         $message = $this->getMockBuilder('\PhpAmqpLib\Message\AMQPMessage')
-            ->setMethods(array('get'))
-            ->setConstructorArgs(array($expectedNotify))
+            ->setMethods(['get'])
+            ->setConstructorArgs([$expectedNotify])
             ->getMock();
         $notified = false;
         $client->notify(function ($message) use (&$notified) {
@@ -61,7 +61,7 @@ class RpcClientTest extends TestCase
     {
         /** @var RpcClient $client */
         $client = $this->getMockBuilder('\OldSound\RabbitMqBundle\RabbitMq\RpcClient')
-            ->setMethods(array('sendReply', 'maybeStopConsumer'))
+            ->setMethods(['sendReply', 'maybeStopConsumer'])
             ->disableOriginalConstructor()
             ->getMock();
 

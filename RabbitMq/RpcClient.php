@@ -7,7 +7,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 class RpcClient extends BaseAmqp
 {
     protected $requests = 0;
-    protected $replies = array();
+    protected $replies = [];
     protected $expectSerializedResponse;
     protected $timeout = 0;
     protected $notifyCallback;
@@ -30,21 +30,21 @@ class RpcClient extends BaseAmqp
 
         if (0 == $this->requests) {
             // On first addRequest() call, clear all replies
-            $this->replies = array();
+            $this->replies = [];
 
             if ($this->directReplyTo) {
                 // On direct reply-to mode, make initial consume call
-                $this->directConsumerTag = $this->getChannel()->basic_consume('amq.rabbitmq.reply-to', '', false, true, false, false, array($this, 'processMessage'));
+                $this->directConsumerTag = $this->getChannel()->basic_consume('amq.rabbitmq.reply-to', '', false, true, false, false, [$this, 'processMessage']);
             }
         }
 
-        $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain',
+        $msg = new AMQPMessage($msgBody, ['content_type' => 'text/plain',
                                                'reply_to' => $this->directReplyTo
                                                    ? 'amq.rabbitmq.reply-to' // On direct reply-to mode, use predefined queue name
                                                    : $this->getQueueName(),
                                                'delivery_mode' => 1, // non durable
                                                'expiration' => $expiration*1000,
-                                               'correlation_id' => $requestId));
+                                               'correlation_id' => $requestId, ]);
 
         $this->getChannel()->basic_publish($msg, $server, $routingKey);
 
@@ -60,7 +60,7 @@ class RpcClient extends BaseAmqp
         if ($this->directReplyTo) {
             $consumer_tag = $this->directConsumerTag;
         } else {
-            $consumer_tag = $this->getChannel()->basic_consume($this->getQueueName(), '', false, true, false, false, array($this, 'processMessage'));
+            $consumer_tag = $this->getChannel()->basic_consume($this->getQueueName(), '', false, true, false, false, [$this, 'processMessage']);
         }
 
         try {
@@ -94,7 +94,7 @@ class RpcClient extends BaseAmqp
     protected function getQueueName()
     {
         if (null === $this->queueName) {
-            list($this->queueName, ,) = $this->getChannel()->queue_declare("", false, false, true, false);
+            [$this->queueName, , ] = $this->getChannel()->queue_declare("", false, false, true, false);
         }
 
         return $this->queueName;
@@ -121,7 +121,7 @@ class RpcClient extends BaseAmqp
 
     public function reset()
     {
-        $this->replies = array();
+        $this->replies = [];
         $this->requests = 0;
     }
 }

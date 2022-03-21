@@ -31,11 +31,10 @@ This bundle was presented at [Symfony Live Paris 2011](http://www.symfony-live.c
 
 ## Version 2 ##
 Due to the breaking changes happened caused by Symfony >=4.4, a new tag was released, making the bundle compatible with Symfony >=4.4.
-Also it eliminates a lot notices caused by symfony event dispatcher in Symfony 4.3.
 
 ## Installation ##
 
-### For Symfony Framework >= 4.3 ###
+### For Symfony Framework >= 4.4 ###
 
 Require the bundle and its dependencies with composer:
 
@@ -169,6 +168,7 @@ The argument value must be a list of datatype and value. Valid datatypes are:
 * `T` - Timestamps
 * `F` - Table
 * `A` - Array
+* `t` - Bool
 
 Adapt the `arguments` according to your needs.
 

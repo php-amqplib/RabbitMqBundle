@@ -12,11 +12,11 @@ class ConsumerCommandTest extends BaseCommandTest
         parent::setUp();
         $this->definition->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 new InputOption('--verbose', '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
                 new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', 'dev'),
                 new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'),
-            )));
+            ]));
         $this->application->expects($this->once())
             ->method('getHelperSet')
             ->will($this->returnValue($this->helperSet));

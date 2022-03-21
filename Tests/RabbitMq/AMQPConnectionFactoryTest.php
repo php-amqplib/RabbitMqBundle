@@ -259,7 +259,7 @@ class AMQPConnectionFactoryTest extends TestCase
         $this->assertEquals(['ssl' => ['verify_peer' => false]], $options);
         $this->assertEquals([
             'ssl_host',     // host
-            123 ,            // port
+            123,            // port
             'ssl_user',     // user
             'ssl_password', // password
             '/ssl',         // vhost,
@@ -277,7 +277,7 @@ class AMQPConnectionFactoryTest extends TestCase
                 'context' => null, // context checked earlier
                 'keepalive' => false,
                 'heartbeat' => 0,
-            ]
+            ],
         ], $instance->constructParams);
     }
 
@@ -296,8 +296,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     ],
                     [
                         'url' => 'amqp://user:pass@host:321/vhost',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -337,7 +337,7 @@ class AMQPConnectionFactoryTest extends TestCase
                         'user' => 'user',
                         'password' => 'pass',
                         'vhost' => 'vhost',
-                    ]
+                    ],
                 ],
                 [
                     'url'                => '',
@@ -350,8 +350,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     'read_write_timeout' => 3,
                     'ssl_context'        => null,
                     'keepalive'          => false,
-                    'heartbeat'          => 0
-                ]
+                    'heartbeat'          => 0,
+                ],
             ],
             $instance::$createConnectionParams
         );
@@ -375,7 +375,7 @@ class AMQPConnectionFactoryTest extends TestCase
                         'password' => 'cluster_password',
                         'vhost' => '/vhost',
                     ],
-                ]
+                ],
             ]
         );
 
@@ -408,7 +408,7 @@ class AMQPConnectionFactoryTest extends TestCase
                         'user' => 'cluster_user',
                         'password' => 'cluster_password',
                         'vhost' => '/vhost',
-                    ]
+                    ],
                 ],
                 [
                     'url'                => '',
@@ -421,8 +421,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     'read_write_timeout' => 3,
                     'ssl_context'        => null,
                     'keepalive'          => false,
-                    'heartbeat'          => 0
-                ]
+                    'heartbeat'          => 0,
+                ],
             ],
             $instance::$createConnectionParams
         );
@@ -443,7 +443,7 @@ class AMQPConnectionFactoryTest extends TestCase
                     ],
                     [
                         'url' => 'amqp://user:pass@host:321/vhost',
-                    ]
+                    ],
                 ],
                 'ssl_context' => [
                     'verify_peer' => false,
@@ -482,7 +482,7 @@ class AMQPConnectionFactoryTest extends TestCase
 
         $this->assertEquals([
             'ssl_cluster_host',     // host
-            123 ,                   // port
+            123,                   // port
             'ssl_cluster_user',     // user
             'ssl_cluster_password', // password
             '/ssl_cluster_vhost',   // vhost,
@@ -500,7 +500,7 @@ class AMQPConnectionFactoryTest extends TestCase
                 'context' => null,
                 'keepalive' => false,
                 'heartbeat' => 0,
-            ]
+            ],
         ], $instance->constructParams);
 
         $this->assertEquals(
@@ -519,7 +519,7 @@ class AMQPConnectionFactoryTest extends TestCase
                         'user' => 'user',
                         'password' => 'pass',
                         'vhost' => 'vhost',
-                    ]
+                    ],
                 ],
                 [
                     'url'                => '',
@@ -533,8 +533,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     'ssl_context'        => null, // context checked earlier
                     'context'        => null, // context checked earlier
                     'keepalive'          => false,
-                    'heartbeat'          => 0
-                ]
+                    'heartbeat'          => 0,
+                ],
             ],
             $instance::$createConnectionParams
         );
@@ -555,8 +555,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     ],
                     [
                         'url' => 'amqp://user:pass@host:321/vhost',
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 
@@ -595,7 +595,7 @@ class AMQPConnectionFactoryTest extends TestCase
                         'user' => 'user',
                         'password' => 'pass',
                         'vhost' => 'vhost',
-                    ]
+                    ],
                 ],
                 [
                     'url'                => '',
@@ -610,8 +610,8 @@ class AMQPConnectionFactoryTest extends TestCase
                     'connection_timeout' => 3,
                     'read_write_timeout' => 3,
                     'read_timeout'       => 3,
-                    'write_timeout'      => 3
-                ]
+                    'write_timeout'      => 3,
+                ],
             ],
             $instance::$createConnectionParams
         );
@@ -624,7 +624,7 @@ class AMQPConnectionFactoryTest extends TestCase
             ->method('getConnectionParameters')
             ->will($this->returnValue(
                 [
-                    'constructor_args' => [1,2,3,4]
+                    'constructor_args' => [1,2,3,4],
                 ]
             ));
         $factory = new AMQPConnectionFactory(

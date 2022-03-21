@@ -25,7 +25,8 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
             // Halt consumer if waiting for a new message from the queue
             try {
                 $this->consumer->stopConsuming();
-            } catch (AMQPTimeoutException $e) {}
+            } catch (AMQPTimeoutException $e) {
+            }
         }
     }
 
@@ -66,8 +67,8 @@ final class BatchConsumerCommand extends BaseRabbitMqCommand
                 throw new \BadFunctionCallException("Function 'pcntl_signal' is referenced in the php.ini 'disable_functions' and can't be called.");
             }
 
-            pcntl_signal(SIGTERM, array(&$this, 'stopConsumer'));
-            pcntl_signal(SIGINT, array(&$this, 'stopConsumer'));
+            pcntl_signal(SIGTERM, [&$this, 'stopConsumer']);
+            pcntl_signal(SIGINT, [&$this, 'stopConsumer']);
         }
 
         if (defined('AMQP_DEBUG') === false) {

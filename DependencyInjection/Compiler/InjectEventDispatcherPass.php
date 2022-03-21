@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InjectEventDispatcherPass implements CompilerPassInterface
 {
-    const EVENT_DISPATCHER_SERVICE_ID = 'event_dispatcher';
+    public const EVENT_DISPATCHER_SERVICE_ID = 'event_dispatcher';
 
     /**
      * @inheritDoc
@@ -30,11 +30,10 @@ class InjectEventDispatcherPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
             $definition->addMethodCall(
                 'setEventDispatcher',
-                array(
-                    new Reference(self::EVENT_DISPATCHER_SERVICE_ID, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
-                )
+                [
+                    new Reference(self::EVENT_DISPATCHER_SERVICE_ID, ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                ]
             );
         }
-
     }
 }

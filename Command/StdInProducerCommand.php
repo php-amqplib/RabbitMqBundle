@@ -9,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class StdInProducerCommand extends BaseRabbitMqCommand
 {
-    const FORMAT_PHP = 'php';
-    const FORMAT_RAW = 'raw';
+    public const FORMAT_PHP = 'php';
+    public const FORMAT_RAW = 'raw';
 
     protected function configure()
     {
@@ -55,8 +55,11 @@ class StdInProducerCommand extends BaseRabbitMqCommand
                 $data = serialize($data);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid payload format "%s", expecting one of: %s.',
-                    $format, implode(', ', array(self::FORMAT_PHP, self::FORMAT_RAW))));
+                throw new \InvalidArgumentException(sprintf(
+                    'Invalid payload format "%s", expecting one of: %s.',
+                    $format,
+                    implode(', ', [self::FORMAT_PHP, self::FORMAT_RAW])
+                ));
         }
 
         $producer->publish($data, $route);

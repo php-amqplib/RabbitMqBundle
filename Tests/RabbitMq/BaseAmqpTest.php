@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BaseAmqpTest extends TestCase
 {
-
     public function testLazyConnection()
     {
         $connection = $this->getMockBuilder('PhpAmqpLib\Connection\AbstractConnection')
@@ -64,7 +63,7 @@ class BaseAmqpTest extends TestCase
             ->with(new AMQPEvent(), AMQPEvent::ON_CONSUME)
             ->willReturn(new AMQPEvent());
 
-        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, array(AMQPEvent::ON_CONSUME, new AMQPEvent()));
+        $this->invokeMethod('dispatchEvent', $baseAmqpConsumer, [AMQPEvent::ON_CONSUME, new AMQPEvent()]);
     }
 
     /**

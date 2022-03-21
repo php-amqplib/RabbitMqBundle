@@ -13,7 +13,7 @@ class AMQPConnectionFactory
     private $class;
 
     /** @var array */
-    private $parameters = array(
+    private $parameters = [
         'url'                => '',
         'host'               => 'localhost',
         'port'               => 5672,
@@ -25,8 +25,8 @@ class AMQPConnectionFactory
         'ssl_context'        => null,
         'keepalive'          => false,
         'heartbeat'          => 0,
-        'hosts'              => []
-    );
+        'hosts'              => [],
+    ];
 
     /**
      * Constructor
@@ -56,7 +56,7 @@ class AMQPConnectionFactory
 
         if (is_array($this->parameters['ssl_context'])) {
             $this->parameters['context'] = ! empty($this->parameters['ssl_context'])
-                ? stream_context_create(array('ssl' => $this->parameters['ssl_context']))
+                ? stream_context_create(['ssl' => $this->parameters['ssl_context']])
                 : null;
         }
         if ($parametersProvider) {
@@ -82,8 +82,8 @@ class AMQPConnectionFactory
         unset($options['hosts']);
 
         if ($this->class == AMQPSocketConnection::class || is_subclass_of($this->class, AMQPSocketConnection::class)) {
-            $options['read_timeout'] = $options['read_timeout'] ?? $this->parameters['read_write_timeout'];
-            $options['write_timeout'] = $options['write_timeout'] ?? $this->parameters['read_write_timeout'];
+            $options['read_timeout'] ??= $this->parameters['read_write_timeout'];
+            $options['write_timeout'] ??= $this->parameters['read_write_timeout'];
         }
 
         // No need to unpack options, they will be handled inside connection classes
@@ -127,7 +127,7 @@ class AMQPConnectionFactory
         }
 
         if (isset($url['query'])) {
-            $query = array();
+            $query = [];
             parse_str($url['query'], $query);
             $parameters = array_merge($parameters, $query);
         }

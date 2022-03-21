@@ -18,7 +18,7 @@ class SetupFabricCommand extends BaseRabbitMqCommand
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (defined('AMQP_DEBUG') === false) {
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
@@ -28,7 +28,7 @@ class SetupFabricCommand extends BaseRabbitMqCommand
 
         $partsHolder = $this->getContainer()->get('old_sound_rabbit_mq.parts_holder');
 
-        foreach (array('base_amqp', 'binding') as $key) {
+        foreach (['base_amqp', 'binding'] as $key) {
             foreach ($partsHolder->getParts('old_sound_rabbit_mq.' . $key) as $baseAmqp) {
                 if ($baseAmqp instanceof DynamicConsumer) {
                     continue;
@@ -38,6 +38,5 @@ class SetupFabricCommand extends BaseRabbitMqCommand
         }
 
         return 0;
-
     }
 }
