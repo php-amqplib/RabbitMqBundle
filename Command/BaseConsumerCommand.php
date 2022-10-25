@@ -3,6 +3,8 @@
 namespace OldSound\RabbitMqBundle\Command;
 
 use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer as Consumer;
+use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
+use PhpAmqpLib\Connection\Heartbeat\SIGHeartbeatSender;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,6 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 {
+    const HEARTBEAT_SENDERS = [
+        'pcntl' => PCNTLHeartbeatSender::class,
+        'sig' => SIGHeartbeatSender::class,
+    ];
+
     protected $consumer;
 
     /** @var int */
@@ -48,6 +55,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
             ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process (MB)')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
             ->addOption('without-signals', 'w', InputOption::VALUE_NONE, 'Disable catching of system signals')
+            ->addOption('heartbeat-sender', null, InputOption::VALUE_REQUIRED, sprintf('Enable heartbeat sender. One of %s', $this->getSupportedHeartbeatSenders()))
         ;
     }
 
@@ -106,6 +114,20 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
                 $this->consumer->setMemoryLimit($memoryLimit);
             }
         }
+        if ($heartbeatSender = $input->getOption('heartbeat-sender')) {
+            if (!isset(self::HEARTBEAT_SENDERS[$heartbeatSender])) {
+                throw new \InvalidArgumentException(sprintf('Invalid heartbeat-sender value. Supported senders are: %s', $this->getSupportedHeartbeatSenders()));
+            }
+
+            if ($this->consumer instanceof Consumer) {
+                $this->consumer->setHeartbeatSender(self::HEARTBEAT_SENDERS[$heartbeatSender]);
+            }
+        }
         $this->consumer->setRoutingKey($input->getOption('route'));
+    }
+
+    protected function getSupportedHeartbeatSenders()
+    {
+        return '"'.implode('", "', array_keys(self::HEARTBEAT_SENDERS)).'"';
     }
 }

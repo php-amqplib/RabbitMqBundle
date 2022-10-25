@@ -8,6 +8,7 @@ use OldSound\RabbitMqBundle\Event\OnConsumeEvent;
 use OldSound\RabbitMqBundle\Event\OnIdleEvent;
 use OldSound\RabbitMqBundle\MemoryChecker\MemoryConsumptionChecker;
 use OldSound\RabbitMqBundle\MemoryChecker\NativeMemoryUsageProvider;
+use PhpAmqpLib\Connection\Heartbeat\AbstractSignalHeartbeatSender;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 
@@ -17,6 +18,11 @@ class Consumer extends BaseConsumer
      * @var int|null $memoryLimit
      */
     protected $memoryLimit = null;
+
+    /**
+     * @var string
+     */
+    protected $heartbeatSender = null;
 
     /**
      * @var \DateTime|null DateTime after which the consumer will gracefully exit. "Gracefully" means, that
@@ -60,6 +66,16 @@ class Consumer extends BaseConsumer
     }
 
     /**
+     * Set the heartbeat sender class name
+     *
+     * @param string $heartbeatSender
+     */
+    public function setHeartbeatSender($heartbeatSender): void
+    {
+        $this->heartbeatSender = $heartbeatSender;
+    }
+
+    /**
      * Consume the message
      *
      * @param   int     $msgAmount
@@ -73,6 +89,12 @@ class Consumer extends BaseConsumer
         $this->target = $msgAmount;
 
         $this->setupConsumer();
+
+        if ($this->heartbeatSender) {
+            /** @var AbstractSignalHeartbeatSender $heartbeatSender */
+            $heartbeatSender = new $this->heartbeatSender($this->conn);
+            $heartbeatSender->register();
+        }
 
         $this->setLastActivityDateTime(new \DateTime());
         while ($this->getChannel()->is_consuming()) {
@@ -117,6 +139,10 @@ class Consumer extends BaseConsumer
                     }
                 }
             }
+        }
+
+        if (isset($heartbeatSender)) {
+            $heartbeatSender->unregister();
         }
 
         return 0;
