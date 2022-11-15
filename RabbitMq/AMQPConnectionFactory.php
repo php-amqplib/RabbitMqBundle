@@ -26,6 +26,7 @@ class AMQPConnectionFactory
         'keepalive'          => false,
         'heartbeat'          => 0,
         'hosts'              => [],
+        'channel_rpc_timeout' => 0
     ];
 
     /**
