@@ -24,7 +24,7 @@ class DynamicConsumerCommand extends BaseConsumerCommand
             ->setName('rabbitmq:dynamic-consumer')
             ->setDescription('Executes context-aware consumer')
             ->addArgument('context', InputArgument::REQUIRED, 'Context the consumer runs in')
-            ;
+        ;
     }
 
     protected function getConsumerService()
