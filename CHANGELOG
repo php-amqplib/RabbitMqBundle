@@ -1,3 +1,7 @@
+- 2023-04-21
+    * interface `OldSound\RabbitMqBundle\RabbitMq\ProducerInterface` brought to implementation
+        `OldSound\RabbitMqBundle\RabbitMq\Producer`, corrected signature of `OldSound\RabbitMqBundle\RabbitMq\Fallback`
+
 - 2021-05-15
     * Add possibility to use multiple RabbitMQ hosts
 
