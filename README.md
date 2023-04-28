@@ -114,8 +114,8 @@ old_sound_rabbit_mq:
             connection_timeout: 3
             read_write_timeout: 3
             
-            # the timeout when waiting for a response from rabbitMQ (0 means waits forever)
-            channel_rpc_timeout: 0
+            # the timeout when waiting for a response from rabbitMQ (0.0 means waits forever)
+            channel_rpc_timeout: 0.0
 
             # requires php-amqplib v2.4.1+ and PHP5.4+
             keepalive: false
