@@ -37,7 +37,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         // TODO: Implement restarting of consumer
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -51,7 +51,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->amount = (int)$input->getOption('messages');
         if (0 > $this->amount) {
