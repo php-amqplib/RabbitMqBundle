@@ -59,6 +59,7 @@ class AMQPConnectionFactory
                 ? stream_context_create(['ssl' => $this->parameters['ssl_context']])
                 : null;
         }
+        
         if ($parametersProvider) {
             $this->parameters = array_merge($this->parameters, $parametersProvider->getConnectionParameters());
         }
