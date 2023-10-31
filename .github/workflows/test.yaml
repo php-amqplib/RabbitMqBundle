@@ -6,16 +6,16 @@ jobs:
     test:
         name: PHP ${{ matrix.php-version }} + Symfony ${{ matrix.symfony-version }}
 
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
 
         strategy:
             matrix:
-                php-version: ['7.4', '8.0', '8.1']
-                symfony-version: ['4.4', '5.3', '5.4', '6.0']
+                php-version: ['7.4', '8.0', '8.2']
+                symfony-version: ['4.4', '5.3', '5.4', '6.3']
                 coverage: ['none']
                 exclude:
                     - php-version: '7.4'
-                      symfony-version: '6.0'
+                      symfony-version: '6..'
                 include:
                     - php-version: '8.0'
                       symfony-version: '5.4'
