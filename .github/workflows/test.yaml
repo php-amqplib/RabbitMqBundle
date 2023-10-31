@@ -20,7 +20,7 @@ jobs:
                 coverage: ['none']
                 exclude:
                     - php-version: '7.4'
-                      symfony-version: '6..'
+                      symfony-version: '6.0'
                 include:
                     - php-version: '8.0'
                       symfony-version: '5.4'
