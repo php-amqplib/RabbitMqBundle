@@ -43,7 +43,7 @@ class RpcClient extends BaseAmqp
                                                    ? 'amq.rabbitmq.reply-to' // On direct reply-to mode, use predefined queue name
                                                    : $this->getQueueName(),
                                                'delivery_mode' => 1, // non durable
-                                               'expiration' => $expiration*1000,
+                                               'expiration' => $expiration * 1000,
                                                'correlation_id' => $requestId, ]);
 
         $this->getChannel()->basic_publish($msg, $server, $routingKey);
