@@ -83,6 +83,7 @@ class Consumer extends BaseConsumer
              * Be careful not to trigger ::wait() with 0 or less seconds, when
              * graceful max execution timeout is being used.
              */
+
             $waitTimeout = $this->chooseWaitTimeout();
             if ($this->gracefulMaxExecutionDateTime
                 && $waitTimeout < 1

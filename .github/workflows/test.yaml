@@ -1,6 +1,11 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
 
 jobs:
     test:
@@ -10,16 +15,28 @@ jobs:
 
         strategy:
             matrix:
-                php-version: ['7.4', '8.0', '8.1']
+                php-version: ['7.4', '8.2']
                 symfony-version: ['4.4', '5.3', '5.4', '6.0']
                 coverage: ['none']
                 exclude:
                     - php-version: '7.4'
-                      symfony-version: '6.0'
+                      symfony-version: '6..'
                 include:
                     - php-version: '8.0'
                       symfony-version: '5.4'
                       coverage: xdebug
+                    - php-version: '8.1'
+                      symfony-version: '6.2'
+                      coverage: 'none'
+                    - php-version: '8.1'
+                      symfony-version: '6.1'
+                      coverage: 'none'
+                    - php-version: '8.1'
+                      symfony-version: '6.3'
+                      coverage: 'none'
+                    - php-version: '8.2'
+                      symfony-version: '6.3'
+                      coverage: 'none'
 
         steps:
             - name: Checkout
