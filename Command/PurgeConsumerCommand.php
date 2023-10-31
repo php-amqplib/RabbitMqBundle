@@ -13,7 +13,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class PurgeConsumerCommand extends ConsumerCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
              ->setDescription('Purge a consumer\'s queue')
@@ -22,7 +22,7 @@ class PurgeConsumerCommand extends ConsumerCommand
         $this->setName('rabbitmq:purge');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         // nothing to initialize here as BaseConsumerCommand initializes on option that is not available here
     }

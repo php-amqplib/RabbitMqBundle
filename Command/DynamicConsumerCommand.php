@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class DynamicConsumerCommand extends BaseConsumerCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

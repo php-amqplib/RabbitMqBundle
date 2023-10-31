@@ -12,7 +12,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
     public const FORMAT_PHP = 'php';
     public const FORMAT_RAW = 'raw';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

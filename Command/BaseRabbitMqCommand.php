@@ -13,10 +13,7 @@ abstract class BaseRabbitMqCommand extends Command implements ContainerAwareInte
      */
     protected $container;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class RegisterPartsPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $services = $container->findTaggedServiceIds('old_sound_rabbit_mq.base_amqp');
         $container->setParameter('old_sound_rabbit_mq.base_amqp', array_keys($services));

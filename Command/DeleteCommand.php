@@ -13,7 +13,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class DeleteCommand extends ConsumerCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Consumer Name')
              ->setDescription('Delete a consumer\'s queue')
@@ -22,7 +22,7 @@ class DeleteCommand extends ConsumerCommand
         $this->setName('rabbitmq:delete');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         // nothing to initialize here as BaseConsumerCommand initializes on option that is not available here
     }
