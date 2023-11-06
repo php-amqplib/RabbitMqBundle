@@ -257,6 +257,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['consumer_options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -349,6 +355,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['consumer_options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -424,6 +436,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['consumer_options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -483,6 +501,13 @@ class OldSoundRabbitMqExtension extends Extension
 
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
+            }
+
+            if (isset($consumer['consumer_options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
             }
 
             if ($consumer['keep_alive']) {

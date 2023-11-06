@@ -49,6 +49,10 @@ abstract class BaseAmqp
         'declare' => true,
     ];
 
+    protected $consumerOptions = [
+        'no_ack' => false,
+    ];
+
     /**
      * @var EventDispatcherInterface|null
      */
@@ -153,6 +157,15 @@ abstract class BaseAmqp
     public function setQueueOptions(array $options = [])
     {
         $this->queueOptions = array_merge($this->queueOptions, $options);
+    }
+
+    /**
+     * @param  array $options
+     * @return void
+     */
+    public function setConsumerOptions(array $options = [])
+    {
+        $this->consumerOptions = array_merge($this->consumerOptions, $options);
     }
 
     /**
