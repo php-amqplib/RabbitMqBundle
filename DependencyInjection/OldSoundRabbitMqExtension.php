@@ -257,7 +257,7 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
-            if (isset($consumer['consumer_options'])) {
+            if (isset($consumer['options'])) {
                 $definition->addMethodCall(
                     'setConsumerOptions',
                     [$this->normalizeArgumentKeys($consumer['options'])]
@@ -355,7 +355,7 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
-            if (isset($consumer['consumer_options'])) {
+            if (isset($consumer['options'])) {
                 $definition->addMethodCall(
                     'setConsumerOptions',
                     [$this->normalizeArgumentKeys($consumer['options'])]
@@ -436,7 +436,7 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
-            if (isset($consumer['consumer_options'])) {
+            if (isset($consumer['options'])) {
                 $definition->addMethodCall(
                     'setConsumerOptions',
                     [$this->normalizeArgumentKeys($consumer['options'])]
@@ -503,7 +503,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
 
-            if (isset($consumer['consumer_options'])) {
+            if (isset($consumer['options'])) {
                 $definition->addMethodCall(
                     'setConsumerOptions',
                     [$this->normalizeArgumentKeys($consumer['options'])]
