@@ -1,3 +1,6 @@
+- 2023-11-07
+    * Add consumer option `no_ack`
+
 - 2021-05-15
     * Add possibility to use multiple RabbitMQ hosts
 

@@ -257,6 +257,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -349,6 +355,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -424,6 +436,12 @@ class OldSoundRabbitMqExtension extends Extension
             if (!$consumer['auto_setup_fabric']) {
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
+            if (isset($consumer['options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
 
             $this->injectConnection($definition, $consumer['connection']);
             if ($this->collectorEnabled) {
@@ -485,6 +503,13 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addMethodCall('disableAutoSetupFabric');
             }
 
+            if (isset($consumer['options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($consumer['options'])]
+                );
+            }
+
             if ($consumer['keep_alive']) {
                 $definition->addMethodCall('keepAlive');
             }
@@ -512,6 +537,14 @@ class OldSoundRabbitMqExtension extends Extension
                 ->addTag('old_sound_rabbit_mq.anon_consumer')
                 ->addMethodCall('setExchangeOptions', [$this->normalizeArgumentKeys($anon['exchange_options'])])
                 ->addMethodCall('setCallback', [[new Reference($anon['callback']), 'execute']]);
+
+            if (isset($anon['options'])) {
+                $definition->addMethodCall(
+                    'setConsumerOptions',
+                    [$this->normalizeArgumentKeys($anon['options'])]
+                );
+            }
+
             $this->injectConnection($definition, $anon['connection']);
             if ($this->collectorEnabled) {
                 $this->injectLoggedChannel($definition, $key, $anon['connection']);

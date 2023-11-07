@@ -486,6 +486,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     'setTimeoutWait',
                     [3],
                 ],
+                [
+                    'setConsumerOptions',
+                    [
+                        [
+                            'no_ack' => true,
+                        ],
+                    ],
+                ],
             ],
             $definition->getMethodCalls()
         );
@@ -670,6 +678,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                     'setTimeoutWait',
                     [3],
                 ],
+                [
+                    'setConsumerOptions',
+                    [
+                        [
+                            'no_ack' => true,
+                        ],
+                    ],
+                ],
             ],
             $definition->getMethodCalls()
         );
@@ -714,6 +730,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                             new Reference('foo.dynamic.provider'),
                         ],
                 ],
+                [
+                    'setConsumerOptions',
+                    [
+                        [
+                            'no_ack' => true,
+                        ],
+                    ],
+                ],
             ],
             $definition->getMethodCalls()
         );
@@ -749,6 +773,14 @@ class OldSoundRabbitMqExtensionTest extends TestCase
                 [
                     'setCallback',
                     [[new Reference('foo_anon.callback'), 'execute']],
+                ],
+                [
+                    'setConsumerOptions',
+                    [
+                        [
+                            'no_ack' => true,
+                        ],
+                    ],
                 ],
             ],
             $definition->getMethodCalls()
