@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OldSoundRabbitMqBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -20,7 +20,7 @@ class OldSoundRabbitMqBundle extends Bundle
     /**
      * {@inheritDoc}
      */
-    public function shutdown()
+    public function shutdown(): void
     {
         parent::shutdown();
         if (!$this->container->hasParameter('old_sound_rabbit_mq.base_amqp')) {
