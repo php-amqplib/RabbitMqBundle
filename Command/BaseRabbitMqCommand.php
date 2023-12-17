@@ -2,11 +2,10 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 
-abstract class BaseRabbitMqCommand extends Command implements ContainerAwareInterface
+abstract class BaseRabbitMqCommand extends Command
 {
     /**
      * @var ContainerInterface

@@ -32,7 +32,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
      *
      * @throws \InvalidArgumentException When the number of messages to consume is less than 0
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         $amount = (int)$input->getOption('messages');

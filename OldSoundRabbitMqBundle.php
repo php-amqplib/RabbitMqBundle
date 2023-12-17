@@ -4,6 +4,7 @@ namespace OldSound\RabbitMqBundle;
 
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\InjectEventDispatcherPass;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
+use OldSound\RabbitMqBundle\DependencyInjection\Compiler\ServiceContainerPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -15,6 +16,7 @@ class OldSoundRabbitMqBundle extends Bundle
 
         $container->addCompilerPass(new RegisterPartsPass());
         $container->addCompilerPass(new InjectEventDispatcherPass());
+        $container->addCompilerPass(new ServiceContainerPass());
     }
 
     /**

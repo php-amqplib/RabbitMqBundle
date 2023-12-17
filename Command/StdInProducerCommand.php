@@ -34,7 +34,7 @@ class StdInProducerCommand extends BaseRabbitMqCommand
      *
      * @return integer 0 if everything went fine, or an error code
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         define('AMQP_DEBUG', (bool) $input->getOption('debug'));
 
