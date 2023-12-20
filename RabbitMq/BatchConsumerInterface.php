@@ -9,7 +9,7 @@ interface BatchConsumerInterface
     /**
      * @param   AMQPMessage[]   $messages
      *
-     * @return  array|bool
+     * @return  array|int|bool
      */
     public function batchExecute(array $messages);
 }
