@@ -70,7 +70,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
      * @throws \InvalidArgumentException When the number of messages to consume is less than 0
      * @throws \BadFunctionCallException When the pcntl is not installed and option -s is true
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (defined('AMQP_WITHOUT_SIGNALS') === false) {
             define('AMQP_WITHOUT_SIGNALS', $input->getOption('without-signals'));
