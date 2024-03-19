@@ -3,6 +3,7 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use PhpAmqpLib\Connection\AMQPConnectionConfig;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -73,6 +74,14 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('user')->defaultValue('guest')->end()
                             ->scalarNode('password')->defaultValue('guest')->end()
                             ->scalarNode('vhost')->defaultValue('/')->end()
+                            ->enumNode('login_method')
+                                ->values([
+                                    AMQPConnectionConfig::AUTH_AMQPPLAIN,
+                                    AMQPConnectionConfig::AUTH_PLAIN,
+                                    AMQPConnectionConfig::AUTH_EXTERNAL
+                                ])
+                                ->defaultValue(AMQPConnectionConfig::AUTH_AMQPPLAIN)
+                                ->end()
                             ->arrayNode('hosts')
                                 ->info('connection_timeout, read_write_timeout, use_socket, ssl_context, keepalive, 
                                         heartbeat and connection_parameters_provider should be specified globally when

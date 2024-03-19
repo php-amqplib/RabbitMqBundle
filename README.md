@@ -125,6 +125,9 @@ old_sound_rabbit_mq:
 
             #requires php_sockets.dll
             use_socket: true # default false
+            
+            login_method: 'AMQPLAIN' # default 'AMQPLAIN', can be 'EXTERNAL' or 'PLAIN', see https://www.rabbitmq.com/docs/access-control#mechanisms
+            
         another:
             # A different (unused) connection defined by an URL. One can omit all parts,
             # except the scheme (amqp:). If both segment in the URL and a key value (see above)

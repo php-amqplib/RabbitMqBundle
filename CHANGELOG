@@ -1,3 +1,6 @@
+- 2024-03-18
+    * Add bundle configuration for `login_method` for RabbitMQ connections, this allow to configure other values than default AMQPLAIN (PLAIN or EXTERNAL), see https://www.rabbitmq.com/docs/access-control#mechanisms
+
 - 2023-11-07
     * Add consumer option `no_ack`
 
