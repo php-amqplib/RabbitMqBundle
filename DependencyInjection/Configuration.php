@@ -78,7 +78,7 @@ class Configuration implements ConfigurationInterface
                                 ->values([
                                     AMQPConnectionConfig::AUTH_AMQPPLAIN,
                                     AMQPConnectionConfig::AUTH_PLAIN,
-                                    AMQPConnectionConfig::AUTH_EXTERNAL
+                                    AMQPConnectionConfig::AUTH_EXTERNAL,
                                 ])
                                 ->defaultValue(AMQPConnectionConfig::AUTH_AMQPPLAIN)
                                 ->end()
