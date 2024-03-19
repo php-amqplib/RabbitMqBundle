@@ -40,6 +40,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'url' => '',
             'hosts' => [],
             'channel_rpc_timeout' => 0.0,
+            'login_method' => 'AMQPLAIN',
 
         ], $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
@@ -72,6 +73,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'url' => '',
             'hosts' => [],
             'channel_rpc_timeout' => 0.0,
+            'login_method' => 'AMQPLAIN',
         ], $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -101,6 +103,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'url' => '',
             'hosts' => [],
             'channel_rpc_timeout' => 0.0,
+            'login_method' => 'AMQPLAIN',
         ], $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.lazy.connection.class%', $definition->getClass());
     }
@@ -130,6 +133,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'url' => '',
             'hosts' => [],
             'channel_rpc_timeout' => 0.0,
+            'login_method' => 'AMQPLAIN',
         ], $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
@@ -194,6 +198,7 @@ class OldSoundRabbitMqExtensionTest extends TestCase
             'use_socket' => false,
             'url' => '',
             'channel_rpc_timeout' => 0.0,
+            'login_method' => 'AMQPLAIN',
         ], $factory->getArgument(1));
         $this->assertEquals('%old_sound_rabbit_mq.connection.class%', $definition->getClass());
     }
