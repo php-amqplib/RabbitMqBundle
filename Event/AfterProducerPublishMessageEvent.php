@@ -32,7 +32,7 @@ class AfterProducerPublishMessageEvent extends AMQPEvent
     }
 
     /**
-     * @return AMQPMessage
+     * @return string
      */
     public function getRoutingKey()
     {
