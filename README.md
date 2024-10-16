@@ -316,6 +316,49 @@ If you need to use a custom class for a producer (which should inherit from `Old
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
 
+#### Producer Events ####
+
+There are currently two events emitted by the producer.
+
+##### BeforeProducerPublishMessageEvent #####
+This event occurs immediately before publishing the message. This is a good hook to do any final logging, validation, etc. before actually sending the message. A sample implementation of a listener:
+
+```php
+namespace App\EventListener;
+
+use OldSound\RabbitMqBundle\Event\BeforeProducerPublishMessageEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener(event: BeforeProducerPublishMessageEvent::NAME)]
+final class AMQPBeforePublishEventListener
+{
+    public function __invoke(BeforeProducerPublishMessageEvent $event): void
+    {
+        // Your code goes here
+    }
+}
+```
+
+##### AfterProducerPublishMessageEvent #####
+This event occurs immediately after publishing the message. This is a good hook to do any confirmation logging, commits, etc. after actually sending the message. A sample implementation of a listener:
+
+```php
+namespace App\EventListener;
+
+use OldSound\RabbitMqBundle\Event\AfterProducerPublishMessageEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener(event: AfterProducerPublishMessageEvent::NAME)]
+final class AMQPBeforePublishEventListener
+{
+    public function __invoke(AfterProducerPublishMessageEvent $event): void
+    {
+        // Your code goes here
+    }
+}
+```
+
+
 ### Consumers ###
 
 A consumer will connect to the server and start a __loop__  waiting for incoming messages to process. Depending on the specified __callback__ for such consumer will be the behavior it will have. Let's review the consumer configuration from above:
