@@ -12,7 +12,7 @@ use PhpAmqpLib\Message\AMQPMessage;
  */
 class BeforeProducerPublishMessageEvent extends AMQPEvent
 {
-    public const NAME = AMQPEvent::BEFORE_PROCESSING_MESSAGE;
+    public const NAME = AMQPEvent::BEFORE_PUBLISH_MESSAGE;
 
     /**
      * @var string
