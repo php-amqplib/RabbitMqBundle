@@ -3,7 +3,6 @@
 namespace OldSound\RabbitMqBundle\DependencyInjection;
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
-use PhpAmqpLib\Connection\AMQPConnectionConfig;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -76,11 +75,11 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('vhost')->defaultValue('/')->end()
                             ->enumNode('login_method')
                                 ->values([
-                                    AMQPConnectionConfig::AUTH_AMQPPLAIN,
-                                    AMQPConnectionConfig::AUTH_PLAIN,
-                                    AMQPConnectionConfig::AUTH_EXTERNAL,
+                                    'AMQPLAIN', // Can be replaced by AMQPConnectionConfig constants when PhpAmqpLib 2 support is dropped
+                                    'PLAIN',
+                                    'EXTERNAL',
                                 ])
-                                ->defaultValue(AMQPConnectionConfig::AUTH_AMQPPLAIN)
+                                ->defaultValue('AMQPLAIN')
                                 ->end()
                             ->arrayNode('hosts')
                                 ->info('connection_timeout, read_write_timeout, use_socket, ssl_context, keepalive, 
