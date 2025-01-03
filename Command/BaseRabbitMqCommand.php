@@ -12,7 +12,7 @@ abstract class BaseRabbitMqCommand extends Command
      */
     protected $container;
 
-    public function setContainer(ContainerInterface $container = null): void
+    public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
