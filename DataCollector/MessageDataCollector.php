@@ -21,7 +21,7 @@ class MessageDataCollector extends DataCollector
         $this->data = [];
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         foreach ($this->channels as $channel) {
             foreach ($channel->getBasicPublishLog() as $log) {
