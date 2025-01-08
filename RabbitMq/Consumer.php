@@ -234,7 +234,7 @@ class Consumer extends BaseConsumer
     /**
      * @param \DateTime|null $dateTime
      */
-    public function setGracefulMaxExecutionDateTime(\DateTime $dateTime = null)
+    public function setGracefulMaxExecutionDateTime(?\DateTime $dateTime = null)
     {
         $this->gracefulMaxExecutionDateTime = $dateTime;
     }

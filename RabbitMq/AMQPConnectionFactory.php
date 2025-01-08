@@ -41,7 +41,7 @@ class AMQPConnectionFactory
     public function __construct(
         $class,
         array $parameters,
-        ConnectionParametersProviderInterface $parametersProvider = null
+        ?ConnectionParametersProviderInterface $parametersProvider = null
     ) {
         $this->class = $class;
         $this->parameters = array_merge($this->parameters, $parameters);
