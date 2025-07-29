@@ -83,6 +83,7 @@ abstract class BaseConsumerCommand extends BaseRabbitMqCommand
 
             pcntl_signal(SIGTERM, [&$this, 'stopConsumer']);
             pcntl_signal(SIGINT, [&$this, 'stopConsumer']);
+            pcntl_signal(SIGQUIT, [&$this, 'stopConsumer']);
             pcntl_signal(SIGHUP, [&$this, 'restartConsumer']);
         }
 
