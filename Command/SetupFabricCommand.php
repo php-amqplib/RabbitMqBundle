@@ -2,6 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
+use OldSound\RabbitMqBundle\RabbitMq\AnonConsumer;
 use OldSound\RabbitMqBundle\RabbitMq\DynamicConsumer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,6 +16,7 @@ class SetupFabricCommand extends BaseRabbitMqCommand
             ->setName('rabbitmq:setup-fabric')
             ->setDescription('Sets up the Rabbit MQ fabric')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Enable Debugging')
+            ->addOption('skip-anon-consumers', null, InputOption::VALUE_NONE, 'Do not run the fabric-setup for anonymous consumers')
         ;
     }
 
@@ -24,13 +26,22 @@ class SetupFabricCommand extends BaseRabbitMqCommand
             define('AMQP_DEBUG', (bool) $input->getOption('debug'));
         }
 
+        $skipAnonConsumers = (bool) $input->getOption('skip-anon-consumers');
+
         $output->writeln('Setting up the Rabbit MQ fabric');
+
+        if ($skipAnonConsumers && $output->isVeryVerbose()) {
+            $output->writeln('Skipping fabric-setup for anonymous consumers');
+        }
 
         $partsHolder = $this->getContainer()->get('old_sound_rabbit_mq.parts_holder');
 
         foreach (['base_amqp', 'binding'] as $key) {
             foreach ($partsHolder->getParts('old_sound_rabbit_mq.' . $key) as $baseAmqp) {
-                if ($baseAmqp instanceof DynamicConsumer) {
+                if (
+                    $baseAmqp instanceof DynamicConsumer
+                    || ($skipAnonConsumers && $baseAmqp instanceof AnonConsumer)
+                ) {
                     continue;
                 }
                 $baseAmqp->setupFabric();
