@@ -13,6 +13,10 @@ jobs:
                 php-version: ['8.2', '8.3', '8.4', '8.5']
                 symfony-version: ['6.4', '7.4']
                 coverage: ['none']
+                include:
+                  - php-version: '8.3'
+                    symfony-version: '6.4'
+                    coverage: xdebug
 
         steps:
             - name: Checkout
