@@ -1,0 +1,81 @@
+parameters:
+  old_sound_rabbit_mq.connection.class: PhpAmqpLib\Connection\AMQPStreamConnection
+  old_sound_rabbit_mq.socket_connection.class: PhpAmqpLib\Connection\AMQPSocketConnection
+  old_sound_rabbit_mq.lazy.connection.class: PhpAmqpLib\Connection\AMQPLazyConnection
+  old_sound_rabbit_mq.lazy.socket_connection.class: PhpAmqpLib\Connection\AMQPLazySocketConnection
+  old_sound_rabbit_mq.connection_factory.class: OldSound\RabbitMqBundle\RabbitMq\AMQPConnectionFactory
+  old_sound_rabbit_mq.binding.class: OldSound\RabbitMqBundle\RabbitMq\Binding
+  old_sound_rabbit_mq.producer.class: OldSound\RabbitMqBundle\RabbitMq\Producer
+  old_sound_rabbit_mq.consumer.class: OldSound\RabbitMqBundle\RabbitMq\Consumer
+  old_sound_rabbit_mq.multi_consumer.class: OldSound\RabbitMqBundle\RabbitMq\MultipleConsumer
+  old_sound_rabbit_mq.dynamic_consumer.class: OldSound\RabbitMqBundle\RabbitMq\DynamicConsumer
+  old_sound_rabbit_mq.batch_consumer.class: OldSound\RabbitMqBundle\RabbitMq\BatchConsumer
+  old_sound_rabbit_mq.anon_consumer.class: OldSound\RabbitMqBundle\RabbitMq\AnonConsumer
+  old_sound_rabbit_mq.rpc_client.class: OldSound\RabbitMqBundle\RabbitMq\RpcClient
+  old_sound_rabbit_mq.rpc_server.class: OldSound\RabbitMqBundle\RabbitMq\RpcServer
+  old_sound_rabbit_mq.logged.channel.class: OldSound\RabbitMqBundle\RabbitMq\AMQPLoggedChannel
+  old_sound_rabbit_mq.data_collector.class: OldSound\RabbitMqBundle\DataCollector\MessageDataCollector
+  old_sound_rabbit_mq.parts_holder.class: OldSound\RabbitMqBundle\RabbitMq\AmqpPartsHolder
+  old_sound_rabbit_mq.fallback.class: OldSound\RabbitMqBundle\RabbitMq\Fallback
+
+services:
+  old_sound_rabbit_mq.data_collector:
+    class: '%old_sound_rabbit_mq.data_collector.class%'
+    arguments:
+      - []
+    tags:
+      - { name: 'data_collector', template: '@OldSoundRabbitMq/Collector/collector.html.twig', id: 'rabbit_mq' }
+
+  old_sound_rabbit_mq.parts_holder:
+    class: '%old_sound_rabbit_mq.parts_holder.class%'
+    public: true
+
+  old_sound_rabbit_mq.anon_consumer_command:
+    class: OldSound\RabbitMqBundle\Command\AnonConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:anon-consumer' }
+
+  old_sound_rabbit_mq.batch_consumer_command:
+    class: OldSound\RabbitMqBundle\Command\BatchConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:batch:consumer' }
+
+  old_sound_rabbit_mq.consumer_command:
+    class: OldSound\RabbitMqBundle\Command\ConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:consumer' }
+
+  old_sound_rabbit_mq.delete_command:
+    class: OldSound\RabbitMqBundle\Command\DeleteCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:delete' }
+
+  old_sound_rabbit_mq.dynamic_consumer_command:
+    class: OldSound\RabbitMqBundle\Command\DynamicConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:dynamic-consumer' }
+
+  old_sound_rabbit_mq.multiple_consumer_command:
+    class: OldSound\RabbitMqBundle\Command\MultipleConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:multiple-consumer' }
+
+  old_sound_rabbit_mq.purge_consumer_command:
+    class: OldSound\RabbitMqBundle\Command\PurgeConsumerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:purge' }
+
+  old_sound_rabbit_mq.command.rpc_server_command:
+    class: OldSound\RabbitMqBundle\Command\RpcServerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:rpc-server' }
+
+  old_sound_rabbit_mq.command.setup_fabric_command:
+    class: OldSound\RabbitMqBundle\Command\SetupFabricCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:setup-fabric' }
+
+  old_sound_rabbit_mq.command.std_in_producer_command:
+    class: OldSound\RabbitMqBundle\Command\StdInProducerCommand
+    tags:
+      - { name: 'console.command', command: 'rabbitmq:stdin-producer' }
