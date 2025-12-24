@@ -26,4 +26,8 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <php>
+        <server name="KERNEL_CLASS" value="\OldSound\RabbitMqBundle\Tests\TestKernel"/>
+    </php>
 </phpunit>
