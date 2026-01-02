@@ -21,7 +21,7 @@ class MessageDataCollector extends DataCollector
         $this->data = [];
     }
 
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         foreach ($this->channels as $channel) {
             foreach ($channel->getBasicPublishLog() as $log) {
@@ -30,22 +30,22 @@ class MessageDataCollector extends DataCollector
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'rabbit_mq';
     }
 
-    public function getPublishedMessagesCount()
+    public function getPublishedMessagesCount(): int
     {
         return count($this->data);
     }
 
-    public function getPublishedMessagesLog()
+    public function getPublishedMessagesLog(): array
     {
         return $this->data;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }
