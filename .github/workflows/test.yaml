@@ -10,13 +10,26 @@ jobs:
 
         strategy:
             matrix:
-                php-version: ['8.2', '8.3', '8.4', '8.5']
-                symfony-version: ['6.4', '7.4', '8.0']
-                coverage: ['none']
-                include:
-                  - php-version: '8.3'
-                    symfony-version: '6.4'
-                    coverage: xdebug
+              include:
+                - php-version: '8.2'
+                  symfony-version: '6.4'
+                  coverage: none
+
+                - php-version: '8.3'
+                  symfony-version: '7.4'
+                  coverage: none
+
+                - php-version: '8.4'
+                  symfony-version: '8.0'
+                  coverage: none
+
+                - php-version: '8.4'
+                  symfony-version: '7.4'
+                  coverage: none
+
+                - php-version: '8.3'
+                  symfony-version: '6.4'
+                  coverage: xdebug
 
         steps:
             - name: Checkout
@@ -34,7 +47,7 @@ jobs:
               run: composer validate --no-check-lock
 
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@v1
+              uses: ramsey/composer-install@v2
               with:
                   composer-options: "--prefer-dist"
               env:
