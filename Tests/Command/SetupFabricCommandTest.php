@@ -54,7 +54,12 @@ class SetupFabricCommandTest extends KernelTestCase
         $command->setContainer($container);
 
         // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
-        $application->add($command);
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            // @phpstan-ignore-next-line
+            $application->add($command);
+        }
 
         $registeredCommand = $application->find('rabbitmq:setup-fabric');
 
@@ -102,7 +107,12 @@ class SetupFabricCommandTest extends KernelTestCase
         $command->setContainer($container);
 
         // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
-        $application->add($command);
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            // @phpstan-ignore-next-line
+            $application->add($command);
+        }
 
         $registeredCommand = $application->find('rabbitmq:setup-fabric');
 

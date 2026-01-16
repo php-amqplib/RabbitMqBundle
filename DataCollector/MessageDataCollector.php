@@ -15,38 +15,41 @@ class MessageDataCollector extends DataCollector
 {
     private $channels;
 
+    /** @var array */
+    private $messages;
+
     public function __construct($channels)
     {
         $this->channels = $channels;
-        $this->data = [];
+        $this->messages = [];
     }
 
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         foreach ($this->channels as $channel) {
             foreach ($channel->getBasicPublishLog() as $log) {
-                $this->data[] = $log;
+                $this->messages[] = $log;
             }
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'rabbit_mq';
     }
 
-    public function getPublishedMessagesCount()
+    public function getPublishedMessagesCount(): int
     {
-        return count($this->data);
+        return count($this->messages);
     }
 
-    public function getPublishedMessagesLog()
+    public function getPublishedMessagesLog(): array
     {
-        return $this->data;
+        return $this->messages;
     }
 
-    public function reset()
+    public function reset(): void
     {
-        $this->data = [];
+        $this->messages = [];
     }
 }

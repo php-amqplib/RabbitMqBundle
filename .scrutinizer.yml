@@ -1,7 +1,12 @@
 build:
+    environment:
+        php:
+            version: 8.2
     dependencies:
         before:
             - composer config minimum-stability RC
+        override:
+            - composer install --prefer-dist --no-interaction
     nodes:
         analysis:
             tests:
