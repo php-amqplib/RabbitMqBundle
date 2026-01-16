@@ -54,7 +54,6 @@ class SetupFabricCommandTest extends KernelTestCase
         $command->setContainer($container);
 
         // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
-        // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
         if (method_exists($application, 'addCommand')) {
             $application->addCommand($command);
         } else {
@@ -107,7 +106,6 @@ class SetupFabricCommandTest extends KernelTestCase
 
         $command->setContainer($container);
 
-        // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
         // TODO: Use addCommand() once Symfony Support for < 7.4 is dropped
         if (method_exists($application, 'addCommand')) {
             $application->addCommand($command);
