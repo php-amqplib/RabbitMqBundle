@@ -666,6 +666,25 @@ class OldSoundRabbitMqExtension extends Extension
             if (array_key_exists('serializer', $server)) {
                 $definition->addMethodCall('setSerializer', [$server['serializer']]);
             }
+            if (isset($server['idle_timeout'])) {
+                $definition->addMethodCall('setIdleTimeout', [$server['idle_timeout']]);
+            }
+            if (isset($server['idle_timeout_exit_code'])) {
+                $definition->addMethodCall('setIdleTimeoutExitCode', [$server['idle_timeout_exit_code']]);
+            }
+            if (isset($server['timeout_wait'])) {
+                $definition->addMethodCall('setTimeoutWait', [$server['timeout_wait']]);
+            }
+            if (isset($server['graceful_max_execution'])) {
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionDateTimeFromSecondsInTheFuture',
+                    [$server['graceful_max_execution']['timeout']]
+                );
+                $definition->addMethodCall(
+                    'setGracefulMaxExecutionTimeoutExitCode',
+                    [$server['graceful_max_execution']['exit_code']]
+                );
+            }
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
         }
     }

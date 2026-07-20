@@ -247,6 +247,15 @@ old_sound_rabbit_mq:
             exchange_options:
                 name: exchange
                 type: topic
+
+        server_with_timeouts:
+            callback:        server_with_timeouts.callback
+            idle_timeout:    60
+            idle_timeout_exit_code: 2
+            timeout_wait:    10
+            graceful_max_execution:
+                timeout: 1800
+                exit_code: 10
 services:
     foo.callback:
     default.callback:
@@ -263,3 +272,4 @@ services:
     default_server.callback:
     server_with_queue_options.callback:
     server_with_exchange_options.callback:
+    server_with_timeouts.callback:

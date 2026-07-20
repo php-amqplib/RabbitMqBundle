@@ -2,7 +2,7 @@
 
 namespace OldSound\RabbitMqBundle\Event;
 
-use OldSound\RabbitMqBundle\RabbitMq\Consumer;
+use OldSound\RabbitMqBundle\RabbitMq\BaseConsumer;
 
 /**
  * Class OnIdleEvent
@@ -21,9 +21,9 @@ class OnIdleEvent extends AMQPEvent
     /**
      * OnConsumeEvent constructor.
      *
-     * @param Consumer $consumer
+     * @param BaseConsumer $consumer
      */
-    public function __construct(Consumer $consumer)
+    public function __construct(BaseConsumer $consumer)
     {
         $this->setConsumer($consumer);
 

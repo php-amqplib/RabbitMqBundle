@@ -109,6 +109,54 @@ test('consume dispatches consume event and stops when not consuming', function (
     'with no messages' => [['messages' => []]],
 ]);
 
+test('process message stops consuming when memory limit is almost reached', function (string $consumerClass) {
+    $amqpConnection = $this->getMockBuilder(AMQPStreamConnection::class)->disableOriginalConstructor()->getMock();
+    $amqpChannel    = $this->getMockBuilder(AMQPChannel::class)->disableOriginalConstructor()->getMock();
+
+    $consumer = $this->getMockBuilder($consumerClass)
+        ->setConstructorArgs([$amqpConnection, $amqpChannel])
+        ->onlyMethods(['isRamAlmostOverloaded', 'stopConsuming'])
+        ->getMock();
+
+    $consumer->setCallback(static fn () => true);
+    $consumer->setMemoryLimit(128);
+
+    $consumer->expects($this->once())->method('isRamAlmostOverloaded')->willReturn(true);
+    $consumer->expects($this->once())->method('stopConsuming');
+
+    $amqpMessage = new AMQPMessage('foo body');
+    $amqpMessage->setChannel($amqpChannel);
+    $amqpMessage->setDeliveryTag(0);
+
+    $consumer->processMessage($amqpMessage);
+})->with('consumer_classes');
+
+test('consume exits without waiting when memory limit is already exceeded', function (string $consumerClass) {
+    $amqpConnection = $this->getMockBuilder(AMQPStreamConnection::class)->disableOriginalConstructor()->getMock();
+    $amqpChannel    = $this->getMockBuilder(AMQPChannel::class)->disableOriginalConstructor()->getMock();
+
+    $amqpChannel->method('getChannelId')->willReturn(true);
+    $amqpChannel->expects($this->once())->method('basic_consume')->withAnyParameters()->willReturn(true);
+    $amqpChannel->expects(self::exactly(2))
+        ->method('is_consuming')
+        ->willReturnOnConsecutiveCalls(true, false);
+    $amqpChannel->expects($this->once())->method('basic_cancel');
+    // The consumer is already cancelled, so wait() would block indefinitely.
+    $amqpChannel->expects($this->never())->method('wait');
+
+    $consumer = $this->getMockBuilder($consumerClass)
+        ->setConstructorArgs([$amqpConnection, $amqpChannel])
+        ->onlyMethods(['isRamAlmostOverloaded'])
+        ->getMock();
+    $consumer->method('isRamAlmostOverloaded')->willReturn(true);
+
+    $consumer->disableAutoSetupFabric();
+    $consumer->setChannel($amqpChannel);
+    $consumer->setMemoryLimit(1);
+
+    expect($consumer->consume(1))->toBe(0);
+})->with('consumer_classes');
+
 test('idle timeout returns configured exit code', function (string $consumerClass) {
     $amqpConnection = $this->getMockBuilder(AMQPStreamConnection::class)->disableOriginalConstructor()->getMock();
     $amqpChannel    = $this->getMockBuilder(AMQPChannel::class)->disableOriginalConstructor()->getMock();

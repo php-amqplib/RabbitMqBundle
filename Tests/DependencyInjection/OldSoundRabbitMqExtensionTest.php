@@ -483,6 +483,26 @@ test('rpc server with queue options definition', function () {
     expect($definition->getClass())->toBe('%old_sound_rabbit_mq.rpc_server.class%');
 });
 
+test('rpc server with timeouts definition', function () {
+    $container  = buildContainer('test.yml');
+    $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_timeouts_server');
+
+    expect($container->has('old_sound_rabbit_mq.server_with_timeouts_server'))->toBeTrue();
+    expect((string) $definition->getArgument(0))->toBe('old_sound_rabbit_mq.connection.default');
+    expect((string) $definition->getArgument(1))->toBe('old_sound_rabbit_mq.channel.server_with_timeouts');
+    expect($definition->getMethodCalls())->toEqual([
+        ['initServer', ['server_with_timeouts']],
+        ['setCallback', [[new Reference('server_with_timeouts.callback'), 'execute']]],
+        ['setSerializer', ['serialize']],
+        ['setIdleTimeout', [60]],
+        ['setIdleTimeoutExitCode', [2]],
+        ['setTimeoutWait', [10]],
+        ['setGracefulMaxExecutionDateTimeFromSecondsInTheFuture', [1800]],
+        ['setGracefulMaxExecutionTimeoutExitCode', [10]],
+    ]);
+    expect($definition->getClass())->toBe('%old_sound_rabbit_mq.rpc_server.class%');
+});
+
 test('rpc server with exchange options definition', function () {
     $container  = buildContainer('test.yml');
     $definition = $container->getDefinition('old_sound_rabbit_mq.server_with_exchange_options_server');

@@ -2,12 +2,9 @@
 
 namespace OldSound\RabbitMqBundle\Command;
 
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
-class RpcServerCommand extends BaseRabbitMqCommand
+class RpcServerCommand extends BaseConsumerCommand
 {
     protected function configure(): void
     {
@@ -16,35 +13,17 @@ class RpcServerCommand extends BaseRabbitMqCommand
         $this
             ->setName('rabbitmq:rpc-server')
             ->setDescription('Start an RPC server')
-            ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
-            ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', '0')
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)
         ;
+
+        // Restore an RPC-specific description for the "name" argument, inherited
+        // from BaseConsumerCommand as "Consumer Name".
+        $this->getDefinition()->setArguments([
+            new InputArgument('name', InputArgument::REQUIRED, 'Server Name'),
+        ]);
     }
 
-    /**
-     * Executes the current command.
-     *
-     * @param InputInterface  $input  An InputInterface instance
-     * @param OutputInterface $output An OutputInterface instance
-     *
-     * @return integer 0 if everything went fine, or an error code
-     *
-     * @throws \InvalidArgumentException When the number of messages to consume is less than 0
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function getConsumerService()
     {
-        define('AMQP_DEBUG', (bool) $input->getOption('debug'));
-        $amount = (int)$input->getOption('messages');
-
-        if (0 > $amount) {
-            throw new \InvalidArgumentException("The -m option should be null or greater than 0");
-        }
-
-        $this->getContainer()
-               ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
-               ->start($amount);
-
-        return 0;
+        return 'old_sound_rabbit_mq.%s_server';
     }
 }
