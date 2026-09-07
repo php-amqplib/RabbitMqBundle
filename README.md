@@ -142,6 +142,8 @@ old_sound_rabbit_mq:
             default_routing_key:   'optional.routing.key' # defaults to '' if not set
             default_content_type:  'content/type' # defaults to 'text/plain'
             default_delivery_mode: 2 # optional. 1 means non-persistent, 2 means persistent. Defaults to "2".
+            confirm_select:        false # optional. Enable AMQP publisher confirms. Defaults to "false".
+            confirm_timeout:       10.0 # optional. Seconds to wait for a confirmation. 0 waits indefinitely. Defaults to "10.0".
     consumers:
         upload_picture:
             connection:       default
@@ -315,6 +317,33 @@ If you need to use a custom class for a producer (which should inherit from `Old
 
 
 The next piece of the puzzle is to have a consumer that will take the message out of the queue and process it accordingly.
+
+#### Publisher Confirms ####
+
+By default `publish()` is fire-and-forget: it returns as soon as the message has been written to the socket, whether or not the broker accepted it. Enable [publisher confirms](https://www.rabbitmq.com/docs/confirms#publisher-confirms) to make the producer wait for the broker to take responsibility for the message:
+
+```yaml
+    producers:
+        upload_picture:
+            connection:       default
+            exchange_options: {name: 'upload-picture', type: direct}
+            confirm_select:   true
+            confirm_timeout:  10.0
+```
+
+With `confirm_select: true`, `publish()` blocks until the broker confirms the message and returns whether it was accepted:
+
+```php
+if (!$this->uploadPictureProducer->publish(serialize($msg))) {
+    // the broker sent basic.nack for this message - it was not accepted
+}
+```
+
+`publish()` returns `false` only for an explicit `basic.nack`. If no confirmation arrives within `confirm_timeout` seconds a `PhpAmqpLib\Exception\AMQPTimeoutException` is thrown - a broker that stops confirming is an infrastructure failure, not a per-message rejection. Set `confirm_timeout: 0` to wait indefinitely.
+
+With `confirm_select: false` (the default) nothing changes and `publish()` always returns `true`.
+
+Confirms cost a round trip per message. For high-throughput producers where per-message certainty is not required, leave them off.
 
 #### Producer Events ####
 
