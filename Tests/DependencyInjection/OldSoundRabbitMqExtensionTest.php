@@ -254,6 +254,24 @@ test('default producer definition', function () {
     expect($definition->getClass())->toBe('%old_sound_rabbit_mq.producer.class%');
 });
 
+test('producer with publisher confirms enabled', function () {
+    $container  = buildContainer('test.yml');
+    $definition = $container->getDefinition('old_sound_rabbit_mq.confirm_producer_producer');
+
+    expect($definition->getMethodCalls())->toContain(['setConfirmSelect', [true]]);
+    expect($definition->getMethodCalls())->toContain(['setConfirmationTimeout', [2.0]]);
+});
+
+test('producers without publisher confirms get no confirm method calls', function () {
+    $container  = buildContainer('test.yml');
+    $definition = $container->getDefinition('old_sound_rabbit_mq.default_producer_producer');
+
+    $called = array_column($definition->getMethodCalls(), 0);
+
+    expect($called)->not->toContain('setConfirmSelect');
+    expect($called)->not->toContain('setConfirmationTimeout');
+});
+
 test('foo consumer definition', function () {
     $container  = buildContainer('test.yml');
     $definition = $container->getDefinition('old_sound_rabbit_mq.foo_consumer_consumer');

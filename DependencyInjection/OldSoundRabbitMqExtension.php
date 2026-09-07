@@ -193,6 +193,11 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addMethodCall('setDefaultRoutingKey', [$producer['default_routing_key']]);
                 $definition->addMethodCall('setContentType', [$producer['default_content_type']]);
                 $definition->addMethodCall('setDeliveryMode', [$producer['default_delivery_mode']]);
+
+                if ($producer['confirm_select']) {
+                    $definition->addMethodCall('setConfirmSelect', [true]);
+                    $definition->addMethodCall('setConfirmationTimeout', [(float) $producer['confirm_timeout']]);
+                }
             }
         } else {
             foreach ($this->config['producers'] as $key => $producer) {
